@@ -14,7 +14,255 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      adhd_patterns: {
+        Row: {
+          created_at: string
+          id: string
+          response: string | null
+          trigger: string
+          user_id: string
+          what_worked: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          response?: string | null
+          trigger: string
+          user_id: string
+          what_worked?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          response?: string | null
+          trigger?: string
+          user_id?: string
+          what_worked?: string | null
+        }
+        Relationships: []
+      }
+      courtroom_entries: {
+        Row: {
+          alternatives: string | null
+          assumptions: string | null
+          created_at: string
+          evidence: string | null
+          facts: string | null
+          id: string
+          situation: string
+          user_id: string
+          verdict: string | null
+        }
+        Insert: {
+          alternatives?: string | null
+          assumptions?: string | null
+          created_at?: string
+          evidence?: string | null
+          facts?: string | null
+          id?: string
+          situation: string
+          user_id: string
+          verdict?: string | null
+        }
+        Update: {
+          alternatives?: string | null
+          assumptions?: string | null
+          created_at?: string
+          evidence?: string | null
+          facts?: string | null
+          id?: string
+          situation?: string
+          user_id?: string
+          verdict?: string | null
+        }
+        Relationships: []
+      }
+      goals: {
+        Row: {
+          created_at: string
+          description: string | null
+          future_self: string
+          id: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          future_self: string
+          id?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          future_self?: string
+          id?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      knowledge_entries: {
+        Row: {
+          body: string
+          category: string
+          created_at: string
+          id: string
+          tags: string[] | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          category: string
+          created_at?: string
+          id?: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          category?: string
+          created_at?: string
+          id?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      mentor_lessons: {
+        Row: {
+          created_at: string
+          id: string
+          lesson: string
+          mentor_name: string
+          role: string | null
+          source: string | null
+          tags: string[] | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson: string
+          mentor_name: string
+          role?: string | null
+          source?: string | null
+          tags?: string[] | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson?: string
+          mentor_name?: string
+          role?: string | null
+          source?: string | null
+          tags?: string[] | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notes: {
+        Row: {
+          category: string | null
+          created_at: string
+          done: boolean
+          id: string
+          priority: string | null
+          text: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          done?: boolean
+          id?: string
+          priority?: string | null
+          text: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          done?: boolean
+          id?: string
+          priority?: string | null
+          text?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          created_at: string
+          future_self: string | null
+          id: string
+          lane: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+          why: string | null
+        }
+        Insert: {
+          created_at?: string
+          future_self?: string | null
+          id?: string
+          lane?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+          why?: string | null
+        }
+        Update: {
+          created_at?: string
+          future_self?: string | null
+          id?: string
+          lane?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+          why?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
