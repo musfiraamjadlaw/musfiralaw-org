@@ -9,38 +9,173 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedVaultRouteImport } from './routes/_authenticated/vault'
+import { Route as AuthenticatedUntangleRouteImport } from './routes/_authenticated/untangle'
+import { Route as AuthenticatedStartRouteImport } from './routes/_authenticated/start'
+import { Route as AuthenticatedMentorsRouteImport } from './routes/_authenticated/mentors'
+import { Route as AuthenticatedMeaningRouteImport } from './routes/_authenticated/meaning'
+import { Route as AuthenticatedDumpRouteImport } from './routes/_authenticated/dump'
+import { Route as AuthenticatedCourtroomRouteImport } from './routes/_authenticated/courtroom'
+import { Route as AuthenticatedClockRouteImport } from './routes/_authenticated/clock'
 
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedVaultRoute = AuthenticatedVaultRouteImport.update({
+  id: '/vault',
+  path: '/vault',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedUntangleRoute = AuthenticatedUntangleRouteImport.update({
+  id: '/untangle',
+  path: '/untangle',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedStartRoute = AuthenticatedStartRouteImport.update({
+  id: '/start',
+  path: '/start',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMentorsRoute = AuthenticatedMentorsRouteImport.update({
+  id: '/mentors',
+  path: '/mentors',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMeaningRoute = AuthenticatedMeaningRouteImport.update({
+  id: '/meaning',
+  path: '/meaning',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedDumpRoute = AuthenticatedDumpRouteImport.update({
+  id: '/dump',
+  path: '/dump',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCourtroomRoute = AuthenticatedCourtroomRouteImport.update({
+  id: '/courtroom',
+  path: '/courtroom',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedClockRoute = AuthenticatedClockRouteImport.update({
+  id: '/clock',
+  path: '/clock',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/clock': typeof AuthenticatedClockRoute
+  '/courtroom': typeof AuthenticatedCourtroomRoute
+  '/dump': typeof AuthenticatedDumpRoute
+  '/meaning': typeof AuthenticatedMeaningRoute
+  '/mentors': typeof AuthenticatedMentorsRoute
+  '/start': typeof AuthenticatedStartRoute
+  '/untangle': typeof AuthenticatedUntangleRoute
+  '/vault': typeof AuthenticatedVaultRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/clock': typeof AuthenticatedClockRoute
+  '/courtroom': typeof AuthenticatedCourtroomRoute
+  '/dump': typeof AuthenticatedDumpRoute
+  '/meaning': typeof AuthenticatedMeaningRoute
+  '/mentors': typeof AuthenticatedMentorsRoute
+  '/start': typeof AuthenticatedStartRoute
+  '/untangle': typeof AuthenticatedUntangleRoute
+  '/vault': typeof AuthenticatedVaultRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_authenticated/clock': typeof AuthenticatedClockRoute
+  '/_authenticated/courtroom': typeof AuthenticatedCourtroomRoute
+  '/_authenticated/dump': typeof AuthenticatedDumpRoute
+  '/_authenticated/meaning': typeof AuthenticatedMeaningRoute
+  '/_authenticated/mentors': typeof AuthenticatedMentorsRoute
+  '/_authenticated/start': typeof AuthenticatedStartRoute
+  '/_authenticated/untangle': typeof AuthenticatedUntangleRoute
+  '/_authenticated/vault': typeof AuthenticatedVaultRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/clock'
+    | '/courtroom'
+    | '/dump'
+    | '/meaning'
+    | '/mentors'
+    | '/start'
+    | '/untangle'
+    | '/vault'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/clock'
+    | '/courtroom'
+    | '/dump'
+    | '/meaning'
+    | '/mentors'
+    | '/start'
+    | '/untangle'
+    | '/vault'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/_authenticated/clock'
+    | '/_authenticated/courtroom'
+    | '/_authenticated/dump'
+    | '/_authenticated/meaning'
+    | '/_authenticated/mentors'
+    | '/_authenticated/start'
+    | '/_authenticated/untangle'
+    | '/_authenticated/vault'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  LoginRoute: typeof LoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,12 +183,106 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/vault': {
+      id: '/_authenticated/vault'
+      path: '/vault'
+      fullPath: '/vault'
+      preLoaderRoute: typeof AuthenticatedVaultRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/untangle': {
+      id: '/_authenticated/untangle'
+      path: '/untangle'
+      fullPath: '/untangle'
+      preLoaderRoute: typeof AuthenticatedUntangleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/start': {
+      id: '/_authenticated/start'
+      path: '/start'
+      fullPath: '/start'
+      preLoaderRoute: typeof AuthenticatedStartRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/mentors': {
+      id: '/_authenticated/mentors'
+      path: '/mentors'
+      fullPath: '/mentors'
+      preLoaderRoute: typeof AuthenticatedMentorsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/meaning': {
+      id: '/_authenticated/meaning'
+      path: '/meaning'
+      fullPath: '/meaning'
+      preLoaderRoute: typeof AuthenticatedMeaningRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dump': {
+      id: '/_authenticated/dump'
+      path: '/dump'
+      fullPath: '/dump'
+      preLoaderRoute: typeof AuthenticatedDumpRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/courtroom': {
+      id: '/_authenticated/courtroom'
+      path: '/courtroom'
+      fullPath: '/courtroom'
+      preLoaderRoute: typeof AuthenticatedCourtroomRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/clock': {
+      id: '/_authenticated/clock'
+      path: '/clock'
+      fullPath: '/clock'
+      preLoaderRoute: typeof AuthenticatedClockRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedClockRoute: typeof AuthenticatedClockRoute
+  AuthenticatedCourtroomRoute: typeof AuthenticatedCourtroomRoute
+  AuthenticatedDumpRoute: typeof AuthenticatedDumpRoute
+  AuthenticatedMeaningRoute: typeof AuthenticatedMeaningRoute
+  AuthenticatedMentorsRoute: typeof AuthenticatedMentorsRoute
+  AuthenticatedStartRoute: typeof AuthenticatedStartRoute
+  AuthenticatedUntangleRoute: typeof AuthenticatedUntangleRoute
+  AuthenticatedVaultRoute: typeof AuthenticatedVaultRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedClockRoute: AuthenticatedClockRoute,
+  AuthenticatedCourtroomRoute: AuthenticatedCourtroomRoute,
+  AuthenticatedDumpRoute: AuthenticatedDumpRoute,
+  AuthenticatedMeaningRoute: AuthenticatedMeaningRoute,
+  AuthenticatedMentorsRoute: AuthenticatedMentorsRoute,
+  AuthenticatedStartRoute: AuthenticatedStartRoute,
+  AuthenticatedUntangleRoute: AuthenticatedUntangleRoute,
+  AuthenticatedVaultRoute: AuthenticatedVaultRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
