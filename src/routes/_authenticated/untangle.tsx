@@ -110,9 +110,9 @@ function DiagnosePage() {
           <p className="text-center text-[10px] tracking-[4px] uppercase text-muted-foreground mb-8">
             Untangle
           </p>
-          <h2 className="font-display text-5xl md:text-6xl text-foreground text-center leading-[1.05] tracking-tight">
+          <h1 className="font-display text-5xl md:text-6xl text-foreground text-center leading-[1.05] tracking-tight">
             What are you noticing?
-          </h2>
+          </h1>
           <p className="mt-6 text-center text-muted-foreground font-serif italic text-lg">
             An observation, not a task.
           </p>
