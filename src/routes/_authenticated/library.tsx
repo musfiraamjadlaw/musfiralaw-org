@@ -358,6 +358,49 @@ function LibraryPage() {
                     </p>
                   )}
 
+                  {a.core_argument && (
+                    <div className="mt-4 border-l-2 border-foreground/40 pl-3">
+                      <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-1">
+                        Core argument
+                      </p>
+                      <p className="font-serif text-foreground leading-snug">
+                        {a.core_argument}
+                      </p>
+                    </div>
+                  )}
+
+                  {(a.tensions?.length ?? 0) > 0 && (
+                    <CorpusRow label="Tensions explored">
+                      {a.tensions.map((t: string) => (
+                        <Chip key={t}>{t}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+
+                  {(a.recurring_concepts?.length ?? 0) > 0 && (
+                    <CorpusRow label="Recurring concepts">
+                      {a.recurring_concepts.map((c: string) => (
+                        <Chip key={c}>{c}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+
+                  {(a.open_loops?.length ?? 0) > 0 && (
+                    <CorpusRow label="Left unresolved">
+                      <ul className="space-y-1.5">
+                        {a.open_loops.map((q: string, i: number) => (
+                          <li
+                            key={i}
+                            className="font-serif italic text-foreground/85 leading-snug"
+                          >
+                            {q}
+                          </li>
+                        ))}
+                      </ul>
+                    </CorpusRow>
+                  )}
+
+
                   {(a.themes?.length ?? 0) > 0 && (
                     <CorpusRow label="Themes">
                       {a.themes.map((t: string) => (
