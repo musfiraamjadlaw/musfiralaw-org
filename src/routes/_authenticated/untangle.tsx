@@ -51,6 +51,9 @@ function DiagnosePage() {
           <p className="mt-3 text-center text-muted-foreground font-serif italic">
             Or — what isn't making sense?
           </p>
+          <p className="mt-4 text-center font-serif text-foreground/90 tracking-wide">
+            Find the pattern. Take the next step. Make it happen.
+          </p>
           <p className="mt-6 text-center text-xs tracking-[2px] uppercase text-muted-foreground">
             Notice · Analyze · Connect · Act
           </p>
