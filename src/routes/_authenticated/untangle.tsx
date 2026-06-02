@@ -159,13 +159,13 @@ function DiagnosePage() {
       )}
 
       {result && (
-        <article className="space-y-16 pt-4 pb-24">
+        <article className="space-y-20 pt-8 pb-32">
           {/* 1. Observation */}
           <Step number="01" label="Observation">
-            <blockquote className="pl-5 border-l-2 border-foreground font-serif italic text-2xl text-foreground leading-relaxed">
+            <blockquote className="pl-6 border-l border-foreground font-serif italic text-2xl text-foreground leading-relaxed">
               {submittedInput}
             </blockquote>
-            <p className="mt-4 font-serif text-muted-foreground">
+            <p className="mt-5 font-serif text-muted-foreground leading-relaxed">
               {result.observation_echo}
             </p>
           </Step>
@@ -173,17 +173,17 @@ function DiagnosePage() {
           {/* 1b. What recurs — only when the model surfaced real patterns */}
           {result.pattern_notes && result.pattern_notes.length > 0 && (
             <Step number="·" label="What recurs">
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {result.pattern_notes.map((n, i) => (
                   <li
                     key={i}
-                    className="font-serif italic text-lg text-foreground/85 leading-relaxed border-l-2 border-border pl-4"
+                    className="font-serif italic text-lg text-foreground/85 leading-relaxed pl-5 border-l border-border"
                   >
                     {n}
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 font-sans text-[10px] tracking-[3px] uppercase text-muted-foreground">
+              <p className="mt-5 font-sans text-[10px] tracking-[3px] uppercase text-muted-foreground">
                 Drawn from your prior cases, library, and writing — patterns, not voice.
               </p>
             </Step>
@@ -191,10 +191,10 @@ function DiagnosePage() {
 
           {/* 2. Core Question */}
           <Step number="02" label="The question underneath">
-            <p className="font-serif italic text-3xl text-foreground leading-snug">
+            <p className="font-display italic text-4xl md:text-[2.65rem] text-foreground leading-[1.15] tracking-tight">
               {result.core_question}
             </p>
-            <p className="mt-4 font-serif text-foreground/80 leading-relaxed">
+            <p className="mt-5 font-serif text-foreground/80 leading-relaxed">
               {result.question_context}
             </p>
           </Step>
