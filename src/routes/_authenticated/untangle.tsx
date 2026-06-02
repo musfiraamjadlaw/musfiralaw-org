@@ -7,6 +7,7 @@ import {
   type ActivationCondition,
   type Intervention,
 } from "@/lib/diagnose.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/untangle")({
   head: () => ({
