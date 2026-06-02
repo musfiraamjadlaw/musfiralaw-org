@@ -27,6 +27,11 @@ THE ACTIVATION FRAMEWORK is your operating logic. When action is difficult, one 
 
 You do not present this as a scorecard. You interpret. The framework should feel like a lens, not a feature.
 
+PERSONALIZATION RULE — read carefully:
+You may be given a PATTERNS block summarizing the user's prior Untangle cases, recurring themes in their writing, and their library. Use it ONLY to recognize recurrences — repeated missing conditions, recurring questions, themes they return to. Reference them observationally, like a research assistant tracking a case ("Urgency has appeared as the missing condition in several prior analyses"; "This resembles questions you've explored in your writing about ambition and validation").
+
+DO NOT imitate the user's voice, tone, vocabulary, sentence rhythm, or style. DO NOT try to sound like them. DO NOT quote their writing back at them. You are personalizing through UNDERSTANDING, not through PERFORMANCE. Stay in your own register: clear, scientific, editorial.
+
 PRINCIPLES:
 - Prioritize the deeper QUESTION beneath the observation. The user's work is driven by recurring questions, not topics.
 - Translate research into clear, human language. Never clinical. Never textbook. Never therapy-speak.
@@ -119,6 +124,7 @@ export type DiagnoseResult = {
     label: string;
     reason: string;
   };
+  pattern_notes: string[];
 };
 
 export const diagnose = createServerFn({ method: "POST" })
@@ -129,11 +135,33 @@ export const diagnose = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<DiagnoseResult> => {
     const { supabase } = context;
 
-    const { data: articles } = await supabase
-      .from("articles")
-      .select("id, title, url, summary, themes, content_text")
-      .order("published_at", { ascending: false })
-      .limit(60);
+    const [
+      { data: articles },
+      { data: priorCases },
+      { data: themes },
+      { data: knowledge },
+    ] = await Promise.all([
+      supabase
+        .from("articles")
+        .select("id, title, url, summary, themes, content_text")
+        .order("published_at", { ascending: false })
+        .limit(60),
+      supabase
+        .from("untangle_analyses")
+        .select("input, core_question, missing_condition, created_at")
+        .order("created_at", { ascending: false })
+        .limit(40),
+      supabase
+        .from("writing_themes")
+        .select("name, frequency, description")
+        .order("frequency", { ascending: false })
+        .limit(20),
+      supabase
+        .from("knowledge_entries")
+        .select("title, category, tags")
+        .order("updated_at", { ascending: false })
+        .limit(40),
+    ]);
 
     const articleCorpus = (articles ?? [])
       .map(
@@ -144,6 +172,57 @@ export const diagnose = createServerFn({ method: "POST" })
       )
       .join("\n---\n");
 
+    // Pattern aggregation — counts, not quotes.
+    const missingTally: Record<string, number> = {};
+    for (const c of priorCases ?? []) {
+      if (c.missing_condition) {
+        missingTally[c.missing_condition] = (missingTally[c.missing_condition] ?? 0) + 1;
+      }
+    }
+    const totalPriorCases = (priorCases ?? []).length;
+    const missingSummary = Object.entries(missingTally)
+      .sort((a, b) => b[1] - a[1])
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(", ") || "(none yet)";
+
+    const recurringQuestions = (priorCases ?? [])
+      .map((c) => c.core_question)
+      .filter((q): q is string => !!q)
+      .slice(0, 12)
+      .map((q) => `- ${q}`)
+      .join("\n") || "(none yet)";
+
+    const recentObservations = (priorCases ?? [])
+      .slice(0, 8)
+      .map((c) => `- "${c.input.slice(0, 200)}"`)
+      .join("\n") || "(none yet)";
+
+    const writingThemes = (themes ?? [])
+      .map((t) => `- ${t.name} (×${t.frequency})${t.description ? ` — ${t.description}` : ""}`)
+      .join("\n") || "(none yet)";
+
+    const libraryIndex = (knowledge ?? [])
+      .map((k) => `- [${k.category}] ${k.title}${k.tags?.length ? ` · ${k.tags.join(", ")}` : ""}`)
+      .join("\n") || "(none yet)";
+
+    const patternsBlock = `PATTERNS — observational only. Use to recognize recurrences. NEVER imitate voice, tone, or vocabulary.
+
+Prior Untangle cases on file: ${totalPriorCases}
+Missing-condition tally across prior cases: ${missingSummary}
+
+Recurring questions the user has surfaced before:
+${recurringQuestions}
+
+Recent observations the user has brought in:
+${recentObservations}
+
+Themes the user returns to in their writing:
+${writingThemes}
+
+Library entries on file (titles only — for theme-matching, not quoting):
+${libraryIndex}
+`;
+
     const prompt = `THE USER WROTE:
 """
 ${data.input}
@@ -151,6 +230,9 @@ ${data.input}
 
 THE USER'S OWN WRITING (their Substack corpus — match by IDEA, not keyword; recommend at most ONE; pick null if nothing genuinely fits):
 ${articleCorpus || "(none)"}
+
+${patternsBlock}
+
 
 Build the intellectual chain. Return JSON with this exact shape:
 
@@ -205,7 +287,11 @@ Build the intellectual chain. Return JSON with this exact shape:
     "kind": "brain_dump | courtroom | clock | meaning | states | none",
     "label": "Plain-English label for the intervention.",
     "reason": "One sentence on why this tool fits the diagnosis."
-  }
+  },
+
+  "pattern_notes": [
+    "0 to 3 short observational notes (one sentence each) ONLY when the PATTERNS block shows a real recurrence relevant to this case. Examples of valid notes: 'Urgency has appeared as the missing condition in 4 prior analyses.' 'This resembles a question you have circled before: why does meaning fade when the work becomes legible?' 'Themes you return to in your writing — ambition, validation, legitimacy — sit underneath this observation.' Notes must be factual references to the PATTERNS data. Do NOT invent recurrences. Do NOT imitate the user's voice. If there is no meaningful recurrence, return an empty array."
+  ]
 }
 
 INTERVENTION ROUTING (pick the one that fits, or "none"):
@@ -219,6 +305,8 @@ INTERVENTION ROUTING (pick the one that fits, or "none"):
 RULES:
 - "article" is null if nothing in the corpus genuinely fits the IDEA (not the keywords).
 - Book and study must be real and accurately cited.
+- pattern_notes must be grounded in the PATTERNS block. Empty array is correct when there is no real recurrence.
+- Never imitate the user's writing voice or vocabulary. Stay in your own editorial register.
 - No emojis. No therapy register. No flattery.
 - Help the user move from description to explanation.`;
 
@@ -229,6 +317,11 @@ RULES:
       const validIds = new Set((articles ?? []).map((a) => a.id));
       if (!validIds.has(parsed.article.id)) parsed.article = null;
     }
+
+    if (!Array.isArray(parsed.pattern_notes)) parsed.pattern_notes = [];
+    parsed.pattern_notes = parsed.pattern_notes
+      .filter((n): n is string => typeof n === "string" && n.trim().length > 0)
+      .slice(0, 3);
 
     return parsed;
   });
