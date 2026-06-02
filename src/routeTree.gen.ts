@@ -21,6 +21,7 @@ import { Route as AuthenticatedEditorialRouteImport } from './routes/_authentica
 import { Route as AuthenticatedDumpRouteImport } from './routes/_authenticated/dump'
 import { Route as AuthenticatedCourtroomRouteImport } from './routes/_authenticated/courtroom'
 import { Route as AuthenticatedClockRouteImport } from './routes/_authenticated/clock'
+import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -81,10 +82,16 @@ const AuthenticatedClockRoute = AuthenticatedClockRouteImport.update({
   path: '/clock',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/about': typeof AuthenticatedAboutRoute
   '/clock': typeof AuthenticatedClockRoute
   '/courtroom': typeof AuthenticatedCourtroomRoute
   '/dump': typeof AuthenticatedDumpRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/about': typeof AuthenticatedAboutRoute
   '/clock': typeof AuthenticatedClockRoute
   '/courtroom': typeof AuthenticatedCourtroomRoute
   '/dump': typeof AuthenticatedDumpRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/about': typeof AuthenticatedAboutRoute
   '/_authenticated/clock': typeof AuthenticatedClockRoute
   '/_authenticated/courtroom': typeof AuthenticatedCourtroomRoute
   '/_authenticated/dump': typeof AuthenticatedDumpRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/about'
     | '/clock'
     | '/courtroom'
     | '/dump'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/about'
     | '/clock'
     | '/courtroom'
     | '/dump'
@@ -155,6 +166,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/about'
     | '/_authenticated/clock'
     | '/_authenticated/courtroom'
     | '/_authenticated/dump'
@@ -258,10 +270,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClockRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/about': {
+      id: '/_authenticated/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AuthenticatedAboutRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
   AuthenticatedClockRoute: typeof AuthenticatedClockRoute
   AuthenticatedCourtroomRoute: typeof AuthenticatedCourtroomRoute
   AuthenticatedDumpRoute: typeof AuthenticatedDumpRoute
@@ -274,6 +294,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAboutRoute: AuthenticatedAboutRoute,
   AuthenticatedClockRoute: AuthenticatedClockRoute,
   AuthenticatedCourtroomRoute: AuthenticatedCourtroomRoute,
   AuthenticatedDumpRoute: AuthenticatedDumpRoute,
@@ -297,3 +318,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
