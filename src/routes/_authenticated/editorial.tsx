@@ -15,6 +15,7 @@ import {
   setThreadStatus,
   syncSubstack,
 } from "@/lib/editorial.functions";
+import { sensemake, type SensemakeResult } from "@/lib/diagnose.functions";
 
 export const Route = createFileRoute("/_authenticated/editorial")({
   head: () => ({ meta: [{ title: "Editorial Intelligence — Untangle" }] }),
@@ -312,70 +313,9 @@ function EditorialPage() {
         )}
       </section>
 
-      {/* RECOMMENDATIONS */}
-      <section>
-        <div className="flex items-baseline justify-between">
-          <SectionTitle>Your Next Best Article</SectionTitle>
-          <button
-            onClick={() => mRecommend.mutate()}
-            disabled={mRecommend.isPending || !articles.data?.length}
-            className="px-4 py-2 text-[10px] tracking-[2px] uppercase border border-border disabled:opacity-50"
-          >
-            {mRecommend.isPending ? "Drafting..." : "Generate recommendations"}
-          </button>
-        </div>
-        {!recs.data?.length && <div className="text-sm text-muted-foreground italic mt-3">No open recommendations.</div>}
-        <div className="mt-4 space-y-4">
-          {(recs.data ?? []).map((r) => (
-            <div key={r.id} className="p-5 border border-border rounded bg-card">
-              <div className="flex items-baseline justify-between gap-3">
-                <h3 className="font-serif text-xl">{r.title}</h3>
-                {typeof r.score === "number" && (
-                  <span className="text-[10px] tracking-[2px] uppercase" style={{ color: "#C87D0E" }}>
-                    {Math.round(r.score)}/100
-                  </span>
-                )}
-              </div>
-              <p className="text-sm mt-3 text-foreground leading-relaxed">{r.rationale}</p>
-              {r.gap && (
-                <div className="mt-3 text-xs">
-                  <span className="text-[9px] tracking-[2px] uppercase text-muted-foreground mr-2">Gap</span>
-                  <span className="text-foreground">{r.gap}</span>
-                </div>
-              )}
-              {r.outline && (
-                <div className="mt-3">
-                  <div className="text-[9px] tracking-[2px] uppercase text-muted-foreground mb-1">Outline</div>
-                  <ul className="text-sm space-y-1">
-                    {r.outline.split("|").map((b: string, i: number) => <li key={i} className="text-foreground">— {b.trim()}</li>)}
-                  </ul>
-                </div>
-              )}
-              {r.connects_to?.length > 0 && (
-                <div className="mt-3 flex gap-1.5 flex-wrap">
-                  <span className="text-[9px] tracking-[2px] uppercase text-muted-foreground mr-1">Builds on</span>
-                  {r.connects_to.map((id: string) => {
-                    const a = articleById[id];
-                    return a ? (
-                      <span key={id} className="text-[10px] px-2 py-0.5 bg-muted rounded">{a.title}</span>
-                    ) : null;
-                  })}
-                </div>
-              )}
-              {r.themes?.length > 0 && (
-                <div className="mt-2 flex gap-1.5 flex-wrap">
-                  {r.themes.map((t: string) => <span key={t} className="text-[10px] px-2 py-0.5 border border-border rounded">#{t}</span>)}
-                </div>
-              )}
-              <div className="mt-4 flex gap-3 text-[10px] tracking-[2px] uppercase">
-                <button onClick={() => mRecStatus.mutate({ id: r.id, status: "drafted" })} className="text-muted-foreground hover:text-navy">Mark drafted</button>
-                <button onClick={() => mRecStatus.mutate({ id: r.id, status: "published" })} className="text-muted-foreground hover:text-navy">Published</button>
-                <button onClick={() => mRecStatus.mutate({ id: r.id, status: "dismissed" })} className="text-muted-foreground hover:text-destructive">Dismiss</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* SENSEMAKING CHAIN */}
+      <SensemakingChain />
+
 
       {/* UNFINISHED THREADS + IDEA DETECTOR */}
       <section>
