@@ -1,6 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import signatureAsset from "@/assets/signature.jpg.asset.json";
 
+const PHOTO_1 =
+  "https://substackcdn.com/image/fetch/$s_!Btg_!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F163f23ce-6e2e-4936-a181-71a6ab769b4e_885x787.jpeg";
+const PHOTO_2 =
+  "https://substackcdn.com/image/fetch/$s_!wqAU!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fe1072df6-26a6-46c3-b2dc-665ed1e91cb2_1080x720.jpeg";
+const PHOTO_3 =
+  "https://substackcdn.com/image/fetch/$s_!0x5q!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F6317c4e3-7564-4af3-855a-d89507c161fc_695x657.jpeg";
+const PHOTO_4 =
+  "https://substackcdn.com/image/fetch/$s_!wT0Q!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fdbd90b81-fd91-4282-89bd-ccd6da150946_736x736.jpeg";
+
+function Figure({ src, alt }: { src: string; alt: string }) {
+  return (
+    <figure className="my-8">
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className="w-full h-auto rounded-sm"
+      />
+    </figure>
+  );
+}
+
+
 export const Route = createFileRoute("/_authenticated/about")({
   component: AboutPage,
   head: () => ({
