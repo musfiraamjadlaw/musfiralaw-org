@@ -46,7 +46,7 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <h1 className="font-serif text-3xl text-navy">Untangle</h1>
+          <h1 className="font-serif text-3xl text-navy">Untangle by Musfira</h1>
           <p className="mt-3 font-serif italic text-sm text-muted-foreground">
             Find the pattern. Take the next step. Make it happen.
           </p>
