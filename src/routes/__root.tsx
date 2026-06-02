@@ -54,8 +54,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Notebook" },
-      { name: "description", content: "An executive function and decision-making tool — start tasks, untangle projects, separate facts from assumptions, and build a searchable second brain." },
+      { title: "Cognitive OS" },
+      { name: "description", content: "A cognitive operating system for managing attention, time, knowledge, and decisions." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
