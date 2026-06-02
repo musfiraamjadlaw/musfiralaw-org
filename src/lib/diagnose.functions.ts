@@ -287,7 +287,11 @@ Build the intellectual chain. Return JSON with this exact shape:
     "kind": "brain_dump | courtroom | clock | meaning | states | none",
     "label": "Plain-English label for the intervention.",
     "reason": "One sentence on why this tool fits the diagnosis."
-  }
+  },
+
+  "pattern_notes": [
+    "0 to 3 short observational notes (one sentence each) ONLY when the PATTERNS block shows a real recurrence relevant to this case. Examples of valid notes: 'Urgency has appeared as the missing condition in 4 prior analyses.' 'This resembles a question you have circled before: why does meaning fade when the work becomes legible?' 'Themes you return to in your writing — ambition, validation, legitimacy — sit underneath this observation.' Notes must be factual references to the PATTERNS data. Do NOT invent recurrences. Do NOT imitate the user's voice. If there is no meaningful recurrence, return an empty array."
+  ]
 }
 
 INTERVENTION ROUTING (pick the one that fits, or "none"):
@@ -301,6 +305,8 @@ INTERVENTION ROUTING (pick the one that fits, or "none"):
 RULES:
 - "article" is null if nothing in the corpus genuinely fits the IDEA (not the keywords).
 - Book and study must be real and accurately cited.
+- pattern_notes must be grounded in the PATTERNS block. Empty array is correct when there is no real recurrence.
+- Never imitate the user's writing voice or vocabulary. Stay in your own editorial register.
 - No emojis. No therapy register. No flattery.
 - Help the user move from description to explanation.`;
 
