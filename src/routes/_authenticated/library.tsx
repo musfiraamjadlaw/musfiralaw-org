@@ -3,7 +3,12 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
-import { analyzeWritingDNA, scanForThreads, syncSubstack } from "@/lib/editorial.functions";
+import {
+  analyzeWritingDNA,
+  scanForThreads,
+  syncSubstack,
+  extractArticleSignals,
+} from "@/lib/editorial.functions";
 
 export const Route = createFileRoute("/_authenticated/library")({
   head: () => ({
