@@ -1,0 +1,14 @@
+# Untangled
+
+> A place to investigate what isn't making sense — moving from observation to understanding rather than rushing to advice. Not a productivity app, second brain, or note-taking system.
+
+Untangled helps you find the question beneath the problem, the mechanism beneath the symptom, the pattern beneath the event, and the condition beneath the struggle. It is built around essays by Musfira Amjad on attention, action, and the difference between descriptions and explanations.
+
+## Pages
+
+- [Sign in](/login): Access Untangled.
+- [Colophon](/colophon): Why this exists — a note from the author.
+
+## Optional
+
+- [Substack — Musfira Amjad](https://musfiraamjadlaw.substack.com/): The published essays this application is built around.
