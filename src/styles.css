@@ -74,8 +74,24 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
-    font-family: var(--font-sans);
+    /* The application reads like a publication, not an interface. */
+    font-family: var(--font-serif);
+    font-feature-settings: "kern", "liga", "onum";
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
-  h1, h2, h3, h4 { font-family: var(--font-serif); letter-spacing: -0.01em; }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    letter-spacing: -0.012em;
+    color: var(--color-foreground);
+  }
+  /* Navigation, buttons, small UI chrome — quiet sans for the masthead. */
+  nav, button, label, input, select, textarea, .font-ui {
+    font-family: var(--font-sans);
+  }
+  /* Override: when a button or input is intentionally serif (editorial pull-quote
+     CTAs, essay-style inputs), opt in with .font-serif. */
+  .font-serif { font-family: var(--font-serif) !important; }
+  .font-display { font-family: var(--font-display) !important; }
 }
