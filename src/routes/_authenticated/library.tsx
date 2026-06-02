@@ -242,46 +242,199 @@ function LibraryPage() {
         </section>
       )}
 
-      {/* === Articles === */}
-      {tab === "articles" && (
+      {/* === Corpus === */}
+      {tab === "corpus" && (
         <section>
-          <div className="flex items-baseline justify-between mb-6">
-            <p className="font-serif italic text-muted-foreground">
-              {articles.data?.length ?? 0} pieces — {filteredArticles.length} showing.
-            </p>
-            <button
-              onClick={() => mSync.mutate()}
-              disabled={mSync.isPending}
-              className="text-[10px] tracking-[2px] uppercase border border-border px-3 py-1.5 disabled:opacity-50"
-            >
-              {mSync.isPending ? "Syncing…" : "Sync Substack"}
-            </button>
+          <div className="flex items-baseline justify-between mb-6 gap-4 flex-wrap">
+            <div>
+              <p className="font-serif italic text-muted-foreground">
+                {articles.data?.length ?? 0} pieces in the archive — {filteredArticles.length} showing.
+              </p>
+              <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground/70 mt-1">
+                {unanalyzedCount > 0
+                  ? `${unanalyzedCount} not yet deep-read`
+                  : "All pieces have been deep-read"}
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => mSync.mutate()}
+                disabled={mSync.isPending}
+                className="text-[10px] tracking-[2px] uppercase border border-border px-3 py-1.5 disabled:opacity-50"
+              >
+                {mSync.isPending ? "Syncing…" : "Sync Substack"}
+              </button>
+              <button
+                onClick={() => mExtract.mutate()}
+                disabled={mExtract.isPending || unanalyzedCount === 0}
+                className="text-[10px] tracking-[2px] uppercase border border-foreground px-3 py-1.5 disabled:opacity-40"
+                title="Read 8 unanalyzed essays and extract themes, questions, ideas, and references."
+              >
+                {mExtract.isPending ? "Reading…" : "Deep-read 8"}
+              </button>
+            </div>
           </div>
-          <div className="divide-y divide-border">
-            {filteredArticles.map((a: any) => (
-              <article key={a.id} className="py-4">
-                <h3 className="font-serif text-lg text-foreground leading-snug">
-                  {a.url ? (
-                    <a href={a.url} target="_blank" rel="noreferrer" className="hover:underline">
-                      {a.title}
-                    </a>
-                  ) : (
-                    a.title
+
+          <div className="space-y-10">
+            {filteredArticles.map((a: any) => {
+              const refs = (a.refs ?? {}) as {
+                books?: string[];
+                people?: string[];
+                concepts?: string[];
+                research?: string[];
+              };
+              const hasDeep =
+                !!a.summary ||
+                (a.questions?.length ?? 0) > 0 ||
+                (a.key_ideas?.length ?? 0) > 0 ||
+                (refs.books?.length ?? 0) +
+                  (refs.people?.length ?? 0) +
+                  (refs.concepts?.length ?? 0) +
+                  (refs.research?.length ?? 0) >
+                  0;
+
+              // Related articles: other pieces that share a theme.
+              const related = (articles.data ?? [])
+                .filter(
+                  (b: any) =>
+                    b.id !== a.id &&
+                    (a.themes ?? []).some((t: string) => (b.themes ?? []).includes(t)),
+                )
+                .slice(0, 4);
+
+              return (
+                <article key={a.id} className="border-l-2 border-border pl-5">
+                  <header>
+                    <h3 className="font-serif text-2xl text-foreground leading-snug">
+                      {a.url ? (
+                        <a
+                          href={a.url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:underline"
+                        >
+                          {a.title}
+                        </a>
+                      ) : (
+                        a.title
+                      )}
+                    </h3>
+                    <p className="mt-1 text-[10px] tracking-[2px] uppercase text-muted-foreground">
+                      {a.source}
+                      {a.published_at
+                        ? ` · ${new Date(a.published_at).toLocaleDateString()}`
+                        : ""}
+                      {!hasDeep && " · not yet deep-read"}
+                    </p>
+                  </header>
+
+                  {a.summary && (
+                    <p className="mt-4 font-serif text-foreground/85 leading-relaxed italic">
+                      {a.summary}
+                    </p>
                   )}
-                </h3>
-                <p className="mt-1 text-[10px] tracking-[2px] uppercase text-muted-foreground">
-                  {a.source}
-                  {a.published_at ? ` · ${new Date(a.published_at).toLocaleDateString()}` : ""}
-                  {a.themes?.length ? ` · ${a.themes.join(", ")}` : ""}
-                </p>
-              </article>
-            ))}
+
+                  {(a.themes?.length ?? 0) > 0 && (
+                    <CorpusRow label="Themes">
+                      {a.themes.map((t: string) => (
+                        <Chip key={t}>{t}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+
+                  {(a.questions?.length ?? 0) > 0 && (
+                    <CorpusRow label="Questions explored">
+                      <ul className="space-y-1.5">
+                        {a.questions.map((q: string, i: number) => (
+                          <li
+                            key={i}
+                            className="font-serif italic text-foreground/85 leading-snug"
+                          >
+                            {q}
+                          </li>
+                        ))}
+                      </ul>
+                    </CorpusRow>
+                  )}
+
+                  {(a.key_ideas?.length ?? 0) > 0 && (
+                    <CorpusRow label="Key ideas">
+                      <ul className="space-y-1.5 list-none">
+                        {a.key_ideas.map((k: string, i: number) => (
+                          <li
+                            key={i}
+                            className="font-serif text-foreground/80 leading-snug before:content-['—'] before:mr-2 before:text-muted-foreground"
+                          >
+                            {k}
+                          </li>
+                        ))}
+                      </ul>
+                    </CorpusRow>
+                  )}
+
+                  {(refs.books?.length ?? 0) > 0 && (
+                    <CorpusRow label="Related books">
+                      {refs.books!.map((b, i) => (
+                        <Chip key={i}>{b}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+                  {(refs.research?.length ?? 0) > 0 && (
+                    <CorpusRow label="Related research">
+                      {refs.research!.map((r, i) => (
+                        <Chip key={i}>{r}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+                  {(refs.concepts?.length ?? 0) > 0 && (
+                    <CorpusRow label="Connected concepts">
+                      {refs.concepts!.map((c, i) => (
+                        <Chip key={i}>{c}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+                  {(refs.people?.length ?? 0) > 0 && (
+                    <CorpusRow label="People named">
+                      {refs.people!.map((p, i) => (
+                        <Chip key={i}>{p}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+
+                  {related.length > 0 && (
+                    <CorpusRow label="Related articles">
+                      <ul className="space-y-1">
+                        {related.map((r: any) => (
+                          <li key={r.id} className="font-serif text-sm">
+                            {r.url ? (
+                              <a
+                                href={r.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-foreground/80 hover:underline"
+                              >
+                                → {r.title}
+                              </a>
+                            ) : (
+                              <span className="text-foreground/80">→ {r.title}</span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </CorpusRow>
+                  )}
+                </article>
+              );
+            })}
             {!filteredArticles.length && (
-              <p className="font-serif italic text-muted-foreground py-6">Nothing here yet.</p>
+              <p className="font-serif italic text-muted-foreground py-6">
+                Nothing in the archive yet. Sync your Substack to begin.
+              </p>
             )}
           </div>
         </section>
       )}
+
 
       {/* === Knowledge entries (formerly Vault) === */}
       {tab === "knowledge" && (
