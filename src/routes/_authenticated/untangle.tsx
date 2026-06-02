@@ -37,7 +37,7 @@ const ACTIVATION_GLYPH: Record<ActivationCondition, string> = {
   Interest: "≈",
   Challenge: "△",
   Urgency: "◷",
-  Novelty: "⌛",
+  Novelty: "◇",
   Relationships: "◎",
   Meaning: "✦",
 };
