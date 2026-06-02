@@ -51,7 +51,7 @@ function Chip({ children }: { children: React.ReactNode }) {
 
 
 
-type Tab = "questions" | "themes" | "corpus" | "knowledge" | "graph";
+type Tab = "questions" | "themes" | "corpus" | "timeline" | "knowledge" | "graph";
 
 function LibraryPage() {
   const qc = useQueryClient();
@@ -67,10 +67,11 @@ function LibraryPage() {
     queryFn: async () =>
       (await supabase
         .from("articles")
-        .select("id, title, url, source, published_at, themes, questions, key_ideas, refs, summary, analyzed_at, content_text")
+        .select("id, title, url, source, published_at, themes, questions, key_ideas, refs, summary, analyzed_at, content_text, core_argument, tensions, open_loops, recurring_concepts")
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(200)).data ?? [],
   });
+
   const themes = useQuery({
     queryKey: ["library-themes"],
     queryFn: async () =>
