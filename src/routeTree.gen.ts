@@ -27,6 +27,7 @@ import { Route as AuthenticatedCourtroomRouteImport } from './routes/_authentica
 import { Route as AuthenticatedColophonRouteImport } from './routes/_authenticated/colophon'
 import { Route as AuthenticatedClockRouteImport } from './routes/_authenticated/clock'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -117,6 +118,12 @@ const AuthenticatedAboutRoute = AuthenticatedAboutRouteImport.update({
   path: '/about',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -136,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/untangle': typeof AuthenticatedUntangleRoute
   '/vault': typeof AuthenticatedVaultRoute
   '/whiteboard': typeof AuthenticatedWhiteboardRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -155,6 +163,7 @@ export interface FileRoutesByTo {
   '/untangle': typeof AuthenticatedUntangleRoute
   '/vault': typeof AuthenticatedVaultRoute
   '/whiteboard': typeof AuthenticatedWhiteboardRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -176,6 +185,7 @@ export interface FileRoutesById {
   '/_authenticated/untangle': typeof AuthenticatedUntangleRoute
   '/_authenticated/vault': typeof AuthenticatedVaultRoute
   '/_authenticated/whiteboard': typeof AuthenticatedWhiteboardRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/untangle'
     | '/vault'
     | '/whiteboard'
+    | '/lovable/email/queue/process'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/untangle'
     | '/vault'
     | '/whiteboard'
+    | '/lovable/email/queue/process'
   id:
     | '__root__'
     | '/'
@@ -236,6 +248,7 @@ export interface FileRouteTypes {
     | '/_authenticated/untangle'
     | '/_authenticated/vault'
     | '/_authenticated/whiteboard'
+    | '/lovable/email/queue/process'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -243,6 +256,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -373,6 +387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAboutRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -419,6 +440,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
