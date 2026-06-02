@@ -9,16 +9,18 @@ export const Route = createFileRoute("/_authenticated/diagnose")({
 });
 
 const EXAMPLES = [
-  "I have a million things to do.",
-  "I don't know where to start.",
-  "I can't focus.",
-  "I'm trying to make a decision.",
   "I'm overwhelmed.",
-  "I'm stuck.",
+  "I can't focus.",
+  "I don't know where to start.",
+  "I'm exhausted.",
+  "I'm stressed.",
+  "I have too many ideas.",
+  "I'm avoiding something.",
 ];
 
 function DiagnosePage() {
   const [input, setInput] = useState("");
+  const [submittedInput, setSubmittedInput] = useState("");
   const [result, setResult] = useState<DiagnoseResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
@@ -29,6 +31,7 @@ function DiagnosePage() {
     setLoading(true);
     setErr("");
     setResult(null);
+    setSubmittedInput(input.trim());
     try {
       const r = await run({ data: { input: input.trim() } });
       setResult(r);
@@ -41,10 +44,12 @@ function DiagnosePage() {
   return (
     <div className="max-w-3xl mx-auto">
       {!result && (
-        <div className="pt-8">
-          <h2 className="font-serif text-4xl text-navy">What's on your mind?</h2>
-          <p className="mt-3 text-sm text-muted-foreground italic font-serif">
-            Speak plainly. The system will diagnose, not judge.
+        <div className="pt-12">
+          <h2 className="font-serif text-5xl text-foreground text-center leading-tight">
+            How are you feeling?
+          </h2>
+          <p className="mt-4 text-center text-muted-foreground font-serif italic">
+            Speak plainly. The system translates feeling into mechanism.
           </p>
 
           <textarea
@@ -53,168 +58,142 @@ function DiagnosePage() {
             onKeyDown={(e) => {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit();
             }}
-            rows={6}
-            placeholder="e.g. I have three deadlines and I keep opening tabs instead of working."
-            className="w-full mt-8 border border-border rounded-sm p-5 bg-card font-serif text-lg leading-relaxed outline-none resize-none focus:border-accent"
+            rows={5}
+            placeholder="I'm overwhelmed."
+            className="w-full mt-10 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
           />
 
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 onClick={() => setInput(ex)}
-                className="text-[11px] tracking-wide font-serif italic text-muted-foreground hover:text-navy border border-border/60 px-3 py-1 rounded-full"
+                className="text-xs font-serif italic text-muted-foreground hover:text-foreground border border-border px-3 py-1.5 rounded-full transition-colors"
               >
                 {ex}
               </button>
             ))}
           </div>
 
-          <div className="mt-6 flex items-center gap-4">
+          <div className="mt-8 flex items-center justify-center gap-4">
             <button
               onClick={submit}
               disabled={loading || !input.trim()}
-              className="px-8 py-3 text-[10px] tracking-[3px] uppercase disabled:opacity-40 text-white"
-              style={{ background: "#1a2745" }}
+              className="px-10 py-3 text-[11px] tracking-[3px] uppercase disabled:opacity-40 bg-foreground text-background hover:bg-foreground/90 transition-colors"
             >
-              {loading ? "Thinking…" : "Diagnose"}
+              {loading ? "Translating…" : "Translate"}
             </button>
             <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
               ⌘ + Enter
             </span>
           </div>
 
-          {err && <p className="mt-6 text-sm text-red-700">{err}</p>}
+          {err && <p className="mt-6 text-sm text-red-700 text-center">{err}</p>}
         </div>
       )}
 
       {result && (
-        <article className="space-y-12 pt-4">
+        <article className="space-y-14 pt-4">
           <header>
-            <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-2">
-              Pattern
+            <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
+              You said
             </p>
-            <h2 className="font-serif text-3xl text-navy">{result.pattern}</h2>
-            <blockquote className="mt-6 pl-5 border-l-2 border-accent font-serif italic text-muted-foreground">
-              {input}
+            <blockquote className="pl-5 border-l-2 border-foreground font-serif italic text-xl text-foreground leading-relaxed">
+              {submittedInput}
             </blockquote>
+            <p className="mt-4 font-serif text-muted-foreground">{result.echo}</p>
           </header>
 
-          <Section number="I" title="Diagnosis">
-            <p className="font-serif leading-relaxed text-foreground">
-              {result.diagnosis.summary}
-            </p>
-            <p className="mt-3 font-serif leading-relaxed text-foreground">
-              <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground mr-2">
-                Friction
-              </span>
-              {result.diagnosis.friction}
-            </p>
-            <p className="mt-3 font-serif leading-relaxed text-navy font-medium">
-              {result.diagnosis.core_problem}
-            </p>
-          </Section>
-
-          <Section number="II" title="Activation Analysis">
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {(
-                [
-                  ["Interest", result.activation.interest],
-                  ["Challenge", result.activation.challenge],
-                  ["Urgency", result.activation.urgency],
-                  ["Novelty", result.activation.novelty],
-                  ["Relationships", result.activation.relationships],
-                  ["Meaning", result.activation.meaning],
-                ] as const
-              ).map(([label, val]) => (
-                <div key={label} className="border border-border/60 px-3 py-2">
-                  <div className="text-[9px] tracking-[2px] uppercase text-muted-foreground">
-                    {label}
+          <Section step="1" title="Cognitive Systems Involved">
+            <div className="space-y-3">
+              {result.systems.map((s) => (
+                <div
+                  key={s.name}
+                  className={`border-l-2 pl-4 py-1 ${
+                    s.name === result.primary_system
+                      ? "border-foreground"
+                      : "border-border"
+                  }`}
+                >
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h4 className="font-serif text-lg text-foreground">{s.name}</h4>
+                    <LoadBadge load={s.load} />
                   </div>
-                  <div className="font-serif text-navy capitalize mt-0.5">{val}</div>
+                  <p className="mt-1 font-serif text-foreground/80">{s.note}</p>
                 </div>
               ))}
             </div>
-            <p className="mt-5 font-serif leading-relaxed">
-              <span className="text-[10px] tracking-[2px] uppercase text-accent mr-2">
-                Missing
-              </span>
-              <span className="text-navy font-medium">{result.activation.missing}.</span>{" "}
-              {result.activation.explanation}
+          </Section>
+
+          <Section step="2" title={`What's Struggling — ${result.primary_system}`}>
+            <p className="font-serif text-xl text-foreground leading-relaxed">
+              {result.plain_explanation}
             </p>
           </Section>
 
-          <Section number="III" title="Recommended Action">
-            <p className="font-serif text-2xl text-navy leading-snug">
-              {result.action.next_step}
-            </p>
-            <p className="mt-3 font-serif italic text-muted-foreground">
-              {result.action.why}
+          <Section step="3" title="The Neuroscience">
+            <p className="font-serif text-lg text-foreground leading-relaxed">
+              {result.neuroscience}
             </p>
           </Section>
 
-          <Section number="IV" title="Related Thinking">
-            <p className="font-serif leading-relaxed text-foreground">
-              {result.related_thinking}
+          <Section step="4" title="Intervention">
+            <p className="font-serif text-2xl text-foreground leading-snug">
+              {result.intervention.action}
+            </p>
+            <div className="mt-2 text-[10px] tracking-[3px] uppercase text-muted-foreground">
+              {result.intervention.duration}
+            </div>
+            <p className="mt-4 font-serif italic text-muted-foreground leading-relaxed">
+              {result.intervention.why_it_works}
             </p>
           </Section>
 
-          {result.articles.length > 0 && (
-            <Section number="V" title="From Your Own Writing">
-              <div className="space-y-6">
-                {result.articles.map((a) => (
-                  <div key={a.id} className="border-l-2 border-accent pl-5">
-                    <h4 className="font-serif text-xl text-navy">
-                      {a.url ? (
-                        <a href={a.url} target="_blank" rel="noreferrer" className="hover:underline">
-                          {a.title}
-                        </a>
-                      ) : (
-                        a.title
-                      )}
-                    </h4>
-                    <p className="mt-2 font-serif text-foreground">{a.relevance}</p>
-                    <p className="mt-2 text-sm font-serif italic text-muted-foreground">
-                      Connecting idea — {a.connecting_idea}
-                    </p>
-                    <p className="mt-2 text-sm font-serif text-foreground/80">{a.why_read}</p>
-                  </div>
-                ))}
-              </div>
-              <p className="mt-4 text-[11px] tracking-wide font-serif italic text-muted-foreground">
-                You have thought about this before.
-              </p>
-            </Section>
-          )}
+          <Section step="5" title="What to Read & Sit With">
+            <div className="space-y-8">
+              {result.article && (
+                <Recommendation label="From your Substack">
+                  <h4 className="font-serif text-xl text-foreground">
+                    {result.article.url ? (
+                      <a
+                        href={result.article.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:underline"
+                      >
+                        {result.article.title}
+                      </a>
+                    ) : (
+                      result.article.title
+                    )}
+                  </h4>
+                  <p className="mt-2 font-serif text-foreground/80">{result.article.why}</p>
+                </Recommendation>
+              )}
 
-          <Section number="VI" title="Intellectual Fuel">
-            <div className="space-y-6">
-              <div>
-                <div className="text-[10px] tracking-[2px] uppercase text-muted-foreground">Book</div>
-                <p className="font-serif text-lg text-navy mt-1">
-                  <em>{result.fuel.book.title}</em> — {result.fuel.book.author}
+              <Recommendation label="Book">
+                <p className="font-serif text-xl text-foreground">
+                  <em>{result.book.title}</em> — {result.book.author}
                 </p>
-                <p className="font-serif text-foreground mt-1">{result.fuel.book.why}</p>
-              </div>
-              <div>
-                <div className="text-[10px] tracking-[2px] uppercase text-muted-foreground">Study</div>
-                <p className="font-serif text-lg text-navy mt-1">{result.fuel.study.title}</p>
+                <p className="mt-2 font-serif text-foreground/80">{result.book.why}</p>
+              </Recommendation>
+
+              <Recommendation label="Study">
+                <p className="font-serif text-xl text-foreground">{result.study.title}</p>
                 <p className="font-serif text-sm text-muted-foreground">
-                  {result.fuel.study.authors} ({result.fuel.study.year})
+                  {result.study.authors} ({result.study.year})
                 </p>
-                <p className="font-serif text-foreground mt-2">{result.fuel.study.summary}</p>
-                <p className="font-mono text-xs text-muted-foreground mt-2">
-                  {result.fuel.study.citation}
+                <p className="mt-2 font-serif text-foreground/80">{result.study.finding}</p>
+                <p className="mt-2 font-mono text-xs text-muted-foreground">
+                  {result.study.citation}
                 </p>
-              </div>
-              <div>
-                <div className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
-                  Question
-                </div>
-                <p className="font-serif italic text-xl text-navy mt-1">
-                  {result.fuel.question}
+              </Recommendation>
+
+              <Recommendation label="Question">
+                <p className="font-serif italic text-2xl text-foreground leading-snug">
+                  {result.question}
                 </p>
-              </div>
+              </Recommendation>
             </div>
           </Section>
 
@@ -223,17 +202,17 @@ function DiagnosePage() {
               onClick={() => {
                 setResult(null);
                 setInput("");
+                setSubmittedInput("");
               }}
-              className="px-6 py-2 text-[10px] tracking-[3px] uppercase text-white"
-              style={{ background: "#1a2745" }}
+              className="px-6 py-2 text-[10px] tracking-[3px] uppercase bg-foreground text-background hover:bg-foreground/90 transition-colors"
             >
-              New thought
+              Again
             </button>
             <button
               onClick={() => setResult(null)}
-              className="px-6 py-2 text-[10px] tracking-[3px] uppercase border border-border text-navy"
+              className="px-6 py-2 text-[10px] tracking-[3px] uppercase border border-border text-foreground hover:bg-muted transition-colors"
             >
-              Refine input
+              Refine
             </button>
           </div>
         </article>
@@ -242,22 +221,49 @@ function DiagnosePage() {
   );
 }
 
+function LoadBadge({ load }: { load: "high" | "medium" | "low" }) {
+  return (
+    <span className="text-[9px] tracking-[2px] uppercase text-muted-foreground">
+      {load} load
+    </span>
+  );
+}
+
 function Section({
-  number,
+  step,
   title,
   children,
 }: {
-  number: string;
+  step: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
     <section>
-      <div className="flex items-baseline gap-4 mb-4 border-b border-border pb-2">
-        <span className="font-serif italic text-accent text-lg">{number}</span>
-        <h3 className="text-[10px] tracking-[3px] uppercase text-muted-foreground">{title}</h3>
+      <div className="flex items-baseline gap-4 mb-5 border-b border-border pb-2">
+        <span className="font-serif italic text-foreground text-base">{step}</span>
+        <h3 className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
+          {title}
+        </h3>
       </div>
       {children}
     </section>
+  );
+}
+
+function Recommendation({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">
+        {label}
+      </div>
+      {children}
+    </div>
   );
 }
