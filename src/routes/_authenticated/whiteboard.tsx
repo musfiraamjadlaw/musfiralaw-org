@@ -8,11 +8,11 @@ import type {
 export const Route = createFileRoute("/_authenticated/whiteboard")({
   head: () => ({
     meta: [
-      { title: "Whiteboard — The reasoning behind the analysis" },
+      { title: "Whiteboard — The model behind the work" },
       {
         name: "description",
         content:
-          "A case board for the last Untangle analysis. Observation, core question, mechanism, activation conditions, related writing, research, and the next action — laid out so you can see how the system reached its conclusions.",
+          "A note on attention, the Activation Framework, and the reasoning behind the last analysis. The intellectual core of the application.",
       },
     ],
   }),
@@ -21,15 +21,52 @@ export const Route = createFileRoute("/_authenticated/whiteboard")({
 
 const STORAGE_KEY = "untangle:last-analysis";
 
-// The Activation Framework — symbols the user specified.
-// This is the application's visual language.
-const ACTIVATION: { id: ActivationCondition; glyph: string; gloss: string }[] = [
-  { id: "Interest",      glyph: "≈", gloss: "Does it pull attention?" },
-  { id: "Challenge",     glyph: "△", gloss: "Is it calibrated to current ability?" },
-  { id: "Urgency",       glyph: "◷", gloss: "Is the cost of delay visible?" },
-  { id: "Novelty",       glyph: "⌛", gloss: "Is anything different this time?" },
-  { id: "Relationships", glyph: "◎", gloss: "Is anyone else in this with you?" },
-  { id: "Meaning",       glyph: "✦", gloss: "Is it tied to something cared about?" },
+// The Activation Framework — the application's visual language.
+// Presented here as a scientific model, not a set of motivational tiles.
+type Condition = {
+  id: ActivationCondition;
+  glyph: string;
+  one_line: string;
+  keywords: [string, string, string];
+};
+
+const ACTIVATION: Condition[] = [
+  {
+    id: "Interest",
+    glyph: "≈",
+    one_line: "Attention flows toward what genuinely engages it.",
+    keywords: ["Natural engagement", "Curiosity", "Momentum"],
+  },
+  {
+    id: "Challenge",
+    glyph: "△",
+    one_line: "Difficulty calibrated to current ability.",
+    keywords: ["Optimal difficulty", "Growth", "Calibration"],
+  },
+  {
+    id: "Urgency",
+    glyph: "◷",
+    one_line: "A visible cost of delay focuses the system.",
+    keywords: ["Time pressure", "Consequences", "Execution"],
+  },
+  {
+    id: "Novelty",
+    glyph: "⌛",
+    one_line: "Difference re-recruits attention that has gone stale.",
+    keywords: ["Freshness", "Exploration", "Change"],
+  },
+  {
+    id: "Relationships",
+    glyph: "◎",
+    one_line: "Other minds in the loop change what is possible to ignore.",
+    keywords: ["Accountability", "Mentorship", "Connection"],
+  },
+  {
+    id: "Meaning",
+    glyph: "✦",
+    one_line: "Connection to identity and purpose stabilizes effort over time.",
+    keywords: ["Purpose", "Identity", "Significance"],
+  },
 ];
 
 function WhiteboardPage() {
@@ -45,318 +82,388 @@ function WhiteboardPage() {
     }
   }, []);
 
-  if (!data) {
-    return (
-      <div className="max-w-3xl mx-auto pt-16 text-center">
-        <p className="text-[11px] tracking-[3px] uppercase text-muted-foreground mb-4">
-          The whiteboard is empty
-        </p>
-        <h1 className="font-serif text-4xl text-foreground">Nothing pinned yet.</h1>
-        <p className="mt-4 font-serif italic text-muted-foreground max-w-xl mx-auto">
-          The Whiteboard is where explanations live. Run an analysis in Untangle and its reasoning will appear here — observation, mechanism, activation, evidence, action — all on one board.
-        </p>
-        <Link
-          to="/untangle"
-          className="inline-block mt-8 px-6 py-3 text-[10px] tracking-[3px] uppercase bg-foreground text-background hover:bg-foreground/90 transition-colors"
-        >
-          Open Untangle
-        </Link>
-
-        <ActivationLegend className="mt-20" />
-      </div>
-    );
-  }
-
-  const { input, result } = data;
-  const missing = result.mechanism.missing_condition;
-  const present = new Set(result.mechanism.present_conditions ?? []);
-
   return (
-    <div className="max-w-6xl mx-auto">
-      {/* Header — strategy room masthead */}
-      <header className="border-b-2 border-foreground pb-4 mb-10 flex items-end justify-between flex-wrap gap-3">
-        <div>
-          <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-            Case Board · Untangle Analysis
-          </p>
-          <h1 className="font-serif text-4xl text-foreground mt-1">Whiteboard</h1>
-        </div>
-        <p className="font-serif italic text-muted-foreground max-w-md text-right">
-          How the system reached its conclusions. The reasoning behind the recommendation, pinned to one board.
+    <article className="max-w-2xl mx-auto pb-32">
+      {/* Masthead — a journal, not a dashboard. */}
+      <header className="pt-10 pb-12 border-b border-border">
+        <p className="text-[10px] tracking-[4px] uppercase text-muted-foreground">
+          The Whiteboard
+        </p>
+        <h1 className="font-display text-5xl md:text-6xl text-foreground leading-[1.05] mt-4">
+          The model behind the work
+        </h1>
+        <p className="mt-6 font-serif italic text-lg text-muted-foreground leading-relaxed">
+          A note on attention, the Activation Framework, and the reasoning the system
+          uses to move from observation to understanding.
         </p>
       </header>
 
-      {/* The board — masonry of cards */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
-        {/* Observation — pinned at the top-left, the entry point */}
-        <BoardCard label="01 · Observation" className="md:col-span-5">
-          <p className="font-serif italic text-foreground/90 leading-relaxed">
-            "{input}"
+      {/* A Note on Attention — verbatim, as a long-form essay. */}
+      <Section eyebrow="I" title="A note on attention">
+        <Prose>
+          <p>
+            For years, I thought my problem was discipline.
           </p>
-          <Hairline />
-          <p className="font-serif text-sm text-muted-foreground leading-relaxed">
-            {result.observation_echo}
+          <p>Then organization.</p>
+          <p>Then productivity.</p>
+          <p>Then ADHD.</p>
+          <p>
+            The issue was not attention. The issue was understanding attention.
           </p>
-        </BoardCard>
+          <p>
+            The ADHD brain is often described as having an attention <em>deficit</em>.
+            A more useful model is attention <em>regulation</em>. Attention is present.
+            The challenge is directing it consistently.
+          </p>
+          <p>
+            This explains why someone can spend hours reading case law, researching
+            neuroscience, writing, or learning — while struggling to answer an email.
+          </p>
+          <p>The question becomes:</p>
+        </Prose>
 
-        {/* Core question */}
-        <BoardCard label="02 · Core Question" tone="ink" className="md:col-span-7">
-          <p className="font-serif italic text-2xl text-background leading-snug">
-            {result.core_question}
-          </p>
-          <p className="mt-3 font-serif text-sm text-background/75 leading-relaxed">
-            {result.question_context}
-          </p>
-        </BoardCard>
+        <PullQuote>
+          Why does attention flow easily toward some things and resist others?
+        </PullQuote>
 
-        {/* Cognitive Mechanism */}
-        <BoardCard label="03 · Cognitive Mechanism" className="md:col-span-7">
-          <p className="font-serif text-foreground leading-relaxed">
-            {result.mechanism.plain}
+        <Prose>
+          <p>
+            This question became the foundation of the framework that follows.
           </p>
-          <Hairline />
-          <p className="font-serif text-sm text-foreground/80 leading-relaxed">
-            {result.mechanism.deeper}
+        </Prose>
+      </Section>
+
+      {/* The Activation Framework — presented as a scientific model. */}
+      <Section eyebrow="II" title="The Activation Framework">
+        <Prose>
+          <p>
+            Attention is not allocated by willpower. It is recruited by conditions.
+            When action becomes difficult, one or more of these six conditions is
+            usually missing. They are not motivational categories. They are the
+            variables that determine whether a system — a brain, a writer, a
+            litigator, a researcher — can sustain engagement with a task.
           </p>
-          {result.mechanism.citations?.length > 0 && (
-            <p className="mt-4 font-mono text-[10px] text-muted-foreground tracking-wide">
-              {result.mechanism.citations.join("  ·  ")}
+        </Prose>
+
+        <dl className="mt-12 space-y-10">
+          {ACTIVATION.map((c) => (
+            <div key={c.id} className="grid grid-cols-[3.5rem_1fr] gap-x-6 items-baseline">
+              <dt
+                className="font-display text-5xl text-foreground leading-none text-center"
+                aria-hidden="true"
+              >
+                {c.glyph}
+              </dt>
+              <dd>
+                <h3 className="font-display text-3xl text-foreground leading-tight">
+                  {c.id}
+                </h3>
+                <p className="mt-2 font-serif italic text-muted-foreground leading-relaxed">
+                  {c.one_line}
+                </p>
+                <p className="mt-3 font-sans text-[11px] tracking-[2.5px] uppercase text-muted-foreground">
+                  {c.keywords.join(" · ")}
+                </p>
+              </dd>
+            </div>
+          ))}
+        </dl>
+
+        <PullQuote attribution="Core principle">
+          When action becomes difficult, identify the missing condition.
+        </PullQuote>
+
+        <Prose>
+          <p>
+            The framework does not tell a person what to do. It tells them what is
+            absent. A missing condition is a diagnosis, not a prescription — but once
+            named, the next step usually becomes obvious. Missing Urgency calls for a
+            visible deadline. Missing Relationships calls for another person in the
+            loop. Missing Meaning calls for a sentence about why the work matters
+            before opening the file.
+          </p>
+          <p>
+            The same logic runs underneath every analysis the system produces. Open
+            an observation in Untangle and the model picks the missing condition
+            first; the action follows from it.
+          </p>
+        </Prose>
+      </Section>
+
+      {/* Intellectual lineage — short, not a memoir. */}
+      <Section eyebrow="III" title="Where the model comes from">
+        <Prose>
+          <p>
+            The framework borrows from several traditions, none of them complete on
+            their own.
+          </p>
+          <p>
+            <strong>Neuroscience</strong> contributes the architecture: executive
+            function, prediction error, dopaminergic salience, the role of arousal
+            in narrowing or broadening attention. <strong>Behavioral science</strong>{" "}
+            contributes the patterns: how deadlines reshape effort, how loss aversion
+            changes what feels urgent, how environments cue action.{" "}
+            <strong>Decision theory</strong> contributes the discipline of separating
+            facts from assumptions and verdicts from evidence.{" "}
+            <strong>Litigation</strong> contributes the habit of building an
+            argument out of what is actually on the record, not what one wishes were
+            there. <strong>Personal experience</strong> contributes the corrective:
+            any model that does not survive contact with a real Tuesday afternoon is
+            not yet finished.
+          </p>
+          <p>
+            The Activation Framework is the part that survived. It is the smallest
+            set of conditions that, taken together, reliably explain when attention
+            holds and when it doesn't.
+          </p>
+        </Prose>
+      </Section>
+
+      {/* Current case — the pinned analysis lives at the bottom, where evidence belongs. */}
+      <Section eyebrow="IV" title="The current case">
+        {data ? (
+          <CurrentCase input={data.input} result={data.result} />
+        ) : (
+          <Prose>
+            <p className="italic text-muted-foreground">
+              No analysis is pinned to the board yet. Run an observation in{" "}
+              <Link to="/untangle" className="underline decoration-foreground/40 hover:decoration-foreground">
+                Untangle
+              </Link>
+              {" "}and its reasoning — observation, mechanism, missing condition,
+              evidence, action — will appear here as the working case.
             </p>
-          )}
-        </BoardCard>
+          </Prose>
+        )}
+      </Section>
 
-        {/* Activation Conditions — permanent legend, with state */}
-        <BoardCard label="04 · Activation Conditions" className="md:col-span-5">
-          <p className="font-serif italic text-sm text-muted-foreground leading-relaxed">
-            {result.mechanism.activation_reading}
-          </p>
-          <Hairline />
-          <ul className="space-y-2.5">
-            {ACTIVATION.map((c) => {
-              const isMissing = c.id === missing;
-              const isPresent = present.has(c.id);
-              return (
-                <li
-                  key={c.id}
-                  className={
-                    "flex items-baseline gap-3 " +
-                    (isMissing
-                      ? "text-foreground"
-                      : isPresent
-                      ? "text-foreground/80"
-                      : "text-muted-foreground/60")
-                  }
-                >
-                  <span
-                    className={
-                      "font-serif text-xl w-6 text-center leading-none " +
-                      (isMissing ? "text-foreground" : "")
-                    }
-                  >
-                    {c.glyph}
-                  </span>
-                  <span className="text-[12px] tracking-[2px] uppercase font-medium">
-                    {c.id}
-                  </span>
-                  <span className="font-serif italic text-xs text-muted-foreground/80">
-                    — {c.gloss}
-                  </span>
-                  {isMissing && (
-                    <span className="ml-auto text-[10px] tracking-[2px] uppercase font-mono text-foreground border border-foreground px-1.5 py-0.5">
-                      missing
-                    </span>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        </BoardCard>
-
-        {/* Missing Condition — the diagnostic */}
-        <BoardCard label="05 · Missing Condition" tone="accent" className="md:col-span-4">
-          <div className="flex items-baseline gap-4">
-            <span className="font-serif text-6xl text-foreground leading-none">
-              {ACTIVATION.find((a) => a.id === missing)?.glyph}
-            </span>
-            <div>
-              <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-                Underlying gap
-              </p>
-              <p className="font-serif italic text-3xl text-foreground">{missing}</p>
-            </div>
-          </div>
-          <Hairline />
-          <p className="font-serif text-sm text-foreground/85 leading-relaxed">
-            {result.action.why_this_emerges}
-          </p>
-        </BoardCard>
-
-        {/* Related Writing */}
-        <BoardCard label="06 · Related Writing" className="md:col-span-8">
-          {result.article ? (
-            <>
-              <p className="font-serif text-xl text-foreground leading-snug">
-                {result.article.url ? (
-                  <a
-                    href={result.article.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="hover:underline"
-                  >
-                    {result.article.title}
-                  </a>
-                ) : (
-                  result.article.title
-                )}
-              </p>
-              <p className="mt-2 font-serif italic text-sm text-muted-foreground">
-                Explores: {result.article.question_it_explores}
-              </p>
-              <Hairline />
-              <p className="font-serif text-sm text-foreground/85 leading-relaxed">
-                {result.article.why_relevant}
-              </p>
-              <p className="mt-2 font-serif text-sm text-foreground/85 leading-relaxed">
-                {result.article.insight}
-              </p>
-            </>
-          ) : (
-            <p className="font-serif italic text-muted-foreground">
-              Nothing in your corpus matched this idea closely enough to cite.
-            </p>
-          )}
-        </BoardCard>
-
-        {/* Related Research */}
-        <BoardCard label="07 · Related Research" className="md:col-span-7">
-          <p className="font-serif text-lg text-foreground">{result.study.title}</p>
-          <p className="font-mono text-[11px] text-muted-foreground mt-1">
-            {result.study.authors} · {result.study.year}
-          </p>
-          <Hairline />
-          <p className="font-serif text-sm text-foreground/85 leading-relaxed">
-            {result.study.finding}
-          </p>
-          <p className="mt-2 font-serif italic text-sm text-muted-foreground leading-relaxed">
-            {result.study.why_it_deepens}
-          </p>
-          <p className="mt-3 font-mono text-[10px] text-muted-foreground">
-            {result.study.citation}
-          </p>
-        </BoardCard>
-
-        {/* Book — small adjacent card */}
-        <BoardCard label="A book to sit with" className="md:col-span-5">
-          <p className="font-serif text-lg text-foreground">
-            <em>{result.book.title}</em>
-          </p>
-          <p className="font-serif text-sm text-muted-foreground mt-1">{result.book.author}</p>
-          <Hairline />
-          <p className="font-serif text-sm text-foreground/85 leading-relaxed">{result.book.why}</p>
-        </BoardCard>
-
-        {/* Better Question */}
-        <BoardCard label="A better question" className="md:col-span-7">
-          <p className="font-serif italic text-2xl text-foreground leading-snug">
-            {result.better_question}
-          </p>
-        </BoardCard>
-
-        {/* Suggested Action — the resolution, bottom of the board */}
-        <BoardCard label="08 · Suggested Action" tone="ink" className="md:col-span-12">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
-              <p className="font-serif text-2xl text-background leading-snug">
-                {result.action.step}
-              </p>
-              <p className="mt-3 font-serif italic text-sm text-background/75 leading-relaxed">
-                This step emerges from the missing condition ({missing}) — not from a generic checklist.
-              </p>
-            </div>
-            <div className="border-l border-background/30 pl-6">
-              <p className="text-[10px] tracking-[3px] uppercase text-background/60 mb-2">
-                Why this and not another
-              </p>
-              <p className="font-serif text-sm text-background/85 leading-relaxed">
-                {result.action.why_this_emerges}
-              </p>
-            </div>
-          </div>
-        </BoardCard>
-      </div>
-
-      <div className="mt-12 pt-6 border-t border-border flex flex-wrap gap-3 items-center justify-between">
-        <p className="font-serif italic text-sm text-muted-foreground">
-          The Whiteboard is the application's operating model. Every analysis lives here.
+      {/* Colophon-style footer — quietly closes the essay. */}
+      <footer className="mt-24 pt-8 border-t border-border text-center">
+        <p className="font-display italic text-2xl text-foreground leading-snug">
+          Observe. Understand. Connect. Act.
         </p>
-        <Link
-          to="/untangle"
-          className="px-5 py-2 text-[10px] tracking-[3px] uppercase border border-border hover:bg-muted transition-colors"
-        >
-          New observation →
-        </Link>
-      </div>
-    </div>
+        <p className="mt-3 font-serif text-sm italic text-muted-foreground">
+          The work is moving from descriptions to explanations.
+        </p>
+      </footer>
+    </article>
   );
 }
 
-function BoardCard({
-  label,
+// ---------- Editorial primitives ----------
+
+function Section({
+  eyebrow,
+  title,
   children,
-  className = "",
-  tone = "paper",
 }: {
-  label: string;
+  eyebrow: string;
+  title: string;
   children: React.ReactNode;
-  className?: string;
-  tone?: "paper" | "ink" | "accent";
 }) {
-  const base =
-    tone === "ink"
-      ? "bg-foreground text-background border-foreground"
-      : tone === "accent"
-      ? "bg-muted/60 border-foreground/40"
-      : "bg-card border-border";
   return (
-    <section
-      className={`relative border ${base} p-6 rounded-sm shadow-sm ${className}`}
-    >
-      <p
-        className={
-          "text-[10px] tracking-[3px] uppercase mb-4 " +
-          (tone === "ink" ? "text-background/60" : "text-muted-foreground")
-        }
-      >
-        {label}
-      </p>
+    <section className="mt-20">
+      <div className="flex items-baseline gap-4 mb-8">
+        <span className="font-mono text-[11px] tracking-[3px] text-muted-foreground">
+          {eyebrow}
+        </span>
+        <h2 className="font-display text-3xl md:text-4xl text-foreground leading-tight">
+          {title}
+        </h2>
+      </div>
       {children}
     </section>
   );
 }
 
-function Hairline() {
-  return <div className="my-4 h-px bg-border/70" />;
+function Prose({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="font-serif text-[18px] leading-[1.75] text-foreground/90 space-y-5 [&_strong]:font-medium [&_strong]:text-foreground">
+      {children}
+    </div>
+  );
 }
 
-function ActivationLegend({ className = "" }: { className?: string }) {
+function PullQuote({
+  children,
+  attribution,
+}: {
+  children: React.ReactNode;
+  attribution?: string;
+}) {
   return (
-    <div className={"text-left max-w-xl mx-auto " + className}>
-      <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3 text-center">
-        The Activation Framework
+    <figure className="my-12 mx-auto max-w-xl text-center">
+      <blockquote className="font-display italic text-3xl md:text-4xl text-foreground leading-snug">
+        “{children}”
+      </blockquote>
+      {attribution && (
+        <figcaption className="mt-4 font-sans text-[10px] tracking-[3px] uppercase text-muted-foreground">
+          — {attribution}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
+// ---------- Current case (the pinned Untangle analysis) ----------
+
+function CurrentCase({
+  input,
+  result,
+}: {
+  input: string;
+  result: DiagnoseResult;
+}) {
+  const missing = result.mechanism.missing_condition;
+  const missingGlyph = ACTIVATION.find((a) => a.id === missing)?.glyph ?? "·";
+  const present = new Set(result.mechanism.present_conditions ?? []);
+
+  return (
+    <div className="space-y-10">
+      <CaseLine label="Observation">
+        <p className="font-serif italic text-xl text-foreground leading-relaxed">
+          "{input}"
+        </p>
+        <p className="mt-2 font-serif text-base text-muted-foreground leading-relaxed">
+          {result.observation_echo}
+        </p>
+      </CaseLine>
+
+      <CaseLine label="Core question">
+        <p className="font-display italic text-2xl text-foreground leading-snug">
+          {result.core_question}
+        </p>
+        <p className="mt-2 font-serif text-base text-muted-foreground leading-relaxed">
+          {result.question_context}
+        </p>
+      </CaseLine>
+
+      <CaseLine label="Cognitive mechanism">
+        <p className="font-serif text-base text-foreground/90 leading-relaxed">
+          {result.mechanism.plain}
+        </p>
+        <p className="mt-3 font-serif text-base text-foreground/80 leading-relaxed">
+          {result.mechanism.deeper}
+        </p>
+        {result.mechanism.citations?.length > 0 && (
+          <p className="mt-3 font-mono text-[10px] tracking-wide text-muted-foreground">
+            {result.mechanism.citations.join("  ·  ")}
+          </p>
+        )}
+      </CaseLine>
+
+      <CaseLine label="Activation reading">
+        <p className="font-serif italic text-base text-foreground/85 leading-relaxed">
+          {result.mechanism.activation_reading}
+        </p>
+        <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2">
+          {ACTIVATION.map((c) => {
+            const isMissing = c.id === missing;
+            const isPresent = present.has(c.id);
+            return (
+              <li
+                key={c.id}
+                className={
+                  "flex items-baseline gap-3 " +
+                  (isMissing
+                    ? "text-foreground"
+                    : isPresent
+                    ? "text-foreground/75"
+                    : "text-muted-foreground/50")
+                }
+              >
+                <span className="font-display text-xl w-5 text-center leading-none">
+                  {c.glyph}
+                </span>
+                <span className="font-sans text-[11px] tracking-[2px] uppercase">
+                  {c.id}
+                </span>
+                {isMissing && (
+                  <span className="ml-auto font-sans text-[9px] tracking-[2px] uppercase text-foreground border-b border-foreground">
+                    missing
+                  </span>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </CaseLine>
+
+      <CaseLine label="Missing condition">
+        <p className="flex items-baseline gap-4">
+          <span className="font-display text-5xl text-foreground leading-none">
+            {missingGlyph}
+          </span>
+          <span className="font-display italic text-3xl text-foreground">{missing}</span>
+        </p>
+        <p className="mt-3 font-serif text-base text-foreground/85 leading-relaxed">
+          {result.action.why_this_emerges}
+        </p>
+      </CaseLine>
+
+      {result.article && (
+        <CaseLine label="Related writing">
+          <p className="font-serif text-lg text-foreground">
+            {result.article.url ? (
+              <a
+                href={result.article.url}
+                target="_blank"
+                rel="noreferrer"
+                className="underline decoration-foreground/30 hover:decoration-foreground"
+              >
+                {result.article.title}
+              </a>
+            ) : (
+              result.article.title
+            )}
+          </p>
+          <p className="mt-2 font-serif italic text-sm text-muted-foreground">
+            Explores: {result.article.question_it_explores}
+          </p>
+          <p className="mt-2 font-serif text-base text-foreground/85 leading-relaxed">
+            {result.article.why_relevant}
+          </p>
+        </CaseLine>
+      )}
+
+      <CaseLine label="Related research">
+        <p className="font-serif text-lg text-foreground">{result.study.title}</p>
+        <p className="font-mono text-[10px] tracking-wide text-muted-foreground mt-1">
+          {result.study.authors} · {result.study.year}
+        </p>
+        <p className="mt-3 font-serif text-base text-foreground/85 leading-relaxed">
+          {result.study.finding}
+        </p>
+        <p className="mt-2 font-serif italic text-sm text-muted-foreground leading-relaxed">
+          {result.study.why_it_deepens}
+        </p>
+      </CaseLine>
+
+      <CaseLine label="Suggested action">
+        <p className="font-display text-2xl text-foreground leading-snug">
+          {result.action.step}
+        </p>
+        <p className="mt-3 font-serif italic text-sm text-muted-foreground leading-relaxed">
+          The step emerges from the missing condition ({missing}), not from a generic checklist.
+        </p>
+      </CaseLine>
+    </div>
+  );
+}
+
+function CaseLine({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="grid md:grid-cols-[10rem_1fr] gap-x-8 gap-y-2 pb-8 border-b border-border/60 last:border-b-0 last:pb-0">
+      <p className="font-sans text-[10px] tracking-[3px] uppercase text-muted-foreground pt-1">
+        {label}
       </p>
-      <ul className="space-y-2">
-        {ACTIVATION.map((c) => (
-          <li key={c.id} className="flex items-baseline gap-3">
-            <span className="font-serif text-xl w-6 text-center text-foreground">
-              {c.glyph}
-            </span>
-            <span className="text-[12px] tracking-[2px] uppercase">{c.id}</span>
-            <span className="font-serif italic text-xs text-muted-foreground">
-              — {c.gloss}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div>{children}</div>
     </div>
   );
 }
