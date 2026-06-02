@@ -157,10 +157,12 @@ function LibraryPage() {
             { id: "questions", label: "Questions" },
             { id: "themes", label: "Themes" },
             { id: "corpus", label: "Corpus" },
+            { id: "timeline", label: "Timeline" },
             { id: "knowledge", label: "Notes" },
-            { id: "graph", label: "Knowledge Graph" },
+            { id: "graph", label: "Idea Graph" },
           ] as { id: Tab; label: string }[]
         ).map((t) => (
+
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
