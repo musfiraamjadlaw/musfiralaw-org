@@ -12,16 +12,31 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthLayout,
 });
 
-const TABS = [
-  { id: "dump", label: "Brain Dump", to: "/dump" },
-  { id: "start", label: "Start", to: "/start" },
-  { id: "untangle", label: "Untangle", to: "/untangle" },
-  { id: "courtroom", label: "Courtroom", to: "/courtroom" },
-  { id: "clock", label: "Time Radar", to: "/clock" },
-  { id: "vault", label: "Knowledge Vault", to: "/vault" },
-  { id: "editorial", label: "Editorial", to: "/editorial" },
-  { id: "meaning", label: "Meaning Engine", to: "/meaning" },
-] as const;
+type Tab = { id: string; label: string; to: string };
+type Group = { label: string; tabs: Tab[] };
+
+const GROUPS: Group[] = [
+  {
+    label: "Cognitive Core",
+    tabs: [
+      { id: "states", label: "States", to: "/states" },
+      { id: "dump", label: "Brain Dump", to: "/dump" },
+      { id: "start", label: "Activation", to: "/start" },
+      { id: "untangle", label: "Untangle", to: "/untangle" },
+      { id: "clock", label: "Time Radar", to: "/clock" },
+      { id: "courtroom", label: "Courtroom", to: "/courtroom" },
+      { id: "vault", label: "Knowledge Vault", to: "/vault" },
+    ],
+  },
+  {
+    label: "Intelligence",
+    tabs: [{ id: "meaning", label: "Decision Engine", to: "/meaning" }],
+  },
+  {
+    label: "Insight",
+    tabs: [{ id: "editorial", label: "Writing Intelligence", to: "/editorial" }],
+  },
+];
 
 function AuthLayout() {
   const router = useRouter();
@@ -40,34 +55,48 @@ function AuthLayout() {
   return (
     <div className="min-h-screen bg-background text-navy font-sans">
       <header className="border-b border-border bg-background sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-7 pt-5">
+        <div className="max-w-5xl mx-auto px-7 pt-5">
           <div className="flex items-baseline justify-between mb-4">
             <div className="flex items-baseline gap-3">
-              <h1 className="font-serif text-xl font-semibold">Notebook</h1>
+              <h1 className="font-serif text-xl font-semibold">Cognitive OS</h1>
               <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-                Executive function &amp; decision system
+                Attention · Time · Knowledge · Decisions
               </span>
             </div>
             <button onClick={signOut} className="text-[10px] tracking-[2px] uppercase text-muted-foreground hover:text-navy">
               {email ? "Sign out" : ""}
             </button>
           </div>
-          <nav className="flex gap-1 overflow-x-auto">
-            {TABS.map((t) => {
-              const active = path.startsWith(t.to);
-              return (
-                <Link key={t.id} to={t.to}
-                  className={`px-4 py-2.5 text-[10px] tracking-[2.5px] uppercase whitespace-nowrap border-b-2 transition-colors ${
-                    active ? "border-accent text-navy font-medium" : "border-transparent text-muted-foreground hover:text-navy"
-                  }`}>
-                  {t.label}
-                </Link>
-              );
-            })}
+          <nav className="flex flex-wrap items-end gap-x-6 gap-y-2 pb-1">
+            {GROUPS.map((g) => (
+              <div key={g.label} className="flex flex-col">
+                <span className="text-[9px] tracking-[2.5px] uppercase text-muted-foreground/70 mb-1">
+                  {g.label}
+                </span>
+                <div className="flex gap-1">
+                  {g.tabs.map((t) => {
+                    const active = path.startsWith(t.to);
+                    return (
+                      <Link
+                        key={t.id}
+                        to={t.to}
+                        className={`px-3 py-2 text-[10px] tracking-[2.5px] uppercase whitespace-nowrap border-b-2 transition-colors ${
+                          active
+                            ? "border-accent text-navy font-medium"
+                            : "border-transparent text-muted-foreground hover:text-navy"
+                        }`}
+                      >
+                        {t.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </nav>
         </div>
       </header>
-      <main className="max-w-4xl mx-auto px-7 py-12 pb-24">
+      <main className="max-w-5xl mx-auto px-7 py-12 pb-24">
         <Outlet />
       </main>
     </div>
