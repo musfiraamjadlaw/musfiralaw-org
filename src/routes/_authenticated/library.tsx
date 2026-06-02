@@ -119,9 +119,10 @@ function LibraryPage() {
         .flat()
         .filter(Boolean)
         .join(" ");
-      return `${a.title} ${(a.themes || []).join(" ")} ${(a.questions || []).join(" ")} ${(a.key_ideas || []).join(" ")} ${refBlob} ${a.summary ?? ""} ${a.content_text ?? ""}`
+      return `${a.title} ${(a.themes || []).join(" ")} ${(a.questions || []).join(" ")} ${(a.key_ideas || []).join(" ")} ${(a.tensions || []).join(" ")} ${(a.recurring_concepts || []).join(" ")} ${(a.open_loops || []).join(" ")} ${a.core_argument ?? ""} ${refBlob} ${a.summary ?? ""} ${a.content_text ?? ""}`
         .toLowerCase()
         .includes(s);
+
     });
   }, [articles.data, q]);
 
