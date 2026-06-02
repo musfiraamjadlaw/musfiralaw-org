@@ -3,7 +3,16 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Sign in — Untangle" }] }),
+  head: () => ({
+    meta: [
+      { title: "Sign in — Untangle" },
+      { name: "description", content: "Sign in to Untangle — a place to investigate what isn't making sense and move from observation to understanding." },
+      { property: "og:title", content: "Sign in — Untangle" },
+      { property: "og:description", content: "Access your Whiteboard, Library, and Activation Framework." },
+      { property: "og:url", content: "/login" },
+    ],
+    links: [{ rel: "canonical", href: "/login" }],
+  }),
   component: LoginPage,
 });
 
@@ -43,7 +52,7 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+    <main className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <YarnBall />
@@ -73,7 +82,7 @@ function LoginPage() {
           </button>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
 

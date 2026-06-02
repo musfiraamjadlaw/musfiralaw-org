@@ -5,7 +5,16 @@ import { askAI } from "@/lib/ai.functions";
 import { Waves, AlertTriangle, Clock, Hourglass, Network, Compass } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/start")({
-  head: () => ({ meta: [{ title: "Act — Untangle" }] }),
+  head: () => ({
+    meta: [
+      { title: "Act — Untangle" },
+      { name: "description", content: "The Activation Framework: diagnose which cognitive condition is missing and find the first move that breaks inertia." },
+      { property: "og:title", content: "Act — The Activation Framework" },
+      { property: "og:description", content: "Action is rarely a matter of willpower. Diagnose which of the six conditions for action is missing." },
+      { property: "og:url", content: "/start" },
+    ],
+    links: [{ rel: "canonical", href: "/start" }],
+  }),
   component: StartPage,
 });
 
@@ -90,7 +99,7 @@ TIME ESTIMATE: [realistic time for this first step only]`,
         <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
           Field guide
         </p>
-        <h2 className="font-serif text-3xl leading-tight">The Activation Framework</h2>
+        <h1 className="font-serif text-3xl leading-tight">The Activation Framework</h1>
         <div
           className="mt-4 max-w-2xl text-foreground/80"
           style={{ fontFamily: "var(--font-serif)", fontSize: "17px", lineHeight: 1.7 }}

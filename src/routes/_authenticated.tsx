@@ -46,7 +46,7 @@ function AuthLayout() {
             <Link to="/untangle" className="block text-center group">
               <img
                 src={signatureAsset.url}
-                alt="Signature"
+                alt="Musfira Amjad's signature"
                 className="block h-12 w-auto mx-auto"
                 style={{ mixBlendMode: "multiply" }}
               />
