@@ -99,7 +99,7 @@ function DiagnosePage() {
         <article className="space-y-14 pt-4">
           <header>
             <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
-              You said
+              Notice
             </p>
             <blockquote className="pl-5 border-l-2 border-foreground font-serif italic text-xl text-foreground leading-relaxed">
               {submittedInput}
@@ -107,7 +107,7 @@ function DiagnosePage() {
             <p className="mt-4 font-serif text-muted-foreground">{result.echo}</p>
           </header>
 
-          <Section step="1" title="Cognitive Systems Involved">
+          <Section phase="Analyze" title="Cognitive Systems Involved">
             <div className="space-y-3">
               {result.systems.map((s) => (
                 <div
@@ -128,31 +128,19 @@ function DiagnosePage() {
             </div>
           </Section>
 
-          <Section step="2" title={`What's Struggling — ${result.primary_system}`}>
+          <Section phase="Analyze" title={`What's Struggling — ${result.primary_system}`}>
             <p className="font-serif text-xl text-foreground leading-relaxed">
               {result.plain_explanation}
             </p>
           </Section>
 
-          <Section step="3" title="The Neuroscience">
+          <Section phase="Analyze" title="The Neuroscience">
             <p className="font-serif text-lg text-foreground leading-relaxed">
               {result.neuroscience}
             </p>
           </Section>
 
-          <Section step="4" title="Intervention">
-            <p className="font-serif text-2xl text-foreground leading-snug">
-              {result.intervention.action}
-            </p>
-            <div className="mt-2 text-[10px] tracking-[3px] uppercase text-muted-foreground">
-              {result.intervention.duration}
-            </div>
-            <p className="mt-4 font-serif italic text-muted-foreground leading-relaxed">
-              {result.intervention.why_it_works}
-            </p>
-          </Section>
-
-          <Section step="5" title="What to Read & Sit With">
+          <Section phase="Connect" title="You've encountered this before">
             <div className="space-y-8">
               {result.article && (
                 <Recommendation label="From your Substack">
@@ -199,6 +187,19 @@ function DiagnosePage() {
               </Recommendation>
             </div>
           </Section>
+
+          <Section phase="Act" title="One next step">
+            <p className="font-serif text-2xl text-foreground leading-snug">
+              {result.intervention.action}
+            </p>
+            <div className="mt-2 text-[10px] tracking-[3px] uppercase text-muted-foreground">
+              {result.intervention.duration}
+            </div>
+            <p className="mt-4 font-serif italic text-muted-foreground leading-relaxed">
+              {result.intervention.why_it_works}
+            </p>
+          </Section>
+
 
           <div className="pt-6 border-t border-border flex gap-3">
             <button
