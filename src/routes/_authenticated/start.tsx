@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/start")({
-  head: () => ({ meta: [{ title: "Start — MusfiraOS" }] }),
+  head: () => ({ meta: [{ title: "Start — Notebook" }] }),
   component: StartPage,
 });
 
@@ -20,7 +20,7 @@ function StartPage() {
     try {
       const { text: r } = await ai({
         data: {
-          prompt: `Musfira is completely frozen on: "${text}"\n\nGive her exactly:\n\nMICRO-STEP: [one physical action she can do RIGHT NOW, under 2 minutes — name the exact file, app, or object]\n\nBODY DOUBLE: [one warm sentence, like a friend sitting beside her]\n\nTIME ESTIMATE: [realistic time for this first step only]`,
+          prompt: `The user is stuck on this task: "${text}"\n\nReturn exactly three short blocks:\n\nFIRST MOVE: [one concrete physical action they can take in under 2 minutes — name the exact file, app, document, or object]\n\nWHY IT WORKS: [one sentence explaining why this is the right entry point]\n\nTIME ESTIMATE: [realistic time for this first step only]`,
         },
       });
       setResult(r);
@@ -31,14 +31,14 @@ function StartPage() {
   return (
     <div>
       <h2 className="font-serif text-3xl">Start This.</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Frozen on something? Type the task. Get the one move that breaks the freeze.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Stuck on something? Name the task. Get the first move that breaks inertia.</p>
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3}
-        placeholder="e.g. finish the Washington demand letter"
+        placeholder="e.g. finish the Q3 client proposal"
         className="w-full mt-6 border border-border rounded p-4 bg-card font-mono text-sm leading-7 outline-none resize-none focus:border-accent" />
       <button onClick={run} disabled={loading || !text.trim()}
         className="mt-4 px-7 py-3 text-[10px] tracking-[2.5px] uppercase disabled:opacity-50 text-white"
         style={{ background: "#E8A838" }}>
-        {loading ? "Thinking..." : "Give me the start"}
+        {loading ? "Thinking..." : "Give me the first move"}
       </button>
       {result && (
         <div className="mt-8 p-6 border-l-4 border-accent bg-card">

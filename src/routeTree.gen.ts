@@ -15,7 +15,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVaultRouteImport } from './routes/_authenticated/vault'
 import { Route as AuthenticatedUntangleRouteImport } from './routes/_authenticated/untangle'
 import { Route as AuthenticatedStartRouteImport } from './routes/_authenticated/start'
-import { Route as AuthenticatedMentorsRouteImport } from './routes/_authenticated/mentors'
 import { Route as AuthenticatedMeaningRouteImport } from './routes/_authenticated/meaning'
 import { Route as AuthenticatedDumpRouteImport } from './routes/_authenticated/dump'
 import { Route as AuthenticatedCourtroomRouteImport } from './routes/_authenticated/courtroom'
@@ -50,11 +49,6 @@ const AuthenticatedStartRoute = AuthenticatedStartRouteImport.update({
   path: '/start',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedMentorsRoute = AuthenticatedMentorsRouteImport.update({
-  id: '/mentors',
-  path: '/mentors',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedMeaningRoute = AuthenticatedMeaningRouteImport.update({
   id: '/meaning',
   path: '/meaning',
@@ -83,7 +77,6 @@ export interface FileRoutesByFullPath {
   '/courtroom': typeof AuthenticatedCourtroomRoute
   '/dump': typeof AuthenticatedDumpRoute
   '/meaning': typeof AuthenticatedMeaningRoute
-  '/mentors': typeof AuthenticatedMentorsRoute
   '/start': typeof AuthenticatedStartRoute
   '/untangle': typeof AuthenticatedUntangleRoute
   '/vault': typeof AuthenticatedVaultRoute
@@ -95,7 +88,6 @@ export interface FileRoutesByTo {
   '/courtroom': typeof AuthenticatedCourtroomRoute
   '/dump': typeof AuthenticatedDumpRoute
   '/meaning': typeof AuthenticatedMeaningRoute
-  '/mentors': typeof AuthenticatedMentorsRoute
   '/start': typeof AuthenticatedStartRoute
   '/untangle': typeof AuthenticatedUntangleRoute
   '/vault': typeof AuthenticatedVaultRoute
@@ -109,7 +101,6 @@ export interface FileRoutesById {
   '/_authenticated/courtroom': typeof AuthenticatedCourtroomRoute
   '/_authenticated/dump': typeof AuthenticatedDumpRoute
   '/_authenticated/meaning': typeof AuthenticatedMeaningRoute
-  '/_authenticated/mentors': typeof AuthenticatedMentorsRoute
   '/_authenticated/start': typeof AuthenticatedStartRoute
   '/_authenticated/untangle': typeof AuthenticatedUntangleRoute
   '/_authenticated/vault': typeof AuthenticatedVaultRoute
@@ -123,7 +114,6 @@ export interface FileRouteTypes {
     | '/courtroom'
     | '/dump'
     | '/meaning'
-    | '/mentors'
     | '/start'
     | '/untangle'
     | '/vault'
@@ -135,7 +125,6 @@ export interface FileRouteTypes {
     | '/courtroom'
     | '/dump'
     | '/meaning'
-    | '/mentors'
     | '/start'
     | '/untangle'
     | '/vault'
@@ -148,7 +137,6 @@ export interface FileRouteTypes {
     | '/_authenticated/courtroom'
     | '/_authenticated/dump'
     | '/_authenticated/meaning'
-    | '/_authenticated/mentors'
     | '/_authenticated/start'
     | '/_authenticated/untangle'
     | '/_authenticated/vault'
@@ -204,13 +192,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedStartRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/mentors': {
-      id: '/_authenticated/mentors'
-      path: '/mentors'
-      fullPath: '/mentors'
-      preLoaderRoute: typeof AuthenticatedMentorsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/meaning': {
       id: '/_authenticated/meaning'
       path: '/meaning'
@@ -247,7 +228,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCourtroomRoute: typeof AuthenticatedCourtroomRoute
   AuthenticatedDumpRoute: typeof AuthenticatedDumpRoute
   AuthenticatedMeaningRoute: typeof AuthenticatedMeaningRoute
-  AuthenticatedMentorsRoute: typeof AuthenticatedMentorsRoute
   AuthenticatedStartRoute: typeof AuthenticatedStartRoute
   AuthenticatedUntangleRoute: typeof AuthenticatedUntangleRoute
   AuthenticatedVaultRoute: typeof AuthenticatedVaultRoute
@@ -258,7 +238,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCourtroomRoute: AuthenticatedCourtroomRoute,
   AuthenticatedDumpRoute: AuthenticatedDumpRoute,
   AuthenticatedMeaningRoute: AuthenticatedMeaningRoute,
-  AuthenticatedMentorsRoute: AuthenticatedMentorsRoute,
   AuthenticatedStartRoute: AuthenticatedStartRoute,
   AuthenticatedUntangleRoute: AuthenticatedUntangleRoute,
   AuthenticatedVaultRoute: AuthenticatedVaultRoute,
@@ -276,3 +255,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

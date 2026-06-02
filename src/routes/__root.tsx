@@ -54,8 +54,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "MusfiraOS" },
-      { name: "description", content: "Musfira's personal operating system." },
+      { title: "Notebook" },
+      { name: "description", content: "An executive function and decision-making tool — start tasks, untangle projects, separate facts from assumptions, and build a searchable second brain." },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

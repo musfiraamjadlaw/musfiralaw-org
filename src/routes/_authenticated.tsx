@@ -13,14 +13,13 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const TABS = [
-  { id: "dump", label: "Dump", to: "/dump" },
+  { id: "dump", label: "Brain Dump", to: "/dump" },
   { id: "start", label: "Start", to: "/start" },
-  { id: "clock", label: "Clock", to: "/clock" },
   { id: "untangle", label: "Untangle", to: "/untangle" },
   { id: "courtroom", label: "Courtroom", to: "/courtroom" },
-  { id: "vault", label: "Vault", to: "/vault" },
-  { id: "mentors", label: "Mentors", to: "/mentors" },
-  { id: "meaning", label: "Meaning", to: "/meaning" },
+  { id: "clock", label: "Time Radar", to: "/clock" },
+  { id: "vault", label: "Knowledge Vault", to: "/vault" },
+  { id: "meaning", label: "Meaning Engine", to: "/meaning" },
 ] as const;
 
 function AuthLayout() {
@@ -43,9 +42,9 @@ function AuthLayout() {
         <div className="max-w-4xl mx-auto px-7 pt-5">
           <div className="flex items-baseline justify-between mb-4">
             <div className="flex items-baseline gap-3">
-              <h1 className="font-serif text-xl font-semibold">MusfiraOS</h1>
+              <h1 className="font-serif text-xl font-semibold">Notebook</h1>
               <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-                Musfira's operating system
+                Executive function &amp; decision system
               </span>
             </div>
             <button onClick={signOut} className="text-[10px] tracking-[2px] uppercase text-muted-foreground hover:text-navy">
