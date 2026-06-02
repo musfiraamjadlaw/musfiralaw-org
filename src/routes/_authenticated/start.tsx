@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/start")({
-  head: () => ({ meta: [{ title: "Start — Notebook" }] }),
+  head: () => ({ meta: [{ title: "Start — Untangle" }] }),
   component: StartPage,
 });
 

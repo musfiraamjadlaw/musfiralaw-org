@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/meaning")({
-  head: () => ({ meta: [{ title: "Meaning Engine — Notebook" }] }),
+  head: () => ({ meta: [{ title: "Meaning Engine — Untangle" }] }),
   component: MeaningPage,
 });
 

@@ -17,7 +17,7 @@ import {
 } from "@/lib/editorial.functions";
 
 export const Route = createFileRoute("/_authenticated/editorial")({
-  head: () => ({ meta: [{ title: "Editorial Intelligence — Notebook" }] }),
+  head: () => ({ meta: [{ title: "Editorial Intelligence — Untangle" }] }),
   component: EditorialPage,
 });
 

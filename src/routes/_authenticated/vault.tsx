@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/vault")({
-  head: () => ({ meta: [{ title: "Knowledge Vault — Notebook" }] }),
+  head: () => ({ meta: [{ title: "Knowledge Vault — Untangle" }] }),
   component: VaultPage,
 });
 
