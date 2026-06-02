@@ -69,6 +69,14 @@ function DiagnosePage() {
     try {
       const r = await run({ data: { input: input.trim() } });
       setResult(r);
+      try {
+        sessionStorage.setItem(
+          WHITEBOARD_KEY,
+          JSON.stringify({ input: input.trim(), result: r }),
+        );
+      } catch {
+        /* storage unavailable — Whiteboard will just show empty state */
+      }
     } catch (e: any) {
       setErr(e.message ?? "Something went wrong.");
     }
