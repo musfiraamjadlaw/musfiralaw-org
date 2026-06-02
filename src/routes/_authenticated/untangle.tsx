@@ -1,22 +1,53 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { diagnose, type DiagnoseResult } from "@/lib/diagnose.functions";
+import {
+  diagnose,
+  type DiagnoseResult,
+  type ActivationCondition,
+  type Intervention,
+} from "@/lib/diagnose.functions";
 
 export const Route = createFileRoute("/_authenticated/untangle")({
-  head: () => ({ meta: [{ title: "Untangle — Cognitive OS" }] }),
+  head: () => ({
+    meta: [
+      { title: "Untangle — Sensemaking" },
+      {
+        name: "description",
+        content:
+          "Enter what you're noticing. Untangle builds an intellectual chain from observation to understanding.",
+      },
+    ],
+  }),
   component: DiagnosePage,
 });
 
 const EXAMPLES = [
-  "I keep returning to the same question and can't tell why.",
-  "Something about this case isn't sitting right.",
-  "I have a hunch I can't yet articulate.",
-  "I can't tell if this is intuition or avoidance.",
-  "Two ideas I've been holding seem to be the same idea.",
-  "I read three things this week that feel connected.",
-  "I keep avoiding this and I don't know what it's about.",
+  "I have a million things to do.",
+  "I can't focus.",
+  "I don't know where to start.",
+  "I keep thinking about them.",
+  "I'm overwhelmed.",
+  "I'm stuck.",
 ];
+
+// Activation icons — minimal geometric glyphs, not emoji.
+const ACTIVATION_GLYPH: Record<ActivationCondition, string> = {
+  Interest: "≋",       // wave
+  Challenge: "△",      // warning triangle
+  Urgency: "◷",        // clock
+  Novelty: "⌛",        // expiration marker
+  Relationships: "◉",  // connected nodes
+  Meaning: "✦",        // compass star
+};
+
+const INTERVENTION_TO: Record<Exclude<Intervention, "none">, string> = {
+  brain_dump: "/dump",
+  courtroom: "/courtroom",
+  clock: "/clock",
+  meaning: "/meaning",
+  states: "/states",
+};
 
 function DiagnosePage() {
   const [input, setInput] = useState("");
@@ -44,18 +75,12 @@ function DiagnosePage() {
   return (
     <div className="max-w-3xl mx-auto">
       {!result && (
-        <div className="pt-12">
+        <div className="pt-16">
           <h2 className="font-serif text-5xl text-foreground text-center leading-tight">
             What are you noticing?
           </h2>
-          <p className="mt-3 text-center text-muted-foreground font-serif italic">
-            Or — what isn't making sense?
-          </p>
-          <p className="mt-4 text-center font-serif text-foreground/90 tracking-wide">
-            Find the pattern. Take the next step. Make it happen.
-          </p>
-          <p className="mt-6 text-center text-xs tracking-[2px] uppercase text-muted-foreground">
-            Notice · Analyze · Connect · Act
+          <p className="mt-4 text-center text-muted-foreground font-serif italic text-lg">
+            An observation, not a task.
           </p>
 
           <textarea
@@ -65,8 +90,8 @@ function DiagnosePage() {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit();
             }}
             rows={5}
-            placeholder="An observation. A friction. A pattern. A question you keep circling."
-            className="w-full mt-8 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
+            placeholder="A friction. A pattern. A question you keep circling."
+            className="w-full mt-10 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
           />
 
           <div className="mt-5 flex flex-wrap justify-center gap-2">
@@ -81,13 +106,13 @@ function DiagnosePage() {
             ))}
           </div>
 
-          <div className="mt-8 flex items-center justify-center gap-4">
+          <div className="mt-10 flex items-center justify-center gap-4">
             <button
               onClick={submit}
               disabled={loading || !input.trim()}
               className="px-10 py-3 text-[11px] tracking-[3px] uppercase disabled:opacity-40 bg-foreground text-background hover:bg-foreground/90 transition-colors"
             >
-              {loading ? "Untangling…" : "Untangle"}
+              {loading ? "Thinking…" : "Untangle"}
             </button>
             <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
               ⌘ + Enter
@@ -99,112 +124,157 @@ function DiagnosePage() {
       )}
 
       {result && (
-        <article className="space-y-14 pt-4">
-          <header>
-            <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
-              Notice
-            </p>
-            <blockquote className="pl-5 border-l-2 border-foreground font-serif italic text-xl text-foreground leading-relaxed">
+        <article className="space-y-16 pt-4 pb-24">
+          {/* 1. Observation */}
+          <Step number="01" label="Observation">
+            <blockquote className="pl-5 border-l-2 border-foreground font-serif italic text-2xl text-foreground leading-relaxed">
               {submittedInput}
             </blockquote>
-            <p className="mt-4 font-serif text-muted-foreground">{result.echo}</p>
-          </header>
+            <p className="mt-4 font-serif text-muted-foreground">
+              {result.observation_echo}
+            </p>
+          </Step>
 
-          <Section phase="Analyze" title="Cognitive Systems Involved">
-            <div className="space-y-3">
-              {result.systems.map((s) => (
-                <div
-                  key={s.name}
-                  className={`border-l-2 pl-4 py-1 ${
-                    s.name === result.primary_system
-                      ? "border-foreground"
-                      : "border-border"
-                  }`}
-                >
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h4 className="font-serif text-lg text-foreground">{s.name}</h4>
-                    <LoadBadge load={s.load} />
-                  </div>
-                  <p className="mt-1 font-serif text-foreground/80">{s.note}</p>
-                </div>
-              ))}
-            </div>
-          </Section>
+          {/* 2. Core Question */}
+          <Step number="02" label="The question underneath">
+            <p className="font-serif italic text-3xl text-foreground leading-snug">
+              {result.core_question}
+            </p>
+            <p className="mt-4 font-serif text-foreground/80 leading-relaxed">
+              {result.question_context}
+            </p>
+          </Step>
 
-          <Section phase="Analyze" title={`What's Struggling — ${result.primary_system}`}>
+          {/* 3. Mechanism (with activation woven in) */}
+          <Step number="03" label="What may be happening">
             <p className="font-serif text-xl text-foreground leading-relaxed">
-              {result.plain_explanation}
+              {result.mechanism.plain}
             </p>
-          </Section>
-
-          <Section phase="Analyze" title="The Neuroscience">
-            <p className="font-serif text-lg text-foreground leading-relaxed">
-              {result.neuroscience}
+            <p className="mt-5 font-serif text-base text-foreground/80 leading-relaxed">
+              {result.mechanism.deeper}
             </p>
-          </Section>
 
-          <Section phase="Connect" title="You've encountered this before">
-            <div className="space-y-8">
-              {result.article && (
-                <Recommendation label="From your Substack">
-                  <h4 className="font-serif text-xl text-foreground">
-                    {result.article.url ? (
-                      <a
-                        href={result.article.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:underline"
-                      >
-                        {result.article.title}
-                      </a>
-                    ) : (
-                      result.article.title
-                    )}
-                  </h4>
-                  <p className="mt-2 font-serif text-foreground/80">{result.article.why}</p>
-                </Recommendation>
-              )}
-
-              <Recommendation label="Book">
-                <p className="font-serif text-xl text-foreground">
-                  <em>{result.book.title}</em> — {result.book.author}
-                </p>
-                <p className="mt-2 font-serif text-foreground/80">{result.book.why}</p>
-              </Recommendation>
-
-              <Recommendation label="Study">
-                <p className="font-serif text-xl text-foreground">{result.study.title}</p>
-                <p className="font-serif text-sm text-muted-foreground">
-                  {result.study.authors} ({result.study.year})
-                </p>
-                <p className="mt-2 font-serif text-foreground/80">{result.study.finding}</p>
-                <p className="mt-2 font-mono text-xs text-muted-foreground">
-                  {result.study.citation}
-                </p>
-              </Recommendation>
-
-              <Recommendation label="Question">
-                <p className="font-serif italic text-2xl text-foreground leading-snug">
-                  {result.question}
-                </p>
-              </Recommendation>
+            {/* Activation interpretation — woven as prose, not a scorecard */}
+            <div className="mt-8 pt-6 border-t border-border/60">
+              <p className="font-serif text-base text-foreground/85 leading-relaxed">
+                {result.mechanism.activation_reading}
+              </p>
+              <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-[11px] tracking-[2px] uppercase">
+                {(["Interest","Challenge","Urgency","Novelty","Relationships","Meaning"] as ActivationCondition[]).map((c) => {
+                  const isMissing = result.mechanism.missing_condition === c;
+                  const isPresent = result.mechanism.present_conditions?.includes(c);
+                  return (
+                    <span
+                      key={c}
+                      className={
+                        isMissing
+                          ? "text-foreground font-medium"
+                          : isPresent
+                            ? "text-muted-foreground"
+                            : "text-muted-foreground/40"
+                      }
+                    >
+                      <span className="mr-1.5 font-serif text-sm not-italic">{ACTIVATION_GLYPH[c]}</span>
+                      {c}
+                      {isMissing && <span className="ml-1 italic normal-case tracking-normal text-[10px]"> missing</span>}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
-          </Section>
 
-          <Section phase="Act" title="One next step">
+            {result.mechanism.citations?.length > 0 && (
+              <p className="mt-6 font-mono text-[11px] text-muted-foreground">
+                {result.mechanism.citations.join(" · ")}
+              </p>
+            )}
+          </Step>
+
+          {/* 4. You've thought about this before */}
+          {result.article && (
+            <Step number="04" label="You've thought about this before">
+              <h4 className="font-serif text-2xl text-foreground leading-snug">
+                {result.article.url ? (
+                  <a href={result.article.url} target="_blank" rel="noreferrer" className="hover:underline">
+                    {result.article.title}
+                  </a>
+                ) : (
+                  result.article.title
+                )}
+              </h4>
+              <p className="mt-3 font-serif italic text-muted-foreground">
+                The question it explores: {result.article.question_it_explores}
+              </p>
+              <p className="mt-3 font-serif text-foreground/85 leading-relaxed">
+                {result.article.why_relevant}
+              </p>
+              <p className="mt-3 font-serif text-foreground/85 leading-relaxed">
+                {result.article.insight}
+              </p>
+            </Step>
+          )}
+
+          {/* 5. Related Research */}
+          <Step number={result.article ? "05" : "04"} label="Related research">
+            <p className="font-serif text-xl text-foreground">{result.study.title}</p>
+            <p className="font-serif text-sm text-muted-foreground mt-1">
+              {result.study.authors} ({result.study.year})
+            </p>
+            <p className="mt-3 font-serif text-foreground/85 leading-relaxed">
+              {result.study.finding}
+            </p>
+            <p className="mt-3 font-serif italic text-muted-foreground leading-relaxed">
+              {result.study.why_it_deepens}
+            </p>
+            <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+              {result.study.citation}
+            </p>
+          </Step>
+
+          {/* 6. Related Book */}
+          <Step number={result.article ? "06" : "05"} label="A book to sit with">
+            <p className="font-serif text-xl text-foreground">
+              <em>{result.book.title}</em> — {result.book.author}
+            </p>
+            <p className="mt-3 font-serif text-foreground/85 leading-relaxed">{result.book.why}</p>
+          </Step>
+
+          {/* 7. A Better Question */}
+          <Step number={result.article ? "07" : "06"} label="A better question">
+            <p className="font-serif italic text-3xl text-foreground leading-snug">
+              {result.better_question}
+            </p>
+          </Step>
+
+          {/* 8. Action — emerges from the missing condition */}
+          <Step number={result.article ? "08" : "07"} label="One next step">
             <p className="font-serif text-2xl text-foreground leading-snug">
-              {result.intervention.action}
+              {result.action.step}
             </p>
-            <div className="mt-2 text-[10px] tracking-[3px] uppercase text-muted-foreground">
-              {result.intervention.duration}
-            </div>
             <p className="mt-4 font-serif italic text-muted-foreground leading-relaxed">
-              {result.intervention.why_it_works}
+              {result.action.why_this_emerges}
             </p>
-          </Section>
 
+            {/* Intervention CTA — only when a specific tool genuinely fits */}
+            {result.suggested_intervention.kind !== "none" && (
+              <div className="mt-8 pt-6 border-t border-border/60">
+                <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
+                  Take it further
+                </p>
+                <Link
+                  to={INTERVENTION_TO[result.suggested_intervention.kind as Exclude<Intervention,"none">]}
+                  className="inline-block px-6 py-3 text-[11px] tracking-[3px] uppercase border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
+                >
+                  {result.suggested_intervention.label} →
+                </Link>
+                <p className="mt-3 font-serif italic text-sm text-muted-foreground max-w-xl">
+                  {result.suggested_intervention.reason}
+                </p>
+              </div>
+            )}
+          </Step>
 
-          <div className="pt-6 border-t border-border flex gap-3">
+          <div className="pt-8 border-t border-border flex gap-3">
             <button
               onClick={() => {
                 setResult(null);
@@ -228,49 +298,24 @@ function DiagnosePage() {
   );
 }
 
-function LoadBadge({ load }: { load: "high" | "medium" | "low" }) {
-  return (
-    <span className="text-[9px] tracking-[2px] uppercase text-muted-foreground">
-      {load} load
-    </span>
-  );
-}
-
-function Section({
-  phase,
-  title,
+function Step({
+  number,
+  label,
   children,
 }: {
-  phase: string;
-  title: string;
+  number: string;
+  label: string;
   children: React.ReactNode;
 }) {
   return (
     <section>
       <div className="flex items-baseline gap-4 mb-5 border-b border-border pb-2">
-        <span className="text-[10px] tracking-[3px] uppercase text-accent-foreground/70 font-medium">
-          {phase}
+        <span className="font-mono text-[10px] tracking-[2px] text-muted-foreground">
+          {number}
         </span>
-        <h3 className="font-serif italic text-foreground text-lg">{title}</h3>
+        <h3 className="font-serif italic text-foreground text-lg">{label}</h3>
       </div>
       {children}
     </section>
-  );
-}
-
-function Recommendation({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <div className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">
-        {label}
-      </div>
-      {children}
-    </div>
   );
 }
