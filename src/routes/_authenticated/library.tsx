@@ -152,7 +152,7 @@ function LibraryPage() {
       </nav>
 
       {/* Search (articles + knowledge only) */}
-      {(tab === "articles" || tab === "knowledge") && (
+      {(tab === "corpus" || tab === "knowledge") && (
         <div className="mb-6">
           <input
             value={q}
