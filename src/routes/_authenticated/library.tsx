@@ -46,7 +46,7 @@ function LibraryPage() {
     queryFn: async () =>
       (await supabase
         .from("articles")
-        .select("id, title, url, source, published_at, themes, content_text")
+        .select("id, title, url, source, published_at, themes, questions, key_ideas, refs, summary, analyzed_at, content_text")
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(200)).data ?? [],
   });
