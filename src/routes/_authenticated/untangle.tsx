@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/untangle")({
-  head: () => ({ meta: [{ title: "Untangle — MusfiraOS" }] }),
+  head: () => ({ meta: [{ title: "Untangle — Notebook" }] }),
   component: UntanglePage,
 });
 
@@ -23,7 +23,7 @@ function UntanglePage() {
     try {
       const { text: raw } = await ai({
         data: {
-          prompt: `Musfira says this task is too big: "${text}"\n\nBreak it into 3–7 ordered micro-steps. Each under 20 minutes. Use action verbs. Name specific apps, documents, or websites.\n\nJSON: {"steps":[{"step":1,"action":"...","minutes":10,"note":"optional short tip"}]}`,
+          prompt: `The user says this project is too big: "${text}"\n\nBreak it into 3–7 ordered micro-steps. Each under 20 minutes. Use action verbs. Name specific tools, documents, or systems where possible.\n\nJSON: {"steps":[{"step":1,"action":"...","minutes":10,"note":"optional short tip"}]}`,
           wantJson: true,
         },
       });
@@ -36,9 +36,9 @@ function UntanglePage() {
   return (
     <div>
       <h2 className="font-serif text-3xl">Untangle This.</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Big scary task? Paste it. Walk out with a list you can actually execute.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Big project? Paste it. Walk out with a list you can actually execute.</p>
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3}
-        placeholder="e.g. apply to University of Florida Levin College of Law"
+        placeholder="e.g. launch the new pricing page"
         className="w-full mt-6 border border-border rounded p-4 bg-card font-mono text-sm leading-7 outline-none resize-none focus:border-accent" />
       <button onClick={run} disabled={loading || !text.trim()}
         className="mt-4 px-7 py-3 text-[10px] tracking-[2.5px] uppercase text-white disabled:opacity-50"
@@ -48,7 +48,7 @@ function UntanglePage() {
       {steps.length > 0 && (
         <div className="mt-10">
           <div className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-5">
-            {steps.length} steps — you can do this
+            {steps.length} steps
           </div>
           {steps.map((s, i) => {
             const isDone = !!done[i];

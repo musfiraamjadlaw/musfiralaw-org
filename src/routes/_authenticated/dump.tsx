@@ -6,16 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/dump")({
-  head: () => ({ meta: [{ title: "Brain Dump — MusfiraOS" }] }),
+  head: () => ({ meta: [{ title: "Brain Dump — Notebook" }] }),
   component: DumpPage,
 });
 
 const CATS: Record<string, { label: string; color: string; bg: string; emoji: string }> = {
-  work:      { label: "WORK",       color: "#C0392B", bg: "#FDF2F2", emoji: "⚖️" },
-  writing:   { label: "WRITING",    color: "#1A6FB5", bg: "#EEF5FD", emoji: "✍️" },
-  lawschool: { label: "LAW SCHOOL", color: "#1A8A4A", bg: "#EDF7F2", emoji: "📚" },
-  personal:  { label: "PERSONAL",   color: "#C87D0E", bg: "#FEF9EF", emoji: "🌿" },
-  tutoring:  { label: "TUTORING",   color: "#7B3FA8", bg: "#F4EEF9", emoji: "🎓" },
+  work:     { label: "WORK",     color: "#1A2744", bg: "#EEF1F8", emoji: "▤" },
+  project:  { label: "PROJECT",  color: "#1A6FB5", bg: "#EEF5FD", emoji: "◇" },
+  research: { label: "RESEARCH", color: "#1A8A4A", bg: "#EDF7F2", emoji: "◎" },
+  idea:     { label: "IDEA",     color: "#C87D0E", bg: "#FEF9EF", emoji: "✦" },
+  admin:    { label: "ADMIN",    color: "#7B3FA8", bg: "#F4EEF9", emoji: "◈" },
 };
 
 function DumpPage() {
@@ -55,7 +55,7 @@ function DumpPage() {
     try {
       const { text: raw } = await ai({
         data: {
-          prompt: `Musfira's brain dump:\n\n"${text}"\n\nParse into individual tasks or items. Assign each to: work, writing, lawschool, personal, or tutoring. Set priority: high, medium, or low.\n\nJSON: {"items":[{"text":"...","category":"work","priority":"high"}]}`,
+          prompt: `Brain dump from the user:\n\n"${text}"\n\nParse into individual tasks or items. Assign each to: work, project, research, idea, or admin. Set priority: high, medium, or low.\n\nJSON: {"items":[{"text":"...","category":"work","priority":"high"}]}`,
           wantJson: true,
         },
       });
@@ -79,10 +79,10 @@ function DumpPage() {
   return (
     <div>
       <h2 className="font-serif text-3xl">Brain Dump.</h2>
-      <p className="mt-2 text-sm text-muted-foreground">Everything in your head. One line or twenty. Don't organize it. Just type.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Everything on your mind. One line or twenty. Don't organize it. Just type.</p>
 
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={8}
-        placeholder="finish Washington demand letter&#10;call court re: filing date&#10;schedule LSAT..."
+        placeholder="finish Q3 proposal&#10;call vendor about contract&#10;research competitor pricing..."
         className="w-full mt-6 border border-border rounded p-4 bg-card font-mono text-sm leading-7 outline-none resize-none focus:border-accent" />
 
       <button onClick={sortIt} disabled={loading || !text.trim()}

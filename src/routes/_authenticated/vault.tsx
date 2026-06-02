@@ -4,27 +4,26 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/vault")({
-  head: () => ({ meta: [{ title: "Knowledge Vault — MusfiraOS" }] }),
+  head: () => ({ meta: [{ title: "Knowledge Vault — Notebook" }] }),
   component: VaultPage,
 });
 
-const CATEGORIES = ["legal", "deposition", "maritime", "writing", "adhd", "lawschool"] as const;
+const CATEGORIES = ["note", "research", "idea", "lesson", "reference"] as const;
 type Cat = typeof CATEGORIES[number];
 
 const CAT_LABEL: Record<Cat, string> = {
-  legal: "Legal lessons",
-  deposition: "Deposition prep",
-  maritime: "Maritime law",
-  writing: "Writing ideas",
-  adhd: "ADHD insights",
-  lawschool: "Law school research",
+  note: "Notes",
+  research: "Research",
+  idea: "Ideas",
+  lesson: "Lessons learned",
+  reference: "Reference material",
 };
 
 function VaultPage() {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<Cat | "all">("all");
   const [adding, setAdding] = useState(false);
-  const [form, setForm] = useState({ title: "", body: "", category: "legal" as Cat, tags: "" });
+  const [form, setForm] = useState({ title: "", body: "", category: "note" as Cat, tags: "" });
   const qc = useQueryClient();
 
   const { data: entries = [] } = useQuery({
@@ -51,7 +50,7 @@ function VaultPage() {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["knowledge"] });
-      setForm({ title: "", body: "", category: "legal", tags: "" });
+      setForm({ title: "", body: "", category: "note", tags: "" });
       setAdding(false);
     },
   });
@@ -75,9 +74,9 @@ function VaultPage() {
     <div>
       <div className="flex items-baseline gap-3">
         <h2 className="font-serif text-3xl">Knowledge Vault.</h2>
-        <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">📚 your library</span>
+        <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">your second brain</span>
       </div>
-      <p className="mt-2 text-sm text-muted-foreground">Lessons, prep, notes, ideas. Searchable forever.</p>
+      <p className="mt-2 text-sm text-muted-foreground">Notes, research, ideas, lessons, references. Searchable forever.</p>
 
       <div className="mt-6 flex flex-wrap gap-2 items-center">
         <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="search…"
@@ -114,7 +113,7 @@ function VaultPage() {
       )}
 
       <div className="mt-8 space-y-3">
-        {filtered.length === 0 && <div className="text-sm text-muted-foreground italic">Nothing in this section yet.</div>}
+        {filtered.length === 0 && <div className="text-sm text-muted-foreground italic">Nothing here yet.</div>}
         {filtered.map((e: any) => (
           <div key={e.id} className="p-5 border border-border rounded bg-card group">
             <div className="flex justify-between items-start gap-3">

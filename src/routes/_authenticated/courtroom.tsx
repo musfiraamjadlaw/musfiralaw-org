@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/courtroom")({
-  head: () => ({ meta: [{ title: "Courtroom — MusfiraOS" }] }),
+  head: () => ({ meta: [{ title: "Courtroom — Notebook" }] }),
   component: CourtroomPage,
 });
 
@@ -50,7 +50,7 @@ function CourtroomPage() {
     try {
       const { text: raw } = await ai({
         data: {
-          prompt: `Musfira presents this SITUATION for adjudication: "${situation}"\n\nAct as a litigator separating signal from noise. Return JSON with these exact keys, each a short paragraph or bullet list (plain text, no markdown):\n- facts: what is objectively true and provable\n- assumptions: what she's assuming but hasn't proved\n- evidence: specific evidence supporting or undermining the assumptions\n- alternatives: 2-3 alternative explanations she hasn't considered\n- verdict: a clear, direct ruling — what is actually happening and what to do\n\nJSON: {"facts":"...","assumptions":"...","evidence":"...","alternatives":"...","verdict":"..."}`,
+          prompt: `Apply structured reasoning to this situation: "${situation}"\n\nReturn JSON with these exact keys, each a short paragraph or bullet list (plain text, no markdown):\n- facts: what is objectively true and verifiable\n- assumptions: what is being assumed but not proven\n- evidence: specific evidence supporting or undermining the assumptions\n- alternatives: 2-3 alternative explanations worth considering\n- verdict: the clearest conclusion the evidence supports, and the next concrete action\n\nKeep it analytical. No emotional commentary. No reference to identity or relationships.\n\nJSON: {"facts":"...","assumptions":"...","evidence":"...","alternatives":"...","verdict":"..."}`,
           wantJson: true,
         },
       });
@@ -65,12 +65,12 @@ function CourtroomPage() {
     <div>
       <div className="flex items-baseline gap-3">
         <h2 className="font-serif text-3xl">The Courtroom.</h2>
-        <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">⚖️ adjudication chamber</span>
+        <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">⚖ structured reasoning</span>
       </div>
-      <p className="mt-2 text-sm text-muted-foreground">Separate facts from assumptions. State the situation. Receive a verdict.</p>
+      <p className="mt-2 text-sm text-muted-foreground">State the situation. Separate facts from assumptions. Reach a defensible conclusion.</p>
 
       <textarea value={situation} onChange={(e) => setSituation(e.target.value)} rows={5}
-        placeholder="e.g. David didn't reply to my email all day. He's mad about the Hawkins filing."
+        placeholder="e.g. The vendor hasn't sent the revised contract in five days. They are stalling the deal."
         className="w-full mt-6 border border-border rounded p-4 bg-card font-mono text-sm leading-7 outline-none resize-none focus:border-accent" />
       <button onClick={deliberate} disabled={loading || !situation.trim()}
         className="mt-4 px-7 py-3 bg-navy text-primary-foreground text-[10px] tracking-[2.5px] uppercase disabled:opacity-50">
@@ -84,7 +84,7 @@ function CourtroomPage() {
             ["Assumptions presented", result.assumptions, "#C87D0E"],
             ["Evidence reviewed", result.evidence, "#1A6FB5"],
             ["Alternative explanations", result.alternatives, "#7B3FA8"],
-            ["Verdict", result.verdict, "#1A8A4A"],
+            ["Conclusion", result.verdict, "#1A8A4A"],
           ] as const).map(([title, body, color]) => (
             <div key={title} className="p-6 border-b border-border last:border-b-0">
               <div className="text-[9px] tracking-[3px] uppercase font-semibold mb-3" style={{ color }}>{title}</div>
@@ -102,7 +102,7 @@ function CourtroomPage() {
               <details key={h.id} className="border border-border rounded bg-card p-4">
                 <summary className="cursor-pointer text-sm font-medium">{h.situation.slice(0, 100)}{h.situation.length > 100 ? "…" : ""}</summary>
                 <div className="mt-4 text-xs space-y-3 text-muted-foreground">
-                  <div><b className="text-foreground">Verdict:</b> {h.verdict}</div>
+                  <div><b className="text-foreground">Conclusion:</b> {h.verdict}</div>
                 </div>
               </details>
             ))}

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
 export const Route = createFileRoute("/_authenticated/clock")({
-  head: () => ({ meta: [{ title: "Clock — MusfiraOS" }] }),
+  head: () => ({ meta: [{ title: "Time Radar — Notebook" }] }),
   component: ClockPage,
 });
 

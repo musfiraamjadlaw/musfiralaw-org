@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Sign in — MusfiraOS" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Notebook" }] }),
   component: LoginPage,
 });
 
@@ -46,9 +46,9 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <h1 className="font-serif text-3xl text-navy">MusfiraOS</h1>
+          <h1 className="font-serif text-3xl text-navy">Notebook</h1>
           <p className="mt-2 text-xs tracking-[3px] uppercase text-muted-foreground">
-            Your personal operating system
+            Executive function &amp; decision system
           </p>
         </div>
         <form onSubmit={submit} className="space-y-4 bg-card border border-border p-8 rounded">
