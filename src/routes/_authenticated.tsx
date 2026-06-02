@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, Link, redirect, useRouter, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import signatureAsset from "@/assets/signature.jpg.asset.json";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
@@ -44,12 +45,13 @@ function AuthLayout() {
           <div className="flex items-center justify-between">
             <div className="w-24" />
             <Link to="/diagnose" className="block text-center group">
-              <span
-                className="block leading-none text-foreground"
-                style={{ fontFamily: "var(--font-script)", fontSize: "44px", fontWeight: 400 }}
-              >
-                Cognitive OS
-              </span>
+              <img
+                src={signatureAsset.url}
+                alt="Signature"
+                className="block h-12 w-auto mx-auto"
+                style={{ mixBlendMode: "multiply" }}
+              />
+
             </Link>
             <div className="w-24 flex justify-end">
               {email && (
