@@ -278,7 +278,7 @@ export const recommendNextArticle = createServerFn({ method: "POST" })
     // Only the writer's PUBLISHED work. No tasks. No admin notes. No reminders.
     const { data: articles, error: artErr } = await supabase
       .from("articles")
-      .select("id, title, url, published_at, content_text, themes")
+      .select("id, title, url, published_at, content_text, themes, core_argument, tensions, open_loops, recurring_concepts, questions")
       .eq("source", "published")
       .order("published_at", { ascending: false, nullsFirst: false })
       .limit(80);
@@ -291,11 +291,16 @@ export const recommendNextArticle = createServerFn({ method: "POST" })
     }
 
     const corpus = articles
-      .map(
-        (a: any, i: number) =>
-          `### Essay ${i + 1} — ID: ${a.id}\nTITLE: ${a.title}${a.published_at ? "\nPUBLISHED: " + a.published_at.slice(0, 10) : ""}\n\n${(a.content_text || "").slice(0, 5000)}`,
-      )
+      .map((a: any, i: number) => {
+        const meta: string[] = [];
+        if (a.core_argument) meta.push(`ARGUMENT: ${a.core_argument}`);
+        if (a.tensions?.length) meta.push(`TENSIONS: ${a.tensions.join(" · ")}`);
+        if (a.open_loops?.length) meta.push(`OPEN LOOPS: ${a.open_loops.join(" | ")}`);
+        if (a.recurring_concepts?.length) meta.push(`CONCEPTS: ${a.recurring_concepts.join(", ")}`);
+        return `### Essay ${i + 1} — ID: ${a.id}\nTITLE: ${a.title}${a.published_at ? "\nPUBLISHED: " + a.published_at.slice(0, 10) : ""}${meta.length ? "\n" + meta.join("\n") : ""}\n\n${(a.content_text || "").slice(0, 4000)}`;
+      })
       .join("\n\n---\n\n");
+
 
     const raw = await callAI(
       `You are a developmental editor who has read the writer's entire body of published work. You are NOT a content strategist. You are NOT recommending topics. You are NOT helping them produce more content.
