@@ -17,6 +17,7 @@ type Tab = { id: string; label: string; to: string };
 
 const TABS: Tab[] = [
   { id: "untangle", label: "Untangle", to: "/untangle" },
+  { id: "whiteboard", label: "Whiteboard", to: "/whiteboard" },
   { id: "library", label: "Library", to: "/library" },
   { id: "essays", label: "Essays", to: "/essays" },
   { id: "colophon", label: "Colophon", to: "/colophon" },
