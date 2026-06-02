@@ -277,9 +277,8 @@ function EssaysPage() {
         </div>
       </section>
 
-      <p className="mt-16 text-center text-[10px] tracking-[3px] uppercase text-muted-foreground">
-        Need the full editorial dashboard?{" "}
-        <Link to="/editorial" className="underline hover:text-foreground">Open it</Link>
+      <p className="mt-16 text-center font-serif italic text-muted-foreground">
+        The goal is not more content. The goal is to understand your own body of work.
       </p>
     </div>
   );

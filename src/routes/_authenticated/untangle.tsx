@@ -70,10 +70,9 @@ function DiagnosePage() {
       const r = await run({ data: { input: input.trim() } });
       setResult(r);
       try {
-        sessionStorage.setItem(
-          WHITEBOARD_KEY,
-          JSON.stringify({ input: input.trim(), result: r }),
-        );
+        const payload = JSON.stringify({ input: input.trim(), result: r });
+        localStorage.setItem(WHITEBOARD_KEY, payload);
+        sessionStorage.setItem(WHITEBOARD_KEY, payload);
       } catch {
         /* storage unavailable — Whiteboard will just show empty state */
       }
@@ -131,6 +130,11 @@ function DiagnosePage() {
           </div>
 
           {err && <p className="mt-6 text-sm text-red-700 text-center">{err}</p>}
+
+          <p className="mt-16 text-center text-[10px] tracking-[3px] uppercase text-muted-foreground">
+            Every analysis is pinned to the{" "}
+            <Link to="/whiteboard" className="underline hover:text-foreground">Whiteboard</Link>
+          </p>
         </div>
       )}
 
