@@ -17,11 +17,9 @@ type Tab = { id: string; label: string; to: string };
 
 const TABS: Tab[] = [
   { id: "untangle", label: "Untangle", to: "/untangle" },
-  { id: "start", label: "Act", to: "/start" },
-  { id: "courtroom", label: "Think", to: "/courtroom" },
-  { id: "vault", label: "Learn", to: "/vault" },
-  { id: "editorial", label: "Write", to: "/editorial" },
-  { id: "about", label: "About", to: "/about" },
+  { id: "library", label: "Library", to: "/library" },
+  { id: "essays", label: "Essays", to: "/essays" },
+  { id: "colophon", label: "Colophon", to: "/colophon" },
 ];
 
 function AuthLayout() {
@@ -44,7 +42,7 @@ function AuthLayout() {
         <div className="max-w-6xl mx-auto px-6 pt-8 pb-0">
           <div className="flex items-center justify-between">
             <div className="w-24" />
-            <Link to="/diagnose" className="block text-center group">
+            <Link to="/untangle" className="block text-center group">
               <img
                 src={signatureAsset.url}
                 alt="Signature"
