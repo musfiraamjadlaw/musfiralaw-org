@@ -3,7 +3,16 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Sign in — Untangle" }] }),
+  head: () => ({
+    meta: [
+      { title: "Sign in — Untangle" },
+      { name: "description", content: "Sign in to Untangle — a place to investigate what isn't making sense and move from observation to understanding." },
+      { property: "og:title", content: "Sign in — Untangle" },
+      { property: "og:description", content: "Access your Whiteboard, Library, and Activation Framework." },
+      { property: "og:url", content: "/login" },
+    ],
+    links: [{ rel: "canonical", href: "/login" }],
+  }),
   component: LoginPage,
 });
 
