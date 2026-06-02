@@ -31,15 +31,18 @@ const EXAMPLES = [
   "I'm stuck.",
 ];
 
-// Activation icons — minimal geometric glyphs, not emoji.
+// Activation icons — the application's visual language.
+// These symbols live permanently on the Whiteboard.
 const ACTIVATION_GLYPH: Record<ActivationCondition, string> = {
-  Interest: "≋",       // wave
-  Challenge: "△",      // warning triangle
-  Urgency: "◷",        // clock
-  Novelty: "⌛",        // expiration marker
-  Relationships: "◉",  // connected nodes
-  Meaning: "✦",        // compass star
+  Interest: "≈",
+  Challenge: "△",
+  Urgency: "◷",
+  Novelty: "⌛",
+  Relationships: "◎",
+  Meaning: "✦",
 };
+
+const WHITEBOARD_KEY = "untangle:last-analysis";
 
 const INTERVENTION_TO: Record<Exclude<Intervention, "none">, string> = {
   brain_dump: "/dump",
