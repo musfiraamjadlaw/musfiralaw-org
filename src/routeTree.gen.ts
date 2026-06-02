@@ -19,6 +19,7 @@ import { Route as AuthenticatedStartRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedMeaningRouteImport } from './routes/_authenticated/meaning'
 import { Route as AuthenticatedEditorialRouteImport } from './routes/_authenticated/editorial'
 import { Route as AuthenticatedDumpRouteImport } from './routes/_authenticated/dump'
+import { Route as AuthenticatedDiagnoseRouteImport } from './routes/_authenticated/diagnose'
 import { Route as AuthenticatedCourtroomRouteImport } from './routes/_authenticated/courtroom'
 import { Route as AuthenticatedClockRouteImport } from './routes/_authenticated/clock'
 
@@ -71,6 +72,11 @@ const AuthenticatedDumpRoute = AuthenticatedDumpRouteImport.update({
   path: '/dump',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedDiagnoseRoute = AuthenticatedDiagnoseRouteImport.update({
+  id: '/diagnose',
+  path: '/diagnose',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedCourtroomRoute = AuthenticatedCourtroomRouteImport.update({
   id: '/courtroom',
   path: '/courtroom',
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/clock': typeof AuthenticatedClockRoute
   '/courtroom': typeof AuthenticatedCourtroomRoute
+  '/diagnose': typeof AuthenticatedDiagnoseRoute
   '/dump': typeof AuthenticatedDumpRoute
   '/editorial': typeof AuthenticatedEditorialRoute
   '/meaning': typeof AuthenticatedMeaningRoute
@@ -100,6 +107,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/clock': typeof AuthenticatedClockRoute
   '/courtroom': typeof AuthenticatedCourtroomRoute
+  '/diagnose': typeof AuthenticatedDiagnoseRoute
   '/dump': typeof AuthenticatedDumpRoute
   '/editorial': typeof AuthenticatedEditorialRoute
   '/meaning': typeof AuthenticatedMeaningRoute
@@ -115,6 +123,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/clock': typeof AuthenticatedClockRoute
   '/_authenticated/courtroom': typeof AuthenticatedCourtroomRoute
+  '/_authenticated/diagnose': typeof AuthenticatedDiagnoseRoute
   '/_authenticated/dump': typeof AuthenticatedDumpRoute
   '/_authenticated/editorial': typeof AuthenticatedEditorialRoute
   '/_authenticated/meaning': typeof AuthenticatedMeaningRoute
@@ -130,6 +139,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/clock'
     | '/courtroom'
+    | '/diagnose'
     | '/dump'
     | '/editorial'
     | '/meaning'
@@ -143,6 +153,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/clock'
     | '/courtroom'
+    | '/diagnose'
     | '/dump'
     | '/editorial'
     | '/meaning'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/clock'
     | '/_authenticated/courtroom'
+    | '/_authenticated/diagnose'
     | '/_authenticated/dump'
     | '/_authenticated/editorial'
     | '/_authenticated/meaning'
@@ -244,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDumpRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/diagnose': {
+      id: '/_authenticated/diagnose'
+      path: '/diagnose'
+      fullPath: '/diagnose'
+      preLoaderRoute: typeof AuthenticatedDiagnoseRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/courtroom': {
       id: '/_authenticated/courtroom'
       path: '/courtroom'
@@ -264,6 +283,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedClockRoute: typeof AuthenticatedClockRoute
   AuthenticatedCourtroomRoute: typeof AuthenticatedCourtroomRoute
+  AuthenticatedDiagnoseRoute: typeof AuthenticatedDiagnoseRoute
   AuthenticatedDumpRoute: typeof AuthenticatedDumpRoute
   AuthenticatedEditorialRoute: typeof AuthenticatedEditorialRoute
   AuthenticatedMeaningRoute: typeof AuthenticatedMeaningRoute
@@ -276,6 +296,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedClockRoute: AuthenticatedClockRoute,
   AuthenticatedCourtroomRoute: AuthenticatedCourtroomRoute,
+  AuthenticatedDiagnoseRoute: AuthenticatedDiagnoseRoute,
   AuthenticatedDumpRoute: AuthenticatedDumpRoute,
   AuthenticatedEditorialRoute: AuthenticatedEditorialRoute,
   AuthenticatedMeaningRoute: AuthenticatedMeaningRoute,
@@ -297,3 +318,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
