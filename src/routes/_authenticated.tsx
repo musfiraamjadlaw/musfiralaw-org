@@ -7,13 +7,21 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthLayout,
 });
 
-type Tab = { id: string; label: string; to: string };
-const TABS: Tab[] = [
-  { id: "untangle", label: "Untangle", to: "/untangle" },
+// ADHD tools first — the whole point of the app
+const TABS = [
+  { id: "start",      label: "Start",      to: "/start" },
+  { id: "untangle",   label: "Untangle",   to: "/untangle" },
+  { id: "dump",       label: "Dump",       to: "/dump" },
+  { id: "clock",      label: "Clock",      to: "/clock" },
+  { id: "states",     label: "States",     to: "/states" },
+];
+
+// Secondary tools — still accessible, just not primary
+const MORE_TABS = [
   { id: "whiteboard", label: "Whiteboard", to: "/whiteboard" },
-  { id: "library", label: "Library", to: "/library" },
-  { id: "essays", label: "Essays", to: "/essays" },
-  { id: "colophon", label: "Colophon", to: "/colophon" },
+  { id: "library",    label: "Library",    to: "/library" },
+  { id: "essays",     label: "Essays",     to: "/essays" },
+  { id: "colophon",   label: "Colophon",   to: "/colophon" },
 ];
 
 const ABOUT_KEY = "untangle:about-you";
@@ -25,6 +33,7 @@ function AuthLayout() {
   const [about, setAbout] = useState<string>("");
   const [aboutInput, setAboutInput] = useState<string>("");
   const [editingAbout, setEditingAbout] = useState(false);
+  const [showMore, setShowMore] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
@@ -46,10 +55,14 @@ function AuthLayout() {
     router.navigate({ to: "/login" });
   }
 
+  const allTabsActive = [...TABS, ...MORE_TABS].some(t => path.startsWith(t.to));
+
   return (
     <div className="min-h-screen bg-background text-foreground font-sans">
       <header className="border-b border-border bg-background">
         <div className="max-w-6xl mx-auto px-6 pt-8 pb-0">
+
+          {/* Top row — signature + sign out */}
           <div className="flex items-center justify-between">
             <div className="w-24" />
             <Link to="/untangle" className="block text-center group">
@@ -75,21 +88,19 @@ function AuthLayout() {
           {/* About you bar */}
           <div className="flex justify-center mt-4 mb-1">
             {editingAbout ? (
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={aboutInput}
-                  onChange={(e) => setAboutInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") saveAbout();
-                    if (e.key === "Escape") setEditingAbout(false);
-                  }}
-                  onBlur={saveAbout}
-                  placeholder="e.g. paralegal with ADHD, grad student, freelancer..."
-                  autoFocus
-                  className="text-[11px] tracking-[1px] text-muted-foreground bg-transparent border-b border-border outline-none w-80 pb-0.5 placeholder:text-muted-foreground/40"
-                />
-              </div>
+              <input
+                type="text"
+                value={aboutInput}
+                onChange={(e) => setAboutInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") saveAbout();
+                  if (e.key === "Escape") setEditingAbout(false);
+                }}
+                onBlur={saveAbout}
+                placeholder="e.g. paralegal with ADHD, grad student, freelancer..."
+                autoFocus
+                className="text-[11px] tracking-[1px] text-muted-foreground bg-transparent border-b border-border outline-none w-80 pb-0.5 placeholder:text-muted-foreground/40"
+              />
             ) : (
               <button
                 onClick={() => setEditingAbout(true)}
@@ -100,6 +111,7 @@ function AuthLayout() {
             )}
           </div>
 
+          {/* Primary nav — ADHD tools */}
           <nav className="flex justify-center gap-8 mt-6">
             {TABS.map((t) => {
               const active = path.startsWith(t.to);
@@ -112,12 +124,36 @@ function AuthLayout() {
                   }`}
                 >
                   {t.label}
-                  {active && (
-                    <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-foreground" />
-                  )}
+                  {active && <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-foreground" />}
                 </Link>
               );
             })}
+
+            {/* More dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowMore(!showMore)}
+                className={`relative pb-3 text-[13px] font-medium tracking-tight transition-colors ${
+                  showMore ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                More
+              </button>
+              {showMore && (
+                <div className="absolute top-full right-0 mt-1 bg-background border border-border shadow-sm z-50 min-w-[120px]">
+                  {MORE_TABS.map((t) => (
+                    <Link
+                      key={t.id}
+                      to={t.to}
+                      onClick={() => setShowMore(false)}
+                      className="block px-4 py-2.5 text-[12px] tracking-tight text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                    >
+                      {t.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
           </nav>
         </div>
       </header>
