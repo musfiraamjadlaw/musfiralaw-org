@@ -81,7 +81,7 @@ function DiagnosePage() {
               disabled={loading || !input.trim()}
               className="px-10 py-3 text-[11px] tracking-[3px] uppercase disabled:opacity-40 bg-foreground text-background hover:bg-foreground/90 transition-colors"
             >
-              {loading ? "Translating…" : "Translate"}
+              {loading ? "Untangling…" : "Untangle"}
             </button>
             <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
               ⌘ + Enter
