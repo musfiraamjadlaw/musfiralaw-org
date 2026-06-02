@@ -275,132 +275,98 @@ export const recommendNextArticle = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const [
-      { data: themes },
-      { data: articles },
-      { data: threads },
-      { data: notes },
-      { data: knowledge },
-      { data: court },
-      { data: mentors },
-    ] = await Promise.all([
-      supabase.from("writing_themes").select("*").order("frequency", { ascending: false }),
-      supabase
-        .from("articles")
-        .select("id, title, published_at, source, themes, content_text")
-        .order("published_at", { ascending: false, nullsFirst: false })
-        .limit(40),
-      supabase.from("unfinished_threads").select("topic, question, evidence, sources, mentions_count").eq("status", "open").limit(30),
-      supabase.from("notes").select("text, category, created_at").order("created_at", { ascending: false }).limit(150),
-      supabase.from("knowledge_entries").select("title, body, category, tags").order("created_at", { ascending: false }).limit(120),
-      supabase.from("courtroom_entries").select("situation, facts, assumptions, verdict").order("created_at", { ascending: false }).limit(40),
-      supabase.from("mentor_lessons").select("mentor_name, role, lesson, tags").order("created_at", { ascending: false }).limit(60),
-    ]);
+    // Only the writer's PUBLISHED work. No tasks. No admin notes. No reminders.
+    const { data: articles, error: artErr } = await supabase
+      .from("articles")
+      .select("id, title, url, published_at, content_text, themes")
+      .eq("source", "published")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .limit(80);
+    if (artErr) throw new Error(artErr.message);
 
-    const totalSignal =
-      (articles?.length ?? 0) +
-      (notes?.length ?? 0) +
-      (knowledge?.length ?? 0) +
-      (court?.length ?? 0) +
-      (mentors?.length ?? 0);
-    if (totalSignal === 0) {
-      throw new Error("Nothing to analyze yet. Add notes, vault entries, courtroom analyses, or import articles first.");
+    if (!articles?.length) {
+      throw new Error(
+        "No published essays to analyze yet. Sync your Substack so the editor has a body of work to read.",
+      );
     }
 
-    const themeSummary = (themes ?? [])
-      .map((t: any) => `- [${t.status}] ${t.name} (×${t.frequency}): ${t.description ?? ""}`)
-      .join("\n");
-    const articleSummary = (articles ?? [])
-      .map((a: any) => `- ${a.id} | ${a.title} [${a.source}${a.published_at ? ", " + a.published_at.slice(0, 10) : ""}] — themes: ${(a.themes || []).join(", ") || "—"}`)
-      .join("\n");
-    const threadSummary = (threads ?? [])
-      .map((t: any) => `- ${t.topic}${t.question ? " — " + t.question : ""}${t.evidence ? " | evidence: " + String(t.evidence).slice(0, 200) : ""} (×${t.mentions_count ?? 1}, sources: ${(t.sources || []).join(",")})`)
-      .join("\n");
-    const notesSummary = (notes ?? [])
-      .map((n: any) => `- [${n.category ?? "note"}] ${String(n.text).slice(0, 240)}`)
-      .join("\n")
-      .slice(0, 12000);
-    const knowledgeSummary = (knowledge ?? [])
-      .map((k: any) => `### ${k.title} [${k.category}]${k.tags?.length ? " {" + k.tags.join(", ") + "}" : ""}\n${String(k.body || "").slice(0, 900)}`)
-      .join("\n\n")
-      .slice(0, 18000);
-    const courtSummary = (court ?? [])
-      .map((c: any) => `- Q: ${String(c.situation || "").slice(0, 300)}\n  Facts: ${String(c.facts || "").slice(0, 200)}\n  Assumptions: ${String(c.assumptions || "").slice(0, 200)}\n  Conclusion: ${String(c.verdict || "").slice(0, 300)}`)
-      .join("\n\n")
-      .slice(0, 10000);
-    const mentorSummary = (mentors ?? [])
-      .map((m: any) => `- ${m.mentor_name}${m.role ? " (" + m.role + ")" : ""}: ${String(m.lesson).slice(0, 300)}`)
-      .join("\n")
-      .slice(0, 6000);
+    const corpus = articles
+      .map(
+        (a: any, i: number) =>
+          `### Essay ${i + 1} — ID: ${a.id}\nTITLE: ${a.title}${a.published_at ? "\nPUBLISHED: " + a.published_at.slice(0, 10) : ""}\n\n${(a.content_text || "").slice(0, 5000)}`,
+      )
+      .join("\n\n---\n\n");
 
     const raw = await callAI(
-      `You are a developmental editor advising the writer on the most interesting articles they are uniquely positioned to write next.
+      `You are a developmental editor who has read the writer's entire body of published work. You are NOT a content strategist. You are NOT recommending topics. You are NOT helping them produce more content.
 
-The goal is NOT "recommend articles similar to past articles." The goal is to find articles that emerge from the INTERSECTION of the writer's entire knowledge ecosystem — notes, brain dumps, vault research, courtroom reasoning, lessons, and prior writing.
+Your job: identify the QUESTIONS this writer keeps returning to but has not fully answered.
 
-Privilege ideas that:
-- Recur across MULTIPLE sources (e.g. a question that surfaces in notes AND in courtroom reasoning AND in vault research)
-- Sit at the intersection of two or more themes that have not been combined yet
-- Are unfinished threads — questions the writer keeps returning to without resolving
-- The writer has unusual standing to write (specific evidence in their own material) and has not already covered in a published piece
+Read the essays below. Look for:
+- Questions the writer keeps circling across multiple pieces
+- Tensions they have raised but not resolved
+- Ideas they keep approaching from different angles without landing
+- Arguments they have gestured at but not fully made
+- Counterpositions they have not seriously engaged with
 
-Propose 3 candidates, ranked. For EACH:
-- title (sharp, publishable headline, 4-10 words)
-- rationale (2-3 sentences: why THIS writer is uniquely positioned to write THIS, citing what in the ecosystem points to it — name the sources)
-- gap (one sentence: the unresolved tension or unanswered question it addresses)
-- outline (3-6 bullet beats joined with " | ")
-- connects_to (article IDs from ARTICLES ALREADY WRITTEN this would build on, max 4)
-- themes (theme names from WRITING DNA, max 4)
-- score (0-100, your confidence this is genuinely the next move — not just a plausible topic)
+DO NOT use task lists, reminders, or administrative notes. There are none here. Only published essays.
 
-Return JSON: { "recommendations": [...] }
+Return JSON: { "recommendations": [ ... ] }
 
-Do not invent facts about the writer. Stay grounded strictly in the material below.
+Produce 3-5 recommendations, ranked by how alive the question is in the work. For EACH:
+{
+  "question": "The deeper question the writer keeps returning to. A real question ending in '?'. Specific to THIS writer's preoccupations. Not generic.",
+  "why_it_keeps_appearing": "2-4 sentences. Where exactly this question surfaces across the corpus. Quote or paraphrase 2-3 specific essays by title. Show the pattern.",
+  "whats_missing": "2-4 sentences. The perspective, argument, counterposition, or tension the writer has not yet explored. Be specific about what is unsaid, dodged, or only half-said. A good developmental editor names the avoidance.",
+  "related_essays": [ "exact essay IDs from the corpus, 2-5 of them, that exemplify the question" ],
+  "suggested_essay": "One sentence describing the next essay worth writing that would advance the question — not 'an essay about X' but a sharp angle: what it would argue, what it would risk, what it would close.",
+  "score": <int 0-100, how alive this question is>
+}
 
-WRITING DNA:
-${themeSummary || "(none yet)"}
+RULES:
+- Ground every claim in the corpus. Do not invent biography.
+- No flattery. No therapy register. No content-marketing language.
+- The point is NOT productivity. The point is helping the writer understand their own body of work.
+- If a "question" is really just a topic, drop it. Only real intellectual questions.
 
-UNFINISHED THREADS:
-${threadSummary || "(none yet)"}
-
-NOTES & BRAIN DUMPS:
-${notesSummary || "(none)"}
-
-KNOWLEDGE VAULT (notes, research, ideas, lessons, references):
-${knowledgeSummary || "(none)"}
-
-COURTROOM REASONING (decisions, facts vs assumptions):
-${courtSummary || "(none)"}
-
-LESSONS / OBSERVATIONS:
-${mentorSummary || "(none)"}
-
-ARTICLES ALREADY WRITTEN:
-${articleSummary || "(none)"}`,
+CORPUS (${articles.length} published essays):
+${corpus}`,
     );
+
     const parsed = parseJson<{
       recommendations: {
-        title: string;
-        rationale: string;
-        gap: string;
-        outline: string;
-        connects_to: string[];
-        themes: string[];
+        question: string;
+        why_it_keeps_appearing: string;
+        whats_missing: string;
+        related_essays: string[];
+        suggested_essay: string;
         score: number;
       }[];
     }>(raw);
 
-    const validIds = new Set((articles ?? []).map((a: any) => a.id));
+    const validIds = new Set(articles.map((a: any) => a.id));
+
+    // Clear previous open recommendations so the surface stays current
+    await supabase
+      .from("article_recommendations")
+      .delete()
+      .eq("user_id", userId)
+      .eq("status", "open");
+
     const rows = (parsed.recommendations ?? []).slice(0, 5).map((r) => ({
       user_id: userId,
-      title: r.title.slice(0, 300),
-      rationale: r.rationale.slice(0, 1500),
-      gap: r.gap?.slice(0, 600) ?? null,
-      outline: r.outline?.slice(0, 2000) ?? null,
-      connects_to: (r.connects_to ?? []).filter((id) => validIds.has(id)).slice(0, 6),
-      themes: (r.themes ?? []).slice(0, 6),
+      // Map the editor's output onto existing columns
+      title: r.question.slice(0, 500), // legacy column reused for "Question"
+      question: r.question.slice(0, 500),
+      rationale: r.why_it_keeps_appearing.slice(0, 2000),
+      gap: r.whats_missing.slice(0, 2000),
+      suggested_essay: r.suggested_essay?.slice(0, 1000) ?? null,
+      outline: null,
+      connects_to: (r.related_essays ?? []).filter((id) => validIds.has(id)).slice(0, 6),
+      themes: [],
       score: typeof r.score === "number" ? r.score : null,
     }));
+
     if (rows.length) {
       const { error } = await supabase.from("article_recommendations").insert(rows);
       if (error) throw new Error(error.message);

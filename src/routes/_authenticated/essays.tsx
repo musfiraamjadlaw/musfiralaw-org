@@ -97,71 +97,78 @@ function EssaysPage() {
         </p>
       </header>
 
-      {/* === EDITORIAL INTELLIGENCE === */}
+      {/* === DEVELOPMENTAL EDITOR === */}
       <section className="mb-16">
         <div className="flex items-baseline justify-between mb-2 border-b border-border pb-3">
-          <h2 className="font-serif italic text-2xl text-foreground">What to write next</h2>
+          <h2 className="font-serif italic text-2xl text-foreground">What I'm Still Trying to Understand</h2>
           <button
             onClick={() => mRecommend.mutate()}
             disabled={mRecommend.isPending}
             className="text-[10px] tracking-[2px] uppercase border border-border px-3 py-1.5 disabled:opacity-50"
           >
-            {mRecommend.isPending ? "Reading the corpus…" : "Surface essays"}
+            {mRecommend.isPending ? "Reading the corpus…" : "Read my work"}
           </button>
         </div>
         <p className="mt-3 mb-6 font-serif italic text-muted-foreground">
-          Not topics. The intellectual questions your writing keeps circling. The pieces that would close a loop.
+          A developmental editor reading only your published essays — surfacing the questions you keep circling, the tensions you haven't resolved, and the arguments you've gestured at but not fully made. Not topics. Not tasks. Questions.
         </p>
 
         {!recs.data?.length && (
           <p className="font-serif italic text-muted-foreground">
-            No recommendations yet. Run "Surface essays" to find the next question worth writing into.
+            Nothing surfaced yet. Run "Read my work" once your Substack is synced.
           </p>
         )}
 
-        <div className="space-y-10">
+        <div className="space-y-14">
           {(recs.data ?? []).map((r: any) => (
             <article key={r.id} className="border-l-2 border-foreground pl-6">
-              <h3 className="font-serif italic text-2xl text-foreground leading-snug">{r.title}</h3>
-              {r.gap && (
-                <p className="mt-3 font-serif text-foreground/85 leading-relaxed">
-                  <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground mr-2">Gap</span>
-                  {r.gap}
-                </p>
+              <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">Question</p>
+              <h3 className="font-serif italic text-2xl text-foreground leading-snug">
+                {r.question ?? r.title}
+              </h3>
+
+              {r.rationale && (
+                <div className="mt-6">
+                  <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">Why it keeps appearing</p>
+                  <p className="font-serif text-foreground/85 leading-relaxed">{r.rationale}</p>
+                </div>
               )}
-              <p className="mt-3 font-serif text-foreground/80 leading-relaxed">{r.rationale}</p>
-              {r.outline && (
-                <div className="mt-4">
-                  <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">Outline</p>
-                  <ul className="space-y-1.5 font-serif text-foreground/85">
-                    {r.outline.split("|").map((b: string, i: number) => (
-                      <li key={i}>— {b.trim()}</li>
-                    ))}
+
+              {r.gap && (
+                <div className="mt-5">
+                  <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">What's missing</p>
+                  <p className="font-serif text-foreground/85 leading-relaxed">{r.gap}</p>
+                </div>
+              )}
+
+              {r.connects_to?.length > 0 && (
+                <div className="mt-5">
+                  <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">Related essays</p>
+                  <ul className="space-y-1 font-serif text-foreground/85">
+                    {r.connects_to.map((id: string) => {
+                      const a = articleById[id];
+                      return a ? <li key={id}>— {a.title}</li> : null;
+                    })}
                   </ul>
                 </div>
               )}
-              {r.connects_to?.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-1.5 items-baseline">
-                  <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground mr-1">Builds on</span>
-                  {r.connects_to.map((id: string) => {
-                    const a = articleById[id];
-                    return a ? (
-                      <span key={id} className="text-xs px-2 py-0.5 bg-muted rounded">
-                        {a.title}
-                      </span>
-                    ) : null;
-                  })}
+
+              {r.suggested_essay && (
+                <div className="mt-5">
+                  <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">Suggested essay</p>
+                  <p className="font-serif italic text-foreground/90 leading-relaxed">{r.suggested_essay}</p>
                 </div>
               )}
-              <div className="mt-5 flex gap-5 text-[10px] tracking-[2px] uppercase">
+
+              <div className="mt-6 flex gap-5 text-[10px] tracking-[2px] uppercase">
                 <button onClick={() => mRecStatus.mutate({ id: r.id, status: "drafted" })} className="text-muted-foreground hover:text-foreground">
-                  Mark drafted
+                  Drafting
                 </button>
                 <button onClick={() => mRecStatus.mutate({ id: r.id, status: "published" })} className="text-muted-foreground hover:text-foreground">
-                  Published
+                  Answered
                 </button>
                 <button onClick={() => mRecStatus.mutate({ id: r.id, status: "dismissed" })} className="text-muted-foreground hover:text-destructive">
-                  Dismiss
+                  Not this one
                 </button>
               </div>
             </article>

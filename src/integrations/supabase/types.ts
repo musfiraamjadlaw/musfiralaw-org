@@ -48,9 +48,11 @@ export type Database = {
           gap: string | null
           id: string
           outline: string | null
+          question: string | null
           rationale: string
           score: number | null
           status: string
+          suggested_essay: string | null
           themes: string[]
           title: string
           updated_at: string
@@ -62,9 +64,11 @@ export type Database = {
           gap?: string | null
           id?: string
           outline?: string | null
+          question?: string | null
           rationale: string
           score?: number | null
           status?: string
+          suggested_essay?: string | null
           themes?: string[]
           title: string
           updated_at?: string
@@ -76,9 +80,11 @@ export type Database = {
           gap?: string | null
           id?: string
           outline?: string | null
+          question?: string | null
           rationale?: string
           score?: number | null
           status?: string
+          suggested_essay?: string | null
           themes?: string[]
           title?: string
           updated_at?: string
