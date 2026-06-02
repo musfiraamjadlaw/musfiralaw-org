@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { askAI } from "@/lib/ai.functions";
 import { Waves, AlertTriangle, Clock, Hourglass, Network, Compass } from "lucide-react";
@@ -7,119 +7,131 @@ import { Waves, AlertTriangle, Clock, Hourglass, Network, Compass } from "lucide
 export const Route = createFileRoute("/_authenticated/start")({
   head: () => ({
     meta: [
-      { title: "Act — Untangle" },
-      { name: "description", content: "The Activation Framework: diagnose which cognitive condition is missing and find the first move that breaks inertia." },
-      { property: "og:title", content: "Act — The Activation Framework" },
-      { property: "og:description", content: "Action is rarely a matter of willpower. Diagnose which of the six conditions for action is missing." },
-      { property: "og:url", content: "/start" },
+      { title: "Start — Untangle" },
+      { name: "description", content: "Name what you're frozen on. Get one specific first move." },
     ],
-    links: [{ rel: "canonical", href: "/start" }],
   }),
   component: StartPage,
 });
 
 const CONDITIONS = [
-  {
-    name: "Interest",
-    Icon: Waves,
-    note: "Sustained attention. Curiosity reduces friction; focus emerges as momentum rather than effort.",
-  },
-  {
-    name: "Challenge",
-    Icon: AlertTriangle,
-    note: "Calibration. Between comfort and panic — too little produces boredom, too much produces overwhelm.",
-  },
-  {
-    name: "Urgency",
-    Icon: Clock,
-    note: "Time introduces consequence. Deadlines narrow attention and convert intention into execution.",
-  },
-  {
-    name: "Novelty",
-    Icon: Hourglass,
-    note: "The motivational lifespan of repetition is finite. New angles, environments, or framings restore activation.",
-  },
-  {
-    name: "Relationships",
-    Icon: Network,
-    note: "Accountability and shared purpose. A mentor, collaborator, or witness changes what feels possible.",
-  },
-  {
-    name: "Meaning",
-    Icon: Compass,
-    note: "Why does this matter? When action connects to values or identity, motivation becomes durable.",
-  },
+  { name: "Interest", Icon: Waves, color: "#1A6FB5", note: "The brain makes its own dopamine here. Focus arrives on its own. Can't force it for things that genuinely don't interest you." },
+  { name: "Challenge", Icon: AlertTriangle, color: "#C0392B", note: "Real difficulty activates the brain. Too easy = no signal. Too hard = shutdown. Use your peak hours for this." },
+  { name: "Urgency", Icon: Clock, color: "#C87D0E", note: "External deadline as fuel. Not yet = miss. The clock becomes the engine when nothing else fires." },
+  { name: "Novelty", Icon: Hourglass, color: "#C87D0E", note: "New things fire fast but have a shelf life. When something feels novel — move on it now while the activation is live." },
+  { name: "Relationships", Icon: Network, color: "#1A8A4A", note: "Other people change what feels possible. A witness, a collaborator, someone who believes in you — the brain moves for that." },
+  { name: "Meaning", Icon: Compass, color: "#7B3FA8", note: "Identity-level connection. When the task is yours — really yours — motivation becomes durable. Not a sprint, a direction." },
 ];
 
 function StartPage() {
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
+  const [about, setAbout] = useState("");
   const ai = useServerFn(askAI);
+
+  useEffect(() => {
+    try { setAbout(localStorage.getItem("untangle:about-you") ?? ""); } catch {}
+  }, []);
 
   async function run() {
     if (!text.trim()) return;
     setLoading(true);
     setResult("");
     try {
+      const userContext = about.trim() ? `\n\nAbout this person: ${about}` : "";
       const { text: r } = await ai({
         data: {
-          prompt: `You are an analyst working from The Activation Framework. The framework holds that action is rarely a failure of willpower — it is the result of specific cognitive conditions being present or absent. The six conditions are:
+          prompt: `You understand the ADHD Interest-Based Nervous System. The brain does not run on willpower — it runs on six activation conditions:
 
-1. Interest — sustained attention through curiosity
-2. Challenge — calibration between boredom and overwhelm
-3. Urgency — time introducing consequence
-4. Novelty — newness restoring attention
-5. Relationships — accountability, connection, shared purpose
-6. Meaning — connection to values, identity, or larger goal
+1. Interest — the brain makes its own dopamine. Focus is calm and steady when present.
+2. Challenge — real difficulty activates; too easy produces boredom, too hard produces shutdown.
+3. Urgency — external deadlines as fuel; the clock becomes the engine.
+4. Novelty — new things fire fast but have a shelf life; act while activation is live.
+5. Relationships — accountability, a witness, someone who believes in you.
+6. Meaning — identity-level connection; when the task is truly theirs, motivation is durable.
 
-The user is stuck on this task: "${text}"
+When someone is frozen, one of these is missing. Your job is to name which one and prescribe the one physical move that restores it.${userContext}
 
-Diagnose which condition is most likely missing, then prescribe the first move. Return exactly four short blocks, no preamble:
+The person is frozen on this: "${text}"
 
-MISSING CONDITION: [name one of the six conditions, then one sentence on why it is missing here]
+Return exactly four short blocks, no preamble, no padding:
 
-FIRST MOVE: [one concrete physical action they can take in under 2 minutes — name the exact file, app, document, or object]
+MISSING CONDITION: [name the one condition that's absent, then one sentence on why]
 
-WHY IT WORKS: [one sentence linking the action back to the missing condition]
+FIRST MOVE: [one concrete physical action under 2 minutes — name the exact file, app, tab, or object]
 
-TIME ESTIMATE: [realistic time for this first step only]`,
+WHY IT WORKS: [one sentence connecting this action to the missing condition]
+
+TIME TO START: [realistic estimate for this first step only]`,
         },
       });
       setResult(r);
-    } catch (e: any) {
-      alert(e.message);
-    }
+    } catch (e: any) { alert(e.message); }
     setLoading(false);
   }
 
   return (
-    <div className="space-y-16">
+    <div className="space-y-14">
+
+      {/* Input first — no theory gate */}
       <section>
         <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
-          Field guide
+          Activation Engine
         </p>
-        <h1 className="font-serif text-3xl leading-tight">The Activation Framework</h1>
-        <div
-          className="mt-4 max-w-2xl text-foreground/80"
-          style={{ fontFamily: "var(--font-serif)", fontSize: "17px", lineHeight: 1.7 }}
+        <h1 className="font-serif text-3xl">What are you frozen on?</h1>
+        <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
+          Name the task. One sentence. The engine diagnoses what's missing and gives you the first move.
+        </p>
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) run(); }}
+          rows={3}
+          placeholder="e.g. I need to send that email but I can't start"
+          className="w-full mt-6 border border-border rounded p-4 bg-card font-mono text-sm leading-7 outline-none resize-none focus:border-accent"
+        />
+        <button
+          onClick={run}
+          disabled={loading || !text.trim()}
+          className="mt-4 px-7 py-3 text-[10px] tracking-[2.5px] uppercase disabled:opacity-50 text-white"
+          style={{ background: "#C87D0E" }}
         >
-          <p>
-            Human behavior is often treated as a question of discipline. This tool starts from a
-            different assumption: action is rarely a matter of willpower alone. More often, it is
-            the result of specific cognitive conditions being present — or absent.
-          </p>
-          <p className="mt-3 italic text-muted-foreground">
-            When progress stalls, the question is not <em>"why am I not trying harder?"</em> — it is{" "}
-            <em>"what condition for action is missing?"</em>
-          </p>
-        </div>
+          {loading ? "Diagnosing..." : "Give me the first move"}
+        </button>
 
+        {result && (
+          <div className="mt-8 p-6 border-l-4 bg-card" style={{ borderColor: "#C87D0E" }}>
+            <div className="font-mono text-sm leading-loose whitespace-pre-wrap text-foreground">
+              {result}
+            </div>
+            <button
+              onClick={() => { setResult(""); setText(""); }}
+              className="mt-5 text-[10px] tracking-[2px] uppercase text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Try another →
+            </button>
+          </div>
+        )}
+      </section>
+
+      {/* Theory below — for when you want to understand, not as a gate */}
+      <section className="pt-4 border-t border-border">
+        <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
+          The framework
+        </p>
+        <h2 className="font-serif text-2xl mb-3">Why you freeze</h2>
+        <p className="font-serif text-base text-foreground/80 leading-relaxed max-w-2xl">
+          The ADHD brain doesn't run on willpower. It runs on a specific set of conditions. When one is missing, action stalls — not because you're lazy, but because your nervous system doesn't have the signal it needs to fire.
+        </p>
+        <p className="mt-3 font-serif italic text-muted-foreground max-w-2xl">
+          The question is never "why aren't you trying harder." It's "which condition is absent."
+        </p>
         <ul className="mt-8 grid gap-px sm:grid-cols-2 border border-border bg-border">
-          {CONDITIONS.map(({ name, Icon, note }) => (
+          {CONDITIONS.map(({ name, Icon, color, note }) => (
             <li key={name} className="bg-background p-5">
               <div className="flex items-start gap-3">
-                <Icon className="h-4 w-4 mt-1 text-accent shrink-0" strokeWidth={1.5} />
+                <Icon className="h-4 w-4 mt-1 shrink-0" strokeWidth={1.5} style={{ color }} />
                 <div>
                   <p className="font-serif text-lg leading-none">{name}</p>
                   <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">{note}</p>
@@ -128,53 +140,6 @@ TIME ESTIMATE: [realistic time for this first step only]`,
             </li>
           ))}
         </ul>
-
-        <div className="mt-8 border-l-2 border-accent pl-5 max-w-2xl">
-          <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-2">
-            Core principle
-          </p>
-          <p
-            className="text-foreground"
-            style={{ fontFamily: "var(--font-serif)", fontSize: "18px", lineHeight: 1.6 }}
-          >
-            Every problem contains a pattern. Every pattern has a mechanism. Every mechanism
-            suggests an intervention. When action becomes difficult, the objective is not to
-            increase effort — it is to identify the missing condition and restore it.
-          </p>
-        </div>
-      </section>
-
-      <section>
-        <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
-          Activation Engine
-        </p>
-        <h2 className="font-serif text-3xl">Start This.</h2>
-        <p className="mt-2 text-sm text-muted-foreground max-w-2xl">
-          Name the task. The engine diagnoses which condition is missing and returns the first move
-          that breaks inertia.
-        </p>
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={3}
-          placeholder="e.g. finish the Q3 client proposal"
-          className="w-full mt-6 border border-border rounded p-4 bg-card font-mono text-sm leading-7 outline-none resize-none focus:border-accent"
-        />
-        <button
-          onClick={run}
-          disabled={loading || !text.trim()}
-          className="mt-4 px-7 py-3 text-[10px] tracking-[2.5px] uppercase disabled:opacity-50 text-white"
-          style={{ background: "#E8A838" }}
-        >
-          {loading ? "Diagnosing..." : "Diagnose & give me the first move"}
-        </button>
-        {result && (
-          <div className="mt-8 p-6 border-l-4 border-accent bg-card">
-            <div className="font-mono text-sm leading-loose whitespace-pre-wrap text-foreground">
-              {result}
-            </div>
-          </div>
-        )}
       </section>
     </div>
   );
