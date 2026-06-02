@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Sign in — Notebook" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Untangle" }] }),
   component: LoginPage,
 });
 
@@ -46,7 +46,7 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
-          <h1 className="font-serif text-3xl text-navy">Notebook</h1>
+          <h1 className="font-serif text-3xl text-navy">Untangle</h1>
           <p className="mt-2 text-xs tracking-[3px] uppercase text-muted-foreground">
             Executive function &amp; decision system
           </p>

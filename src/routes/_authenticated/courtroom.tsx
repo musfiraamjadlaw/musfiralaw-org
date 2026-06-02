@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/courtroom")({
-  head: () => ({ meta: [{ title: "Courtroom — Notebook" }] }),
+  head: () => ({ meta: [{ title: "Courtroom — Untangle" }] }),
   component: CourtroomPage,
 });
 

@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
-const SYSTEM = `You are the reasoning engine inside Notebook — an executive function and decision-making tool for serious thinkers.
+const SYSTEM = `You are the reasoning engine inside Untangle — an executive function and decision-making tool for serious thinkers.
 
 YOUR PURPOSE:
 - Help the user start difficult tasks

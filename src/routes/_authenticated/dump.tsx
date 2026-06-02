@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/dump")({
-  head: () => ({ meta: [{ title: "Brain Dump — Notebook" }] }),
+  head: () => ({ meta: [{ title: "Brain Dump — Untangle" }] }),
   component: DumpPage,
 });
 
