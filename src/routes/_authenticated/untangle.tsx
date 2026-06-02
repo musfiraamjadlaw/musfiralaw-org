@@ -9,13 +9,13 @@ export const Route = createFileRoute("/_authenticated/untangle")({
 });
 
 const EXAMPLES = [
-  "I'm overwhelmed.",
-  "I can't focus.",
-  "I don't know where to start.",
-  "I'm exhausted.",
-  "I'm stressed.",
-  "I have too many ideas.",
-  "I'm avoiding something.",
+  "I keep returning to the same question and can't tell why.",
+  "Something about this case isn't sitting right.",
+  "I have a hunch I can't yet articulate.",
+  "I can't tell if this is intuition or avoidance.",
+  "Two ideas I've been holding seem to be the same idea.",
+  "I read three things this week that feel connected.",
+  "I keep avoiding this and I don't know what it's about.",
 ];
 
 function DiagnosePage() {
@@ -48,8 +48,11 @@ function DiagnosePage() {
           <h2 className="font-serif text-5xl text-foreground text-center leading-tight">
             What are you noticing?
           </h2>
-          <p className="mt-4 text-center text-muted-foreground font-serif italic">
-            Speak plainly. The system untangles feeling into mechanism, evidence, and one next step.
+          <p className="mt-3 text-center text-muted-foreground font-serif italic">
+            Or — what isn't making sense?
+          </p>
+          <p className="mt-6 text-center text-xs tracking-[2px] uppercase text-muted-foreground">
+            Notice · Analyze · Connect · Act
           </p>
 
           <textarea
@@ -59,8 +62,8 @@ function DiagnosePage() {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit();
             }}
             rows={5}
-            placeholder="I'm overwhelmed."
-            className="w-full mt-10 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
+            placeholder="An observation. A friction. A pattern. A question you keep circling."
+            className="w-full mt-8 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
           />
 
           <div className="mt-5 flex flex-wrap justify-center gap-2">
@@ -96,7 +99,7 @@ function DiagnosePage() {
         <article className="space-y-14 pt-4">
           <header>
             <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
-              You said
+              Notice
             </p>
             <blockquote className="pl-5 border-l-2 border-foreground font-serif italic text-xl text-foreground leading-relaxed">
               {submittedInput}
@@ -104,7 +107,7 @@ function DiagnosePage() {
             <p className="mt-4 font-serif text-muted-foreground">{result.echo}</p>
           </header>
 
-          <Section step="1" title="Cognitive Systems Involved">
+          <Section phase="Analyze" title="Cognitive Systems Involved">
             <div className="space-y-3">
               {result.systems.map((s) => (
                 <div
@@ -125,31 +128,19 @@ function DiagnosePage() {
             </div>
           </Section>
 
-          <Section step="2" title={`What's Struggling — ${result.primary_system}`}>
+          <Section phase="Analyze" title={`What's Struggling — ${result.primary_system}`}>
             <p className="font-serif text-xl text-foreground leading-relaxed">
               {result.plain_explanation}
             </p>
           </Section>
 
-          <Section step="3" title="The Neuroscience">
+          <Section phase="Analyze" title="The Neuroscience">
             <p className="font-serif text-lg text-foreground leading-relaxed">
               {result.neuroscience}
             </p>
           </Section>
 
-          <Section step="4" title="Intervention">
-            <p className="font-serif text-2xl text-foreground leading-snug">
-              {result.intervention.action}
-            </p>
-            <div className="mt-2 text-[10px] tracking-[3px] uppercase text-muted-foreground">
-              {result.intervention.duration}
-            </div>
-            <p className="mt-4 font-serif italic text-muted-foreground leading-relaxed">
-              {result.intervention.why_it_works}
-            </p>
-          </Section>
-
-          <Section step="5" title="What to Read & Sit With">
+          <Section phase="Connect" title="You've encountered this before">
             <div className="space-y-8">
               {result.article && (
                 <Recommendation label="From your Substack">
@@ -197,6 +188,19 @@ function DiagnosePage() {
             </div>
           </Section>
 
+          <Section phase="Act" title="One next step">
+            <p className="font-serif text-2xl text-foreground leading-snug">
+              {result.intervention.action}
+            </p>
+            <div className="mt-2 text-[10px] tracking-[3px] uppercase text-muted-foreground">
+              {result.intervention.duration}
+            </div>
+            <p className="mt-4 font-serif italic text-muted-foreground leading-relaxed">
+              {result.intervention.why_it_works}
+            </p>
+          </Section>
+
+
           <div className="pt-6 border-t border-border flex gap-3">
             <button
               onClick={() => {
@@ -230,21 +234,21 @@ function LoadBadge({ load }: { load: "high" | "medium" | "low" }) {
 }
 
 function Section({
-  step,
+  phase,
   title,
   children,
 }: {
-  step: string;
+  phase: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
     <section>
       <div className="flex items-baseline gap-4 mb-5 border-b border-border pb-2">
-        <span className="font-serif italic text-foreground text-base">{step}</span>
-        <h3 className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-          {title}
-        </h3>
+        <span className="text-[10px] tracking-[3px] uppercase text-accent-foreground/70 font-medium">
+          {phase}
+        </span>
+        <h3 className="font-serif italic text-foreground text-lg">{title}</h3>
       </div>
       {children}
     </section>
