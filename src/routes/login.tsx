@@ -47,7 +47,7 @@ function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <YarnBall />
-          <h1 className="font-serif text-xl text-navy mt-4">Untangled by Musfira</h1>
+          <h1 className="font-serif text-2xl text-navy mt-4">Untangled by Musfira</h1>
           <p className="mt-3 font-serif italic text-sm text-muted-foreground">
             Find the pattern. Take the next step. Make it happen.
           </p>
