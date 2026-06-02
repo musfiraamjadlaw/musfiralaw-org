@@ -18,7 +18,11 @@ export const Route = createFileRoute("/_authenticated/untangle")({
         content:
           "Enter what you're noticing. Untangle builds an intellectual chain from observation to understanding.",
       },
+      { property: "og:title", content: "Untangle — Sensemaking" },
+      { property: "og:description", content: "Move from observation to understanding. Find the question beneath the problem." },
+      { property: "og:url", content: "/untangle" },
     ],
+    links: [{ rel: "canonical", href: "/untangle" }],
   }),
   component: DiagnosePage,
 });
