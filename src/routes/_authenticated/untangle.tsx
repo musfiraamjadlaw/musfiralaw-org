@@ -100,13 +100,16 @@ function DiagnosePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto px-6">
       {!result && (
-        <div className="pt-16">
-          <h2 className="font-serif text-5xl text-foreground text-center leading-tight">
+        <div className="pt-24 pb-16">
+          <p className="text-center text-[10px] tracking-[4px] uppercase text-muted-foreground mb-8">
+            Untangle
+          </p>
+          <h2 className="font-display text-5xl md:text-6xl text-foreground text-center leading-[1.05] tracking-tight">
             What are you noticing?
           </h2>
-          <p className="mt-4 text-center text-muted-foreground font-serif italic text-lg">
+          <p className="mt-6 text-center text-muted-foreground font-serif italic text-lg">
             An observation, not a task.
           </p>
 
@@ -118,51 +121,51 @@ function DiagnosePage() {
             }}
             rows={5}
             placeholder="A friction. A pattern. A question you keep circling."
-            className="w-full mt-10 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
+            className="w-full mt-12 border-b border-border bg-transparent px-1 py-4 font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors placeholder:text-muted-foreground/60"
           />
 
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <div className="mt-8 flex flex-wrap justify-center gap-x-5 gap-y-2">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 onClick={() => setInput(ex)}
-                className="text-xs font-serif italic text-muted-foreground hover:text-foreground border border-border px-3 py-1.5 rounded-full transition-colors"
+                className="text-sm font-serif italic text-muted-foreground hover:text-foreground transition-colors"
               >
-                {ex}
+                “{ex}”
               </button>
             ))}
           </div>
 
-          <div className="mt-10 flex items-center justify-center gap-4">
+          <div className="mt-14 flex items-center justify-center gap-5">
             <button
               onClick={submit}
               disabled={loading || !input.trim()}
-              className="px-10 py-3 text-[11px] tracking-[3px] uppercase disabled:opacity-40 bg-foreground text-background hover:bg-foreground/90 transition-colors"
+              className="px-12 py-3.5 text-[11px] tracking-[3px] uppercase disabled:opacity-30 bg-foreground text-background hover:bg-foreground/90 transition-colors"
             >
-              {loading ? "Thinking…" : "Untangle"}
+              {loading ? "Thinking…" : "Begin"}
             </button>
             <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
               ⌘ + Enter
             </span>
           </div>
 
-          {err && <p className="mt-6 text-sm text-red-700 text-center">{err}</p>}
+          {err && <p className="mt-6 text-sm text-destructive text-center">{err}</p>}
 
-          <p className="mt-16 text-center text-[10px] tracking-[3px] uppercase text-muted-foreground">
+          <p className="mt-24 text-center text-[10px] tracking-[3px] uppercase text-muted-foreground">
             Every analysis is pinned to the{" "}
-            <Link to="/whiteboard" className="underline hover:text-foreground">Whiteboard</Link>
+            <Link to="/whiteboard" className="underline underline-offset-4 hover:text-foreground">Whiteboard</Link>
           </p>
         </div>
       )}
 
       {result && (
-        <article className="space-y-16 pt-4 pb-24">
+        <article className="space-y-20 pt-8 pb-32">
           {/* 1. Observation */}
           <Step number="01" label="Observation">
-            <blockquote className="pl-5 border-l-2 border-foreground font-serif italic text-2xl text-foreground leading-relaxed">
+            <blockquote className="pl-6 border-l border-foreground font-serif italic text-2xl text-foreground leading-relaxed">
               {submittedInput}
             </blockquote>
-            <p className="mt-4 font-serif text-muted-foreground">
+            <p className="mt-5 font-serif text-muted-foreground leading-relaxed">
               {result.observation_echo}
             </p>
           </Step>
@@ -170,17 +173,17 @@ function DiagnosePage() {
           {/* 1b. What recurs — only when the model surfaced real patterns */}
           {result.pattern_notes && result.pattern_notes.length > 0 && (
             <Step number="·" label="What recurs">
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {result.pattern_notes.map((n, i) => (
                   <li
                     key={i}
-                    className="font-serif italic text-lg text-foreground/85 leading-relaxed border-l-2 border-border pl-4"
+                    className="font-serif italic text-lg text-foreground/85 leading-relaxed pl-5 border-l border-border"
                   >
                     {n}
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 font-sans text-[10px] tracking-[3px] uppercase text-muted-foreground">
+              <p className="mt-5 font-sans text-[10px] tracking-[3px] uppercase text-muted-foreground">
                 Drawn from your prior cases, library, and writing — patterns, not voice.
               </p>
             </Step>
@@ -188,10 +191,10 @@ function DiagnosePage() {
 
           {/* 2. Core Question */}
           <Step number="02" label="The question underneath">
-            <p className="font-serif italic text-3xl text-foreground leading-snug">
+            <p className="font-display italic text-4xl md:text-[2.65rem] text-foreground leading-[1.15] tracking-tight">
               {result.core_question}
             </p>
-            <p className="mt-4 font-serif text-foreground/80 leading-relaxed">
+            <p className="mt-5 font-serif text-foreground/80 leading-relaxed">
               {result.question_context}
             </p>
           </Step>
@@ -292,7 +295,7 @@ function DiagnosePage() {
 
           {/* 7. A Better Question */}
           <Step number={result.article ? "07" : "06"} label="A better question">
-            <p className="font-serif italic text-3xl text-foreground leading-snug">
+            <p className="font-display italic text-4xl md:text-[2.65rem] text-foreground leading-[1.15] tracking-tight">
               {result.better_question}
             </p>
           </Step>
@@ -368,11 +371,11 @@ function Step({
 }) {
   return (
     <section>
-      <div className="flex items-baseline gap-4 mb-5 border-b border-border pb-2">
-        <span className="font-mono text-[10px] tracking-[2px] text-muted-foreground">
+      <div className="flex items-baseline gap-5 mb-6 border-b border-border pb-3">
+        <span className="font-mono text-[10px] tracking-[3px] text-muted-foreground tabular-nums">
           {number}
         </span>
-        <h3 className="font-serif italic text-foreground text-lg">{label}</h3>
+        <h3 className="font-display italic text-foreground text-xl leading-none">{label}</h3>
       </div>
       {children}
     </section>
