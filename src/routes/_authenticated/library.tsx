@@ -503,6 +503,18 @@ function LibraryPage() {
         </section>
       )}
 
+      {/* === Intellectual Timeline === */}
+      {tab === "timeline" && (
+        <section>
+          <p className="font-serif italic text-muted-foreground mb-8">
+            How ideas evolve across the corpus. First appearances, recurrences, and the questions that still don't close.
+          </p>
+          <IntellectualTimeline articles={articles.data ?? []} />
+        </section>
+      )}
+
+
+
 
       {/* === Knowledge entries (formerly Vault) === */}
       {tab === "knowledge" && (
