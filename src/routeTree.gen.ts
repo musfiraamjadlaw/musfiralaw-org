@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedWhiteboardRouteImport } from './routes/_authenticated/whiteboard'
 import { Route as AuthenticatedVaultRouteImport } from './routes/_authenticated/vault'
 import { Route as AuthenticatedUntangleRouteImport } from './routes/_authenticated/untangle'
 import { Route as AuthenticatedStatesRouteImport } from './routes/_authenticated/states'
@@ -39,6 +40,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedWhiteboardRoute = AuthenticatedWhiteboardRouteImport.update({
+  id: '/whiteboard',
+  path: '/whiteboard',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedVaultRoute = AuthenticatedVaultRouteImport.update({
   id: '/vault',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/states': typeof AuthenticatedStatesRoute
   '/untangle': typeof AuthenticatedUntangleRoute
   '/vault': typeof AuthenticatedVaultRoute
+  '/whiteboard': typeof AuthenticatedWhiteboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/states': typeof AuthenticatedStatesRoute
   '/untangle': typeof AuthenticatedUntangleRoute
   '/vault': typeof AuthenticatedVaultRoute
+  '/whiteboard': typeof AuthenticatedWhiteboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/states': typeof AuthenticatedStatesRoute
   '/_authenticated/untangle': typeof AuthenticatedUntangleRoute
   '/_authenticated/vault': typeof AuthenticatedVaultRoute
+  '/_authenticated/whiteboard': typeof AuthenticatedWhiteboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/states'
     | '/untangle'
     | '/vault'
+    | '/whiteboard'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/states'
     | '/untangle'
     | '/vault'
+    | '/whiteboard'
   id:
     | '__root__'
     | '/'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/_authenticated/states'
     | '/_authenticated/untangle'
     | '/_authenticated/vault'
+    | '/_authenticated/whiteboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -242,6 +254,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/whiteboard': {
+      id: '/_authenticated/whiteboard'
+      path: '/whiteboard'
+      fullPath: '/whiteboard'
+      preLoaderRoute: typeof AuthenticatedWhiteboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/vault': {
       id: '/_authenticated/vault'
@@ -351,6 +370,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedStatesRoute: typeof AuthenticatedStatesRoute
   AuthenticatedUntangleRoute: typeof AuthenticatedUntangleRoute
   AuthenticatedVaultRoute: typeof AuthenticatedVaultRoute
+  AuthenticatedWhiteboardRoute: typeof AuthenticatedWhiteboardRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -367,6 +387,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedStatesRoute: AuthenticatedStatesRoute,
   AuthenticatedUntangleRoute: AuthenticatedUntangleRoute,
   AuthenticatedVaultRoute: AuthenticatedVaultRoute,
+  AuthenticatedWhiteboardRoute: AuthenticatedWhiteboardRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
