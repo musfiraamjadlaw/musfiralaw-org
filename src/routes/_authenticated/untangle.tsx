@@ -9,13 +9,13 @@ export const Route = createFileRoute("/_authenticated/untangle")({
 });
 
 const EXAMPLES = [
-  "I'm overwhelmed.",
-  "I can't focus.",
-  "I don't know where to start.",
-  "I'm exhausted.",
-  "I'm stressed.",
-  "I have too many ideas.",
-  "I'm avoiding something.",
+  "I keep returning to the same question and can't tell why.",
+  "Something about this case isn't sitting right.",
+  "I have a hunch I can't yet articulate.",
+  "I can't tell if this is intuition or avoidance.",
+  "Two ideas I've been holding seem to be the same idea.",
+  "I read three things this week that feel connected.",
+  "I keep avoiding this and I don't know what it's about.",
 ];
 
 function DiagnosePage() {
