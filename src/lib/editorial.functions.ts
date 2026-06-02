@@ -278,7 +278,7 @@ export const recommendNextArticle = createServerFn({ method: "POST" })
     // Only the writer's PUBLISHED work. No tasks. No admin notes. No reminders.
     const { data: articles, error: artErr } = await supabase
       .from("articles")
-      .select("id, title, url, published_at, content_text, themes")
+      .select("id, title, url, published_at, content_text, themes, core_argument, tensions, open_loops, recurring_concepts, questions")
       .eq("source", "published")
       .order("published_at", { ascending: false, nullsFirst: false })
       .limit(80);
@@ -291,11 +291,16 @@ export const recommendNextArticle = createServerFn({ method: "POST" })
     }
 
     const corpus = articles
-      .map(
-        (a: any, i: number) =>
-          `### Essay ${i + 1} — ID: ${a.id}\nTITLE: ${a.title}${a.published_at ? "\nPUBLISHED: " + a.published_at.slice(0, 10) : ""}\n\n${(a.content_text || "").slice(0, 5000)}`,
-      )
+      .map((a: any, i: number) => {
+        const meta: string[] = [];
+        if (a.core_argument) meta.push(`ARGUMENT: ${a.core_argument}`);
+        if (a.tensions?.length) meta.push(`TENSIONS: ${a.tensions.join(" · ")}`);
+        if (a.open_loops?.length) meta.push(`OPEN LOOPS: ${a.open_loops.join(" | ")}`);
+        if (a.recurring_concepts?.length) meta.push(`CONCEPTS: ${a.recurring_concepts.join(", ")}`);
+        return `### Essay ${i + 1} — ID: ${a.id}\nTITLE: ${a.title}${a.published_at ? "\nPUBLISHED: " + a.published_at.slice(0, 10) : ""}${meta.length ? "\n" + meta.join("\n") : ""}\n\n${(a.content_text || "").slice(0, 4000)}`;
+      })
       .join("\n\n---\n\n");
+
 
     const raw = await callAI(
       `You are a developmental editor who has read the writer's entire body of published work. You are NOT a content strategist. You are NOT recommending topics. You are NOT helping them produce more content.
@@ -492,6 +497,21 @@ export const extractArticleSignals = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     if (!articles?.length) return { analyzed: 0, remaining: 0 };
 
+    // Pull the canonical concept vocabulary so the model reuses existing
+    // labels instead of inventing fresh ones. This keeps the idea graph
+    // and timeline coherent across the corpus.
+    const { data: existing } = await supabase
+      .from("articles")
+      .select("recurring_concepts, tensions")
+      .not("analyzed_at", "is", null)
+      .limit(200);
+    const conceptVocab = Array.from(
+      new Set((existing ?? []).flatMap((a: any) => a.recurring_concepts ?? [])),
+    ).slice(0, 60);
+    const tensionVocab = Array.from(
+      new Set((existing ?? []).flatMap((a: any) => a.tensions ?? [])),
+    ).slice(0, 40);
+
     let analyzed = 0;
     for (const a of articles) {
       try {
@@ -505,11 +525,46 @@ export const extractArticleSignals = createServerFn({ method: "POST" })
         }
 
         const raw = await callAI(
-          `You are a developmental editor cataloguing a single essay for the writer's intellectual archive.\n\nEssay title: ${a.title}\n\nEssay text:\n${body}\n\nReturn JSON:\n{\n  "summary": "2-3 sentences. What this essay is actually arguing or wrestling with. Editorial register, not a blurb.",\n  "themes": ["1-3 word canonical theme names, max 6"],\n  "questions": ["The recurring questions this essay asks — not topics, real questions ending in '?'. Max 5."],\n  "key_ideas": ["Load-bearing ideas in the essay — short noun phrases or single sentences. Max 6."],\n  "references": {\n    "books": ["Title — Author, when the essay names or clearly leans on a book"],\n    "people": ["Person, role/why-mentioned"],\n    "concepts": ["Named concepts, frameworks, or terms the essay uses"],\n    "research": ["Studies, papers, fields, or empirical findings the essay relies on"]\n  }\n}\n\nRules: Ground every entry strictly in the essay. Do NOT invent references. Empty arrays are correct when the essay doesn't name them. No emojis. No marketing language.`,
+          `You are a developmental editor cataloguing a single essay for the writer's intellectual archive. The archive is a map of thought — not a content index. Identify what the essay is arguing, what conflict it is exploring, what it leaves unresolved, and which recurring concepts it touches.
+
+Essay title: ${a.title}
+
+Essay text:
+${body}
+
+Existing concept vocabulary across the corpus (REUSE these exact labels when the essay touches them; only invent a new label when none fits):
+${conceptVocab.length ? conceptVocab.join(", ") : "(none yet — establish the vocabulary)"}
+
+Existing tension vocabulary (same rule — reuse "X vs Y" labels when applicable):
+${tensionVocab.length ? tensionVocab.join(", ") : "(none yet)"}
+
+Return JSON:
+{
+  "summary": "2-3 sentences. What this essay is actually arguing or wrestling with. Editorial register, not a blurb.",
+  "core_argument": "One sentence. The claim this essay is actually making — what it is asking the reader to accept. Not the topic. The argument.",
+  "tensions": ["The conflicts the essay explores, in the form 'X vs Y' (e.g. 'Ambition vs Meaning', 'Validation vs Identity', 'Performance vs Authenticity'). Max 4. Empty array if none."],
+  "open_loops": ["Questions the essay raises but does NOT resolve by the end. Real questions ending in '?'. Max 5."],
+  "recurring_concepts": ["Concepts this essay touches that recur across a writer's body of work (e.g. 'mentorship', 'excellence', 'attention', 'authority', 'identity', 'curiosity'). Short lowercase noun phrases. Max 8."],
+  "themes": ["1-3 word canonical theme names, max 6"],
+  "questions": ["The recurring questions this essay asks — real questions ending in '?'. Max 5."],
+  "key_ideas": ["Load-bearing ideas in the essay — short noun phrases or single sentences. Max 6."],
+  "references": {
+    "books": ["Title — Author, when the essay names or clearly leans on a book"],
+    "people": ["Person, role/why-mentioned"],
+    "concepts": ["Named concepts, frameworks, or terms the essay uses"],
+    "research": ["Studies, papers, fields, or empirical findings the essay relies on"]
+  }
+}
+
+Rules: Ground every entry strictly in the essay. Do NOT invent references. Distinguish core_argument (the claim) from summary (what the piece is doing). An open_loop is something the essay deliberately or accidentally leaves unanswered — not every question it asks. Empty arrays are correct when the essay doesn't supply them. No emojis. No marketing language.`,
         );
 
         const parsed = parseJson<{
           summary?: string;
+          core_argument?: string;
+          tensions?: string[];
+          open_loops?: string[];
+          recurring_concepts?: string[];
           themes?: string[];
           questions?: string[];
           key_ideas?: string[];
@@ -526,12 +581,22 @@ export const extractArticleSignals = createServerFn({ method: "POST" })
         const themes = (parsed.themes ?? []).slice(0, 6).map((s) => String(s).slice(0, 80));
         const questions = (parsed.questions ?? []).slice(0, 5).map((s) => String(s).slice(0, 240));
         const key_ideas = (parsed.key_ideas ?? []).slice(0, 6).map((s) => String(s).slice(0, 280));
+        const tensions = (parsed.tensions ?? []).slice(0, 4).map((s) => String(s).slice(0, 120));
+        const open_loops = (parsed.open_loops ?? []).slice(0, 5).map((s) => String(s).slice(0, 280));
+        const recurring_concepts = (parsed.recurring_concepts ?? [])
+          .slice(0, 8)
+          .map((s) => String(s).toLowerCase().slice(0, 80));
         const summary = (parsed.summary ?? "").slice(0, 800);
+        const core_argument = (parsed.core_argument ?? "").slice(0, 500);
 
         const { error: upErr } = await supabase
           .from("articles")
           .update({
             summary: summary || null,
+            core_argument: core_argument || null,
+            tensions,
+            open_loops,
+            recurring_concepts,
             themes,
             questions,
             key_ideas,
@@ -544,6 +609,7 @@ export const extractArticleSignals = createServerFn({ method: "POST" })
         console.error("extract failed for", a.id, e);
       }
     }
+
 
     const { count } = await supabase
       .from("articles")

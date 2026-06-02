@@ -51,7 +51,7 @@ function Chip({ children }: { children: React.ReactNode }) {
 
 
 
-type Tab = "questions" | "themes" | "corpus" | "knowledge" | "graph";
+type Tab = "questions" | "themes" | "corpus" | "timeline" | "knowledge" | "graph";
 
 function LibraryPage() {
   const qc = useQueryClient();
@@ -67,10 +67,11 @@ function LibraryPage() {
     queryFn: async () =>
       (await supabase
         .from("articles")
-        .select("id, title, url, source, published_at, themes, questions, key_ideas, refs, summary, analyzed_at, content_text")
+        .select("id, title, url, source, published_at, themes, questions, key_ideas, refs, summary, analyzed_at, content_text, core_argument, tensions, open_loops, recurring_concepts")
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(200)).data ?? [],
   });
+
   const themes = useQuery({
     queryKey: ["library-themes"],
     queryFn: async () =>
@@ -118,9 +119,10 @@ function LibraryPage() {
         .flat()
         .filter(Boolean)
         .join(" ");
-      return `${a.title} ${(a.themes || []).join(" ")} ${(a.questions || []).join(" ")} ${(a.key_ideas || []).join(" ")} ${refBlob} ${a.summary ?? ""} ${a.content_text ?? ""}`
+      return `${a.title} ${(a.themes || []).join(" ")} ${(a.questions || []).join(" ")} ${(a.key_ideas || []).join(" ")} ${(a.tensions || []).join(" ")} ${(a.recurring_concepts || []).join(" ")} ${(a.open_loops || []).join(" ")} ${a.core_argument ?? ""} ${refBlob} ${a.summary ?? ""} ${a.content_text ?? ""}`
         .toLowerCase()
         .includes(s);
+
     });
   }, [articles.data, q]);
 
@@ -156,10 +158,12 @@ function LibraryPage() {
             { id: "questions", label: "Questions" },
             { id: "themes", label: "Themes" },
             { id: "corpus", label: "Corpus" },
+            { id: "timeline", label: "Timeline" },
             { id: "knowledge", label: "Notes" },
-            { id: "graph", label: "Knowledge Graph" },
+            { id: "graph", label: "Idea Graph" },
           ] as { id: Tab; label: string }[]
         ).map((t) => (
+
           <button
             key={t.id}
             onClick={() => setTab(t.id)}
@@ -355,6 +359,49 @@ function LibraryPage() {
                     </p>
                   )}
 
+                  {a.core_argument && (
+                    <div className="mt-4 border-l-2 border-foreground/40 pl-3">
+                      <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-1">
+                        Core argument
+                      </p>
+                      <p className="font-serif text-foreground leading-snug">
+                        {a.core_argument}
+                      </p>
+                    </div>
+                  )}
+
+                  {(a.tensions?.length ?? 0) > 0 && (
+                    <CorpusRow label="Tensions explored">
+                      {a.tensions.map((t: string) => (
+                        <Chip key={t}>{t}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+
+                  {(a.recurring_concepts?.length ?? 0) > 0 && (
+                    <CorpusRow label="Recurring concepts">
+                      {a.recurring_concepts.map((c: string) => (
+                        <Chip key={c}>{c}</Chip>
+                      ))}
+                    </CorpusRow>
+                  )}
+
+                  {(a.open_loops?.length ?? 0) > 0 && (
+                    <CorpusRow label="Left unresolved">
+                      <ul className="space-y-1.5">
+                        {a.open_loops.map((q: string, i: number) => (
+                          <li
+                            key={i}
+                            className="font-serif italic text-foreground/85 leading-snug"
+                          >
+                            {q}
+                          </li>
+                        ))}
+                      </ul>
+                    </CorpusRow>
+                  )}
+
+
                   {(a.themes?.length ?? 0) > 0 && (
                     <CorpusRow label="Themes">
                       {a.themes.map((t: string) => (
@@ -456,6 +503,18 @@ function LibraryPage() {
         </section>
       )}
 
+      {/* === Intellectual Timeline === */}
+      {tab === "timeline" && (
+        <section>
+          <p className="font-serif italic text-muted-foreground mb-8">
+            How ideas evolve across the corpus. First appearances, recurrences, and the questions that still don't close.
+          </p>
+          <IntellectualTimeline articles={articles.data ?? []} />
+        </section>
+      )}
+
+
+
 
       {/* === Knowledge entries (formerly Vault) === */}
       {tab === "knowledge" && (
@@ -494,11 +553,11 @@ function LibraryPage() {
         </section>
       )}
 
-      {/* === Knowledge Graph === */}
+      {/* === Idea Graph === */}
       {tab === "graph" && (
         <section>
           <p className="font-serif italic text-muted-foreground mb-6">
-            Themes (gold) at the center. Articles (navy) orbit and connect to the themes they belong to.
+            A map of thought. Themes (gold) at the center; recurring concepts (rust) trace what the work keeps returning to; essays (navy) orbit the ideas they touch.
           </p>
           <KnowledgeGraph articles={articles.data ?? []} themes={themes.data ?? []} />
         </section>
@@ -507,8 +566,9 @@ function LibraryPage() {
   );
 }
 
+
 function KnowledgeGraph({ articles, themes }: { articles: any[]; themes: any[] }) {
-  const W = 720, H = 440;
+  const W = 720, H = 480;
   const cx = W / 2, cy = H / 2;
   if (!themes.length || !articles.length) {
     return (
@@ -517,33 +577,63 @@ function KnowledgeGraph({ articles, themes }: { articles: any[]; themes: any[] }
       </div>
     );
   }
-  const themeR = Math.min(160, 30 + themes.length * 12);
+
+  // Tally recurring concepts across the corpus; keep top 14 for legibility.
+  const conceptTally: Record<string, number> = {};
+  for (const a of articles) {
+    for (const c of (a.recurring_concepts || []) as string[]) {
+      const k = String(c).toLowerCase();
+      conceptTally[k] = (conceptTally[k] ?? 0) + 1;
+    }
+  }
+  const topConcepts = Object.entries(conceptTally)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 14)
+    .map(([name, frequency]) => ({ name, frequency }));
+
+  const themeR = 90;
   const themeNodes = themes.map((t, i) => {
     const a = (i / themes.length) * Math.PI * 2 - Math.PI / 2;
     return { ...t, x: cx + Math.cos(a) * themeR, y: cy + Math.sin(a) * themeR };
   });
   const themePos: Record<string, { x: number; y: number }> = {};
-  themeNodes.forEach((t) => (themePos[t.name.toLowerCase()] = { x: t.x, y: t.y }));
+  themeNodes.forEach((t: any) => (themePos[t.name.toLowerCase()] = { x: t.x, y: t.y }));
 
-  const articleR = Math.min(200, themeR + 80);
+  const conceptR = 165;
+  const conceptNodes = topConcepts.map((c, i) => {
+    const ang = (i / Math.max(1, topConcepts.length)) * Math.PI * 2 - Math.PI / 2;
+    return { ...c, x: cx + Math.cos(ang) * conceptR, y: cy + Math.sin(ang) * conceptR };
+  });
+  const conceptPos: Record<string, { x: number; y: number }> = {};
+  conceptNodes.forEach((c) => (conceptPos[c.name] = { x: c.x, y: c.y }));
+
+  const articleR = 220;
   const articleNodes = articles.slice(0, 80).map((a, i) => {
     const ang = (i / Math.min(80, articles.length)) * Math.PI * 2 - Math.PI / 2;
     return { ...a, x: cx + Math.cos(ang) * articleR, y: cy + Math.sin(ang) * articleR };
   });
 
-  const links: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  const themeLinks: { x1: number; y1: number; x2: number; y2: number }[] = [];
+  const conceptLinks: { x1: number; y1: number; x2: number; y2: number }[] = [];
   for (const a of articleNodes) {
     for (const tn of a.themes || []) {
       const p = themePos[String(tn).toLowerCase()];
-      if (p) links.push({ x1: a.x, y1: a.y, x2: p.x, y2: p.y });
+      if (p) themeLinks.push({ x1: a.x, y1: a.y, x2: p.x, y2: p.y });
+    }
+    for (const cn of a.recurring_concepts || []) {
+      const p = conceptPos[String(cn).toLowerCase()];
+      if (p) conceptLinks.push({ x1: a.x, y1: a.y, x2: p.x, y2: p.y });
     }
   }
 
   return (
     <div className="border border-border rounded bg-card overflow-hidden">
       <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto block">
-        {links.map((l, i) => (
-          <line key={i} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="#C87D0E" strokeOpacity={0.22} strokeWidth={1} />
+        {themeLinks.map((l, i) => (
+          <line key={`t${i}`} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="#C87D0E" strokeOpacity={0.22} strokeWidth={1} />
+        ))}
+        {conceptLinks.map((l, i) => (
+          <line key={`c${i}`} x1={l.x1} y1={l.y1} x2={l.x2} y2={l.y2} stroke="#A0522D" strokeOpacity={0.18} strokeWidth={1} />
         ))}
         {articleNodes.map((a) => (
           <g key={a.id}>
@@ -551,11 +641,22 @@ function KnowledgeGraph({ articles, themes }: { articles: any[]; themes: any[] }
             <title>{a.title}</title>
           </g>
         ))}
-        {themeNodes.map((t) => {
+        {conceptNodes.map((c) => {
+          const r = 6 + Math.min(14, c.frequency * 2);
+          return (
+            <g key={c.name}>
+              <circle cx={c.x} cy={c.y} r={r} fill="#A0522D" fillOpacity={0.18} stroke="#A0522D" strokeWidth={1} />
+              <text x={c.x} y={c.y + r + 11} textAnchor="middle" fontSize={10} fontFamily="serif" fill="#6b3a2a">
+                {c.name}
+              </text>
+            </g>
+          );
+        })}
+        {themeNodes.map((t: any) => {
           const r = 10 + Math.min(20, t.frequency * 2);
           return (
             <g key={t.id}>
-              <circle cx={t.x} cy={t.y} r={r} fill="#E8A838" fillOpacity={0.25} stroke="#C87D0E" strokeWidth={1.5} />
+              <circle cx={t.x} cy={t.y} r={r} fill="#E8A838" fillOpacity={0.3} stroke="#C87D0E" strokeWidth={1.5} />
               <text x={t.x} y={t.y + r + 12} textAnchor="middle" fontSize={11} fontFamily="serif" fill="#1A2744">
                 {t.name}
               </text>
@@ -566,3 +667,84 @@ function KnowledgeGraph({ articles, themes }: { articles: any[]; themes: any[] }
     </div>
   );
 }
+
+// Intellectual timeline — when each recurring concept first appeared and where it recurred.
+function IntellectualTimeline({ articles }: { articles: any[] }) {
+  const dated = articles
+    .filter((a) => a.published_at && (a.recurring_concepts?.length || a.tensions?.length))
+    .map((a) => ({ ...a, ts: new Date(a.published_at).getTime() }))
+    .sort((a, b) => a.ts - b.ts);
+
+  if (!dated.length) {
+    return (
+      <p className="font-serif italic text-muted-foreground">
+        No deep-read essays with publish dates yet. Sync your Substack and run "Deep-read 8" to populate the timeline.
+      </p>
+    );
+  }
+
+  // For each concept, list essays in chronological order.
+  const conceptMap: Record<string, { id: string; title: string; url?: string; date: string; ts: number }[]> = {};
+  for (const a of dated) {
+    for (const c of (a.recurring_concepts || []) as string[]) {
+      const k = c.toLowerCase();
+      (conceptMap[k] ??= []).push({
+        id: a.id,
+        title: a.title,
+        url: a.url,
+        date: new Date(a.published_at).toLocaleDateString(undefined, { year: "numeric", month: "short" }),
+        ts: a.ts,
+      });
+    }
+  }
+
+  const conceptEntries = Object.entries(conceptMap)
+    .filter(([, xs]) => xs.length >= 1)
+    .sort((a, b) => b[1].length - a[1].length);
+
+  return (
+    <div className="space-y-10">
+      {conceptEntries.map(([concept, xs]) => {
+        const first = xs[0];
+        const last = xs[xs.length - 1];
+        return (
+          <div key={concept} className="border-l-2 border-border pl-5">
+            <div className="flex items-baseline justify-between gap-3 flex-wrap">
+              <h3 className="font-serif text-2xl text-foreground capitalize">{concept}</h3>
+              <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
+                {xs.length === 1
+                  ? `First named · ${first.date}`
+                  : `First named ${first.date} · last revisited ${last.date} · ${xs.length} essays`}
+              </span>
+            </div>
+            <ol className="mt-4 relative border-l border-border ml-2 space-y-3 pl-5">
+              {xs.map((x, i) => (
+                <li key={`${x.id}-${i}`} className="relative">
+                  <span className="absolute -left-[27px] top-1.5 h-2 w-2 rounded-full bg-foreground/70" />
+                  <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
+                    {x.date}
+                  </p>
+                  <p className="font-serif text-foreground/90 leading-snug">
+                    {x.url ? (
+                      <a href={x.url} target="_blank" rel="noreferrer" className="hover:underline">
+                        {x.title}
+                      </a>
+                    ) : (
+                      x.title
+                    )}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        );
+      })}
+      {!conceptEntries.length && (
+        <p className="font-serif italic text-muted-foreground">
+          Deep-read more essays to trace how concepts evolve.
+        </p>
+      )}
+    </div>
+  );
+}
+
