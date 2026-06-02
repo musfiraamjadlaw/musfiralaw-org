@@ -70,10 +70,9 @@ function DiagnosePage() {
       const r = await run({ data: { input: input.trim() } });
       setResult(r);
       try {
-        sessionStorage.setItem(
-          WHITEBOARD_KEY,
-          JSON.stringify({ input: input.trim(), result: r }),
-        );
+        const payload = JSON.stringify({ input: input.trim(), result: r });
+        localStorage.setItem(WHITEBOARD_KEY, payload);
+        sessionStorage.setItem(WHITEBOARD_KEY, payload);
       } catch {
         /* storage unavailable — Whiteboard will just show empty state */
       }
