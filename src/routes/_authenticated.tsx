@@ -13,29 +13,13 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 type Tab = { id: string; label: string; to: string };
-type Group = { label: string; tabs: Tab[] };
 
-const GROUPS: Group[] = [
-  {
-    label: "Cognitive Core",
-    tabs: [
-      { id: "states", label: "States", to: "/states" },
-      { id: "dump", label: "Brain Dump", to: "/dump" },
-      { id: "start", label: "Activation", to: "/start" },
-      { id: "untangle", label: "Untangle", to: "/untangle" },
-      { id: "clock", label: "Time Radar", to: "/clock" },
-      { id: "courtroom", label: "Courtroom", to: "/courtroom" },
-      { id: "vault", label: "Knowledge Vault", to: "/vault" },
-    ],
-  },
-  {
-    label: "Intelligence",
-    tabs: [{ id: "meaning", label: "Decision Engine", to: "/meaning" }],
-  },
-  {
-    label: "Insight",
-    tabs: [{ id: "editorial", label: "Writing Intelligence", to: "/editorial" }],
-  },
+const TABS: Tab[] = [
+  { id: "diagnose", label: "Diagnose", to: "/diagnose" },
+  { id: "start", label: "Act", to: "/start" },
+  { id: "courtroom", label: "Think", to: "/courtroom" },
+  { id: "vault", label: "Learn", to: "/vault" },
+  { id: "editorial", label: "Write", to: "/editorial" },
 ];
 
 function AuthLayout() {
@@ -60,39 +44,30 @@ function AuthLayout() {
             <div className="flex items-baseline gap-3">
               <h1 className="font-serif text-xl font-semibold">Cognitive OS</h1>
               <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-                Attention · Time · Knowledge · Decisions
+                A private cognitive navigation system
               </span>
             </div>
             <button onClick={signOut} className="text-[10px] tracking-[2px] uppercase text-muted-foreground hover:text-navy">
               {email ? "Sign out" : ""}
             </button>
           </div>
-          <nav className="flex flex-wrap items-end gap-x-6 gap-y-2 pb-1">
-            {GROUPS.map((g) => (
-              <div key={g.label} className="flex flex-col">
-                <span className="text-[9px] tracking-[2.5px] uppercase text-muted-foreground/70 mb-1">
-                  {g.label}
-                </span>
-                <div className="flex gap-1">
-                  {g.tabs.map((t) => {
-                    const active = path.startsWith(t.to);
-                    return (
-                      <Link
-                        key={t.id}
-                        to={t.to}
-                        className={`px-3 py-2 text-[10px] tracking-[2.5px] uppercase whitespace-nowrap border-b-2 transition-colors ${
-                          active
-                            ? "border-accent text-navy font-medium"
-                            : "border-transparent text-muted-foreground hover:text-navy"
-                        }`}
-                      >
-                        {t.label}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+          <nav className="flex flex-wrap gap-1 pb-1">
+            {TABS.map((t) => {
+              const active = path.startsWith(t.to);
+              return (
+                <Link
+                  key={t.id}
+                  to={t.to}
+                  className={`px-4 py-2 text-[10px] tracking-[3px] uppercase whitespace-nowrap border-b-2 transition-colors ${
+                    active
+                      ? "border-accent text-navy font-medium"
+                      : "border-transparent text-muted-foreground hover:text-navy"
+                  }`}
+                >
+                  {t.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </header>
