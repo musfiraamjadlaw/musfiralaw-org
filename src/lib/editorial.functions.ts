@@ -535,7 +535,7 @@ export const extractArticleSignals = createServerFn({ method: "POST" })
             themes,
             questions,
             key_ideas,
-            refs: refs as unknown as Record<string, unknown>,
+            refs: refs as any,
             analyzed_at: new Date().toISOString(),
           })
           .eq("id", a.id);
