@@ -54,8 +54,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Untangle" },
+      { title: "Untangled" },
       { name: "description", content: "A cognitive operating system for managing attention, time, knowledge, and decisions." },
+      { property: "og:title", content: "Untangled" },
+      { name: "twitter:title", content: "Untangled" },
+      { property: "og:description", content: "A cognitive operating system for managing attention, time, knowledge, and decisions." },
+      { name: "twitter:description", content: "A cognitive operating system for managing attention, time, knowledge, and decisions." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/97ef54fd-6f16-481f-b289-f4a428ef986c/id-preview-d6722541--a327fb80-eb82-4b6d-9c2b-2f612dad1844.lovable.app-1780374815677.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/97ef54fd-6f16-481f-b289-f4a428ef986c/id-preview-d6722541--a327fb80-eb82-4b6d-9c2b-2f612dad1844.lovable.app-1780374815677.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { property: "og:type", content: "website" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
