@@ -146,7 +146,7 @@ function ColophonPage() {
       <figure className="-mx-6 md:mx-0 mb-14">
         <img
           src={PHOTO_2}
-          alt=""
+          alt="Field notes — opening plate for the Colophon"
           loading="eager"
           className="w-full h-auto"
         />
@@ -203,7 +203,7 @@ function ColophonPage() {
       <Ornament />
 
       <figure className="-mx-6 md:mx-0 mb-14">
-        <img src={PHOTO_1} alt="" loading="lazy" className="w-full h-auto" />
+        <img src={PHOTO_1} alt="Plate II — handwritten notes on recurring patterns" loading="lazy" className="w-full h-auto" />
         <figcaption className="mt-3 px-6 md:px-0 text-[11px] tracking-[0.14em] uppercase text-muted-foreground">
           Plate II — On patterns
         </figcaption>
@@ -225,7 +225,7 @@ function ColophonPage() {
       <Ornament />
 
       <figure className="-mx-6 md:mx-0 mb-14">
-        <img src={PHOTO_3} alt="" loading="lazy" className="w-full h-auto" />
+        <img src={PHOTO_3} alt="Plate III — a quiet place to investigate what isn't making sense" loading="lazy" className="w-full h-auto" />
         <figcaption className="mt-3 px-6 md:px-0 text-[11px] tracking-[0.14em] uppercase text-muted-foreground">
           Plate III — A place to investigate
         </figcaption>
@@ -247,7 +247,7 @@ function ColophonPage() {
       <Ornament />
 
       <figure className="-mx-6 md:mx-0 mb-8">
-        <img src={PHOTO_4} alt="" loading="lazy" className="w-full h-auto" />
+        <img src={PHOTO_4} alt="Plate IV — closing image set in the margin" loading="lazy" className="w-full h-auto" />
         <figcaption className="mt-3 px-6 md:px-0 text-[11px] tracking-[0.14em] uppercase text-muted-foreground">
           Plate IV — The margin
         </figcaption>
