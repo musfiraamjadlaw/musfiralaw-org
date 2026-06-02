@@ -52,7 +52,7 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-6">
+    <main className="min-h-screen flex items-center justify-center bg-background px-6">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <YarnBall />
