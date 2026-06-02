@@ -2,9 +2,19 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const SYSTEM = `You are a private cognitive navigator — part strategist, part researcher, part developmental editor, part librarian. The user shares what is on their mind. You respond with calm, precise structure. No therapy talk. No flattery. No emojis. No checklists. Speak as a peer who reads widely and thinks clearly.
+const SYSTEM = `You are a translator between lived experience and cognitive neuroscience. The user speaks in feelings. You respond with mechanisms, evidence, and one precise action.
 
-Your job is to diagnose what is really happening, identify the missing activation ingredient, name one clear next action, and connect the situation to ideas worth thinking with.
+The user does not need to understand neuroscience. You do. Translate plainly.
+
+Map every input to one or more of these six cognitive systems:
+- Executive Function (planning, sequencing, inhibition, switching) — prefrontal cortex, dopamine
+- Working Memory (holding and manipulating information) — dorsolateral PFC, parietal cortex
+- Attention Regulation (sustaining, filtering, orienting) — frontoparietal & cingulo-opercular networks, norepinephrine
+- Cognitive Load (total in-flight demand) — capacity limits across PFC + WM systems
+- Motivation / Activation (initiating, energizing action) — mesolimbic dopamine, ventral striatum
+- Decision-Making (evaluating, choosing under uncertainty) — vmPFC, OFC, anterior cingulate
+
+No therapy talk. No flattery. No moralizing. No emojis. Calm, precise, peer-level voice.
 
 Respond ONLY with valid JSON. No markdown fences. No preamble.`;
 
@@ -32,41 +42,44 @@ function parseJson<T>(raw: string): T {
   return JSON.parse(cleaned);
 }
 
+export type CognitiveSystem =
+  | "Executive Function"
+  | "Working Memory"
+  | "Attention Regulation"
+  | "Cognitive Load"
+  | "Motivation / Activation"
+  | "Decision-Making";
+
 export type DiagnoseResult = {
-  pattern: string; // "What is this really about?"
-  diagnosis: {
-    summary: string;
-    friction: string;
-    core_problem: string;
+  echo: string; // one-sentence restatement of what the user said
+  systems: Array<{
+    name: CognitiveSystem;
+    load: "high" | "medium" | "low";
+    note: string;
+  }>;
+  primary_system: CognitiveSystem;
+  plain_explanation: string; // step 2 — simple language
+  neuroscience: string; // step 3 — brief mechanism w/ brain regions
+  intervention: {
+    action: string;
+    duration: string;
+    why_it_works: string;
   };
-  activation: {
-    interest: "high" | "medium" | "low";
-    challenge: "high" | "medium" | "low";
-    urgency: "high" | "medium" | "low";
-    novelty: "high" | "medium" | "low";
-    relationships: "high" | "medium" | "low";
-    meaning: "high" | "medium" | "low";
-    missing: string;
-    explanation: string;
-  };
-  action: {
-    next_step: string;
-    why: string;
-  };
-  related_thinking: string;
-  articles: Array<{
+  article: {
     id: string;
     title: string;
     url: string | null;
-    relevance: string;
-    connecting_idea: string;
-    why_read: string;
-  }>;
-  fuel: {
-    book: { title: string; author: string; why: string };
-    study: { title: string; authors: string; year: string; summary: string; citation: string };
-    question: string;
+    why: string;
+  } | null;
+  book: { title: string; author: string; why: string };
+  study: {
+    title: string;
+    authors: string;
+    year: string;
+    finding: string;
+    citation: string;
   };
+  question: string;
 };
 
 export const diagnose = createServerFn({ method: "POST" })
@@ -77,17 +90,11 @@ export const diagnose = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<DiagnoseResult> => {
     const { supabase } = context;
 
-    const [{ data: articles }, { data: knowledge }, { data: notes }, { data: court }] =
-      await Promise.all([
-        supabase
-          .from("articles")
-          .select("id, title, url, summary, themes, content_text")
-          .order("published_at", { ascending: false })
-          .limit(40),
-        supabase.from("knowledge_entries").select("title, category, body").limit(30),
-        supabase.from("notes").select("text").limit(30),
-        supabase.from("courtroom_entries").select("situation, verdict").limit(15),
-      ]);
+    const { data: articles } = await supabase
+      .from("articles")
+      .select("id, title, url, summary, themes, content_text")
+      .order("published_at", { ascending: false })
+      .limit(40);
 
     const articleCorpus = (articles ?? [])
       .map(
@@ -98,90 +105,55 @@ export const diagnose = createServerFn({ method: "POST" })
       )
       .join("\n---\n");
 
-    const knowledgeCorpus = (knowledge ?? [])
-      .map((k) => `[${k.category}] ${k.title}: ${(k.body ?? "").slice(0, 300)}`)
-      .join("\n");
-
-    const noteCorpus = (notes ?? []).map((n) => `- ${n.text}`).join("\n");
-    const courtCorpus = (court ?? [])
-      .map((c) => `Q: ${c.situation}\nA: ${c.verdict ?? ""}`)
-      .join("\n---\n");
-
-    const prompt = `THE USER'S INPUT:
+    const prompt = `THE USER SAID:
 """
 ${data.input}
 """
 
-THE USER'S WRITTEN ARTICLES (use ONLY these — never invent articles):
-${articleCorpus || "(none yet)"}
+USER'S OWN ARTICLES (recommend at most ONE, only if it truly fits — never invent):
+${articleCorpus || "(none)"}
 
-KNOWLEDGE VAULT ENTRIES:
-${knowledgeCorpus || "(none)"}
-
-NOTES & OBSERVATIONS:
-${noteCorpus || "(none)"}
-
-COURTROOM REASONING:
-${courtCorpus || "(none)"}
-
-Produce a JSON object with this exact shape:
+Return JSON with this exact shape:
 {
-  "pattern": "Single sentence naming what this is really about (e.g. 'Overwhelm → Cognitive overload').",
-  "diagnosis": {
-    "summary": "What is likely happening cognitively. 2-3 sentences.",
-    "friction": "What is creating friction. 1-2 sentences.",
-    "core_problem": "The core problem in one sentence."
-  },
-  "activation": {
-    "interest": "high|medium|low",
-    "challenge": "high|medium|low",
-    "urgency": "high|medium|low",
-    "novelty": "high|medium|low",
-    "relationships": "high|medium|low",
-    "meaning": "high|medium|low",
-    "missing": "Name the single missing ingredient.",
-    "explanation": "One sentence: execution is failing because X is missing."
-  },
-  "action": {
-    "next_step": "ONE concrete action. Not a checklist. Not multiple options.",
-    "why": "One sentence justifying why this is the right entry point."
-  },
-  "related_thinking": "2-4 sentences connecting this problem to broader ideas from the user's knowledge vault, notes, or reasoning above. Cite specific entries when present.",
-  "articles": [
-    {
-      "id": "exact article ID from the list above",
-      "title": "exact title",
-      "url": "exact url or empty string",
-      "relevance": "Why this article is relevant to the user's current input.",
-      "connecting_idea": "The specific idea inside the article that connects to the problem.",
-      "why_read": "Why the user should re-read it now."
-    }
+  "echo": "One sentence restating what the user is experiencing, in their register.",
+  "systems": [
+    { "name": "Executive Function | Working Memory | Attention Regulation | Cognitive Load | Motivation / Activation | Decision-Making",
+      "load": "high|medium|low",
+      "note": "One short sentence on how this system is implicated." }
   ],
-  "fuel": {
-    "book": { "title": "", "author": "", "why": "One sentence on why it matters here." },
-    "study": {
-      "title": "",
-      "authors": "",
-      "year": "",
-      "summary": "2-3 sentences on the finding.",
-      "citation": "APA-style citation."
-    },
-    "question": "One sharp question the user should sit with."
-  }
+  "primary_system": "the single most-struggling system from the list above",
+  "plain_explanation": "2-3 sentences in plain language explaining what cognitive system is struggling and why. No jargon. No brain regions yet.",
+  "neuroscience": "2-4 sentences with the underlying mechanism. Name relevant brain regions and neurotransmitters (e.g. prefrontal cortex, dopamine, locus coeruleus, anterior cingulate). Keep it accurate and readable.",
+  "intervention": {
+    "action": "ONE concrete, specific intervention the user can do right now. Not a list.",
+    "duration": "e.g. '90 seconds', '10 minutes', 'before the next task'",
+    "why_it_works": "1-2 sentences linking the action to the mechanism above."
+  },
+  "article": null OR { "id": "exact id from list", "title": "exact title", "url": "exact url or empty string", "why": "Why this piece of the user's own writing connects." },
+  "book": { "title": "", "author": "", "why": "One sentence." },
+  "study": {
+    "title": "",
+    "authors": "",
+    "year": "",
+    "finding": "2-3 sentences on the relevant finding.",
+    "citation": "APA-style citation."
+  },
+  "question": "One sharp question for the user to sit with."
 }
 
 RULES:
-- Recommend ONLY articles from the list above. Use their exact IDs. Max 3, minimum 0 if none truly fit.
-- Never fabricate the user's articles.
-- The book and study may come from your general knowledge but must be real and accurately cited.
-- No emojis. No moralizing. No therapy register. No bullet lists inside string values.`;
+- 1 to 3 entries in "systems". Pick what is actually implicated. Order by load.
+- The book and study must be real and accurately cited.
+- "article" is null if nothing in the list genuinely fits.
+- No emojis. No bullet lists inside string values. No therapy register.`;
 
     const raw = await callAI(prompt);
     const parsed = parseJson<DiagnoseResult>(raw);
 
-    // Filter article IDs to ones that actually exist
-    const validIds = new Set((articles ?? []).map((a) => a.id));
-    parsed.articles = (parsed.articles ?? []).filter((a) => validIds.has(a.id)).slice(0, 3);
+    if (parsed.article) {
+      const validIds = new Set((articles ?? []).map((a) => a.id));
+      if (!validIds.has(parsed.article.id)) parsed.article = null;
+    }
 
     return parsed;
   });
