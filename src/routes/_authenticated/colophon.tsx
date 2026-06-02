@@ -188,6 +188,10 @@ function ColophonPage() {
         <div className="mx-auto mt-8 h-px w-12 bg-border" />
       </blockquote>
 
+      <SourceMaterial />
+
+
+
       <footer className="pt-10 border-t border-border">
         <div className="text-center space-y-5">
           <p className="text-muted-foreground italic" style={{ fontSize: "18px" }}>
