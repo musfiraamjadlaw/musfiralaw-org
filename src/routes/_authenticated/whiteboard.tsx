@@ -81,6 +81,8 @@ const ACTIVATION: Condition[] = [
 
 function WhiteboardPage() {
   const [data, setData] = useState<{ input: string; result: DiagnoseResult } | null>(null);
+  const [cases, setCases] = useState<CaseRow[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -90,7 +92,31 @@ function WhiteboardPage() {
     } catch {
       /* ignore */
     }
+    (async () => {
+      const { data: rows } = await supabase
+        .from("untangle_analyses")
+        .select("id, input, result, missing_condition, core_question, created_at")
+        .order("created_at", { ascending: false })
+        .limit(50);
+      if (rows && rows.length) {
+        const typed = rows as unknown as CaseRow[];
+        setCases(typed);
+        // If nothing pinned locally, surface the most recent archived case.
+        setData((prev) =>
+          prev ?? { input: typed[0].input, result: typed[0].result },
+        );
+        setSelectedId(typed[0].id);
+      }
+    })();
   }, []);
+
+  function openCase(c: CaseRow) {
+    setData({ input: c.input, result: c.result });
+    setSelectedId(c.id);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+  }
 
   return (
     <article className="max-w-2xl mx-auto pb-32">
