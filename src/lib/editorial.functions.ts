@@ -275,28 +275,108 @@ export const recommendNextArticle = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
-    const [{ data: themes }, { data: articles }, { data: threads }] = await Promise.all([
+    const [
+      { data: themes },
+      { data: articles },
+      { data: threads },
+      { data: notes },
+      { data: knowledge },
+      { data: court },
+      { data: mentors },
+    ] = await Promise.all([
       supabase.from("writing_themes").select("*").order("frequency", { ascending: false }),
       supabase
         .from("articles")
         .select("id, title, published_at, source, themes, content_text")
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(40),
-      supabase.from("unfinished_threads").select("topic, question").eq("status", "open").limit(20),
+      supabase.from("unfinished_threads").select("topic, question, evidence, sources, mentions_count").eq("status", "open").limit(30),
+      supabase.from("notes").select("text, category, created_at").order("created_at", { ascending: false }).limit(150),
+      supabase.from("knowledge_entries").select("title, body, category, tags").order("created_at", { ascending: false }).limit(120),
+      supabase.from("courtroom_entries").select("situation, facts, assumptions, verdict").order("created_at", { ascending: false }).limit(40),
+      supabase.from("mentor_lessons").select("mentor_name, role, lesson, tags").order("created_at", { ascending: false }).limit(60),
     ]);
 
-    if (!articles?.length) throw new Error("No articles yet. Import or paste at least one piece first.");
+    const totalSignal =
+      (articles?.length ?? 0) +
+      (notes?.length ?? 0) +
+      (knowledge?.length ?? 0) +
+      (court?.length ?? 0) +
+      (mentors?.length ?? 0);
+    if (totalSignal === 0) {
+      throw new Error("Nothing to analyze yet. Add notes, vault entries, courtroom analyses, or import articles first.");
+    }
 
     const themeSummary = (themes ?? [])
       .map((t: any) => `- [${t.status}] ${t.name} (×${t.frequency}): ${t.description ?? ""}`)
       .join("\n");
-    const articleSummary = articles
+    const articleSummary = (articles ?? [])
       .map((a: any) => `- ${a.id} | ${a.title} [${a.source}${a.published_at ? ", " + a.published_at.slice(0, 10) : ""}] — themes: ${(a.themes || []).join(", ") || "—"}`)
       .join("\n");
-    const threadSummary = (threads ?? []).map((t: any) => `- ${t.topic}${t.question ? " — " + t.question : ""}`).join("\n");
+    const threadSummary = (threads ?? [])
+      .map((t: any) => `- ${t.topic}${t.question ? " — " + t.question : ""}${t.evidence ? " | evidence: " + String(t.evidence).slice(0, 200) : ""} (×${t.mentions_count ?? 1}, sources: ${(t.sources || []).join(",")})`)
+      .join("\n");
+    const notesSummary = (notes ?? [])
+      .map((n: any) => `- [${n.category ?? "note"}] ${String(n.text).slice(0, 240)}`)
+      .join("\n")
+      .slice(0, 12000);
+    const knowledgeSummary = (knowledge ?? [])
+      .map((k: any) => `### ${k.title} [${k.category}]${k.tags?.length ? " {" + k.tags.join(", ") + "}" : ""}\n${String(k.body || "").slice(0, 900)}`)
+      .join("\n\n")
+      .slice(0, 18000);
+    const courtSummary = (court ?? [])
+      .map((c: any) => `- Q: ${String(c.situation || "").slice(0, 300)}\n  Facts: ${String(c.facts || "").slice(0, 200)}\n  Assumptions: ${String(c.assumptions || "").slice(0, 200)}\n  Conclusion: ${String(c.verdict || "").slice(0, 300)}`)
+      .join("\n\n")
+      .slice(0, 10000);
+    const mentorSummary = (mentors ?? [])
+      .map((m: any) => `- ${m.mentor_name}${m.role ? " (" + m.role + ")" : ""}: ${String(m.lesson).slice(0, 300)}`)
+      .join("\n")
+      .slice(0, 6000);
 
     const raw = await callAI(
-      `You are recommending the writer's NEXT best article based strictly on the corpus below. Propose 3 candidates, ranked.\n\nFor EACH candidate return:\n- title (sharp, publishable headline, 4-10 words)\n- rationale (2-3 sentences: why this is the next move in their body of work)\n- gap (one sentence: what gap or unresolved tension it fills)\n- outline (3-6 bullet beats, joined with " | ")\n- connects_to (array of article IDs from the list that this would naturally build on, max 4)\n- themes (array of theme names from the DNA, max 4)\n- score (0-100, your confidence)\n\nReturn JSON: { "recommendations": [...] }\n\nWRITING DNA:\n${themeSummary || "(none yet)"}\n\nRECENT ARTICLES:\n${articleSummary}\n\nUNFINISHED THREADS:\n${threadSummary || "(none yet)"}`,
+      `You are a developmental editor advising the writer on the most interesting articles they are uniquely positioned to write next.
+
+The goal is NOT "recommend articles similar to past articles." The goal is to find articles that emerge from the INTERSECTION of the writer's entire knowledge ecosystem — notes, brain dumps, vault research, courtroom reasoning, lessons, and prior writing.
+
+Privilege ideas that:
+- Recur across MULTIPLE sources (e.g. a question that surfaces in notes AND in courtroom reasoning AND in vault research)
+- Sit at the intersection of two or more themes that have not been combined yet
+- Are unfinished threads — questions the writer keeps returning to without resolving
+- The writer has unusual standing to write (specific evidence in their own material) and has not already covered in a published piece
+
+Propose 3 candidates, ranked. For EACH:
+- title (sharp, publishable headline, 4-10 words)
+- rationale (2-3 sentences: why THIS writer is uniquely positioned to write THIS, citing what in the ecosystem points to it — name the sources)
+- gap (one sentence: the unresolved tension or unanswered question it addresses)
+- outline (3-6 bullet beats joined with " | ")
+- connects_to (article IDs from ARTICLES ALREADY WRITTEN this would build on, max 4)
+- themes (theme names from WRITING DNA, max 4)
+- score (0-100, your confidence this is genuinely the next move — not just a plausible topic)
+
+Return JSON: { "recommendations": [...] }
+
+Do not invent facts about the writer. Stay grounded strictly in the material below.
+
+WRITING DNA:
+${themeSummary || "(none yet)"}
+
+UNFINISHED THREADS:
+${threadSummary || "(none yet)"}
+
+NOTES & BRAIN DUMPS:
+${notesSummary || "(none)"}
+
+KNOWLEDGE VAULT (notes, research, ideas, lessons, references):
+${knowledgeSummary || "(none)"}
+
+COURTROOM REASONING (decisions, facts vs assumptions):
+${courtSummary || "(none)"}
+
+LESSONS / OBSERVATIONS:
+${mentorSummary || "(none)"}
+
+ARTICLES ALREADY WRITTEN:
+${articleSummary || "(none)"}`,
     );
     const parsed = parseJson<{
       recommendations: {
@@ -310,7 +390,7 @@ export const recommendNextArticle = createServerFn({ method: "POST" })
       }[];
     }>(raw);
 
-    const validIds = new Set(articles.map((a: any) => a.id));
+    const validIds = new Set((articles ?? []).map((a: any) => a.id));
     const rows = (parsed.recommendations ?? []).slice(0, 5).map((r) => ({
       user_id: userId,
       title: r.title.slice(0, 300),
