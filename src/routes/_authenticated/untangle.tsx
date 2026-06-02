@@ -167,6 +167,25 @@ function DiagnosePage() {
             </p>
           </Step>
 
+          {/* 1b. What recurs — only when the model surfaced real patterns */}
+          {result.pattern_notes && result.pattern_notes.length > 0 && (
+            <Step number="·" label="What recurs">
+              <ul className="space-y-3">
+                {result.pattern_notes.map((n, i) => (
+                  <li
+                    key={i}
+                    className="font-serif italic text-lg text-foreground/85 leading-relaxed border-l-2 border-border pl-4"
+                  >
+                    {n}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 font-sans text-[10px] tracking-[3px] uppercase text-muted-foreground">
+                Drawn from your prior cases, library, and writing — patterns, not voice.
+              </p>
+            </Step>
+          )}
+
           {/* 2. Core Question */}
           <Step number="02" label="The question underneath">
             <p className="font-serif italic text-3xl text-foreground leading-snug">
