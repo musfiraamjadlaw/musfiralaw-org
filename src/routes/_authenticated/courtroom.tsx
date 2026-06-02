@@ -6,7 +6,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { askAI } from "@/lib/ai.functions";
 
 export const Route = createFileRoute("/_authenticated/courtroom")({
-  head: () => ({ meta: [{ title: "Courtroom — Untangle" }] }),
+  head: () => ({
+    meta: [
+      { title: "Courtroom — Untangle" },
+      { name: "description", content: "Examine a situation like a litigator: separate facts from assumptions, weigh evidence, consider alternatives, reach a verdict." },
+      { property: "og:title", content: "Courtroom — Untangle" },
+      { property: "og:description", content: "Stress-test your thinking. Separate facts from assumptions and weigh the evidence." },
+      { property: "og:url", content: "/courtroom" },
+    ],
+    links: [{ rel: "canonical", href: "/courtroom" }],
+  }),
   component: CourtroomPage,
 });
 
