@@ -124,6 +124,7 @@ export type DiagnoseResult = {
     label: string;
     reason: string;
   };
+  pattern_notes: string[];
 };
 
 export const diagnose = createServerFn({ method: "POST" })
