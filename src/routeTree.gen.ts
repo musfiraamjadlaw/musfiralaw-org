@@ -17,9 +17,12 @@ import { Route as AuthenticatedUntangleRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedStatesRouteImport } from './routes/_authenticated/states'
 import { Route as AuthenticatedStartRouteImport } from './routes/_authenticated/start'
 import { Route as AuthenticatedMeaningRouteImport } from './routes/_authenticated/meaning'
+import { Route as AuthenticatedLibraryRouteImport } from './routes/_authenticated/library'
+import { Route as AuthenticatedEssaysRouteImport } from './routes/_authenticated/essays'
 import { Route as AuthenticatedEditorialRouteImport } from './routes/_authenticated/editorial'
 import { Route as AuthenticatedDumpRouteImport } from './routes/_authenticated/dump'
 import { Route as AuthenticatedCourtroomRouteImport } from './routes/_authenticated/courtroom'
+import { Route as AuthenticatedColophonRouteImport } from './routes/_authenticated/colophon'
 import { Route as AuthenticatedClockRouteImport } from './routes/_authenticated/clock'
 import { Route as AuthenticatedAboutRouteImport } from './routes/_authenticated/about'
 
@@ -62,6 +65,16 @@ const AuthenticatedMeaningRoute = AuthenticatedMeaningRouteImport.update({
   path: '/meaning',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedLibraryRoute = AuthenticatedLibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedEssaysRoute = AuthenticatedEssaysRouteImport.update({
+  id: '/essays',
+  path: '/essays',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedEditorialRoute = AuthenticatedEditorialRouteImport.update({
   id: '/editorial',
   path: '/editorial',
@@ -75,6 +88,11 @@ const AuthenticatedDumpRoute = AuthenticatedDumpRouteImport.update({
 const AuthenticatedCourtroomRoute = AuthenticatedCourtroomRouteImport.update({
   id: '/courtroom',
   path: '/courtroom',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedColophonRoute = AuthenticatedColophonRouteImport.update({
+  id: '/colophon',
+  path: '/colophon',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedClockRoute = AuthenticatedClockRouteImport.update({
@@ -93,9 +111,12 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/about': typeof AuthenticatedAboutRoute
   '/clock': typeof AuthenticatedClockRoute
+  '/colophon': typeof AuthenticatedColophonRoute
   '/courtroom': typeof AuthenticatedCourtroomRoute
   '/dump': typeof AuthenticatedDumpRoute
   '/editorial': typeof AuthenticatedEditorialRoute
+  '/essays': typeof AuthenticatedEssaysRoute
+  '/library': typeof AuthenticatedLibraryRoute
   '/meaning': typeof AuthenticatedMeaningRoute
   '/start': typeof AuthenticatedStartRoute
   '/states': typeof AuthenticatedStatesRoute
@@ -107,9 +128,12 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/about': typeof AuthenticatedAboutRoute
   '/clock': typeof AuthenticatedClockRoute
+  '/colophon': typeof AuthenticatedColophonRoute
   '/courtroom': typeof AuthenticatedCourtroomRoute
   '/dump': typeof AuthenticatedDumpRoute
   '/editorial': typeof AuthenticatedEditorialRoute
+  '/essays': typeof AuthenticatedEssaysRoute
+  '/library': typeof AuthenticatedLibraryRoute
   '/meaning': typeof AuthenticatedMeaningRoute
   '/start': typeof AuthenticatedStartRoute
   '/states': typeof AuthenticatedStatesRoute
@@ -123,9 +147,12 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/about': typeof AuthenticatedAboutRoute
   '/_authenticated/clock': typeof AuthenticatedClockRoute
+  '/_authenticated/colophon': typeof AuthenticatedColophonRoute
   '/_authenticated/courtroom': typeof AuthenticatedCourtroomRoute
   '/_authenticated/dump': typeof AuthenticatedDumpRoute
   '/_authenticated/editorial': typeof AuthenticatedEditorialRoute
+  '/_authenticated/essays': typeof AuthenticatedEssaysRoute
+  '/_authenticated/library': typeof AuthenticatedLibraryRoute
   '/_authenticated/meaning': typeof AuthenticatedMeaningRoute
   '/_authenticated/start': typeof AuthenticatedStartRoute
   '/_authenticated/states': typeof AuthenticatedStatesRoute
@@ -139,9 +166,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/about'
     | '/clock'
+    | '/colophon'
     | '/courtroom'
     | '/dump'
     | '/editorial'
+    | '/essays'
+    | '/library'
     | '/meaning'
     | '/start'
     | '/states'
@@ -153,9 +183,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/about'
     | '/clock'
+    | '/colophon'
     | '/courtroom'
     | '/dump'
     | '/editorial'
+    | '/essays'
+    | '/library'
     | '/meaning'
     | '/start'
     | '/states'
@@ -168,9 +201,12 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/about'
     | '/_authenticated/clock'
+    | '/_authenticated/colophon'
     | '/_authenticated/courtroom'
     | '/_authenticated/dump'
     | '/_authenticated/editorial'
+    | '/_authenticated/essays'
+    | '/_authenticated/library'
     | '/_authenticated/meaning'
     | '/_authenticated/start'
     | '/_authenticated/states'
@@ -242,6 +278,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMeaningRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/library': {
+      id: '/_authenticated/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof AuthenticatedLibraryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/essays': {
+      id: '/_authenticated/essays'
+      path: '/essays'
+      fullPath: '/essays'
+      preLoaderRoute: typeof AuthenticatedEssaysRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/editorial': {
       id: '/_authenticated/editorial'
       path: '/editorial'
@@ -261,6 +311,13 @@ declare module '@tanstack/react-router' {
       path: '/courtroom'
       fullPath: '/courtroom'
       preLoaderRoute: typeof AuthenticatedCourtroomRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/colophon': {
+      id: '/_authenticated/colophon'
+      path: '/colophon'
+      fullPath: '/colophon'
+      preLoaderRoute: typeof AuthenticatedColophonRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/clock': {
@@ -283,9 +340,12 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteChildren {
   AuthenticatedAboutRoute: typeof AuthenticatedAboutRoute
   AuthenticatedClockRoute: typeof AuthenticatedClockRoute
+  AuthenticatedColophonRoute: typeof AuthenticatedColophonRoute
   AuthenticatedCourtroomRoute: typeof AuthenticatedCourtroomRoute
   AuthenticatedDumpRoute: typeof AuthenticatedDumpRoute
   AuthenticatedEditorialRoute: typeof AuthenticatedEditorialRoute
+  AuthenticatedEssaysRoute: typeof AuthenticatedEssaysRoute
+  AuthenticatedLibraryRoute: typeof AuthenticatedLibraryRoute
   AuthenticatedMeaningRoute: typeof AuthenticatedMeaningRoute
   AuthenticatedStartRoute: typeof AuthenticatedStartRoute
   AuthenticatedStatesRoute: typeof AuthenticatedStatesRoute
@@ -296,9 +356,12 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAboutRoute: AuthenticatedAboutRoute,
   AuthenticatedClockRoute: AuthenticatedClockRoute,
+  AuthenticatedColophonRoute: AuthenticatedColophonRoute,
   AuthenticatedCourtroomRoute: AuthenticatedCourtroomRoute,
   AuthenticatedDumpRoute: AuthenticatedDumpRoute,
   AuthenticatedEditorialRoute: AuthenticatedEditorialRoute,
+  AuthenticatedEssaysRoute: AuthenticatedEssaysRoute,
+  AuthenticatedLibraryRoute: AuthenticatedLibraryRoute,
   AuthenticatedMeaningRoute: AuthenticatedMeaningRoute,
   AuthenticatedStartRoute: AuthenticatedStartRoute,
   AuthenticatedStatesRoute: AuthenticatedStatesRoute,
