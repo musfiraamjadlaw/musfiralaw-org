@@ -318,6 +318,11 @@ RULES:
       if (!validIds.has(parsed.article.id)) parsed.article = null;
     }
 
+    if (!Array.isArray(parsed.pattern_notes)) parsed.pattern_notes = [];
+    parsed.pattern_notes = parsed.pattern_notes
+      .filter((n): n is string => typeof n === "string" && n.trim().length > 0)
+      .slice(0, 3);
+
     return parsed;
   });
 
