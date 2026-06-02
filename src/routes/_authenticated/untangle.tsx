@@ -100,13 +100,16 @@ function DiagnosePage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-3xl mx-auto px-6">
       {!result && (
-        <div className="pt-16">
-          <h2 className="font-serif text-5xl text-foreground text-center leading-tight">
+        <div className="pt-24 pb-16">
+          <p className="text-center text-[10px] tracking-[4px] uppercase text-muted-foreground mb-8">
+            Untangle
+          </p>
+          <h2 className="font-display text-5xl md:text-6xl text-foreground text-center leading-[1.05] tracking-tight">
             What are you noticing?
           </h2>
-          <p className="mt-4 text-center text-muted-foreground font-serif italic text-lg">
+          <p className="mt-6 text-center text-muted-foreground font-serif italic text-lg">
             An observation, not a task.
           </p>
 
@@ -118,39 +121,39 @@ function DiagnosePage() {
             }}
             rows={5}
             placeholder="A friction. A pattern. A question you keep circling."
-            className="w-full mt-10 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
+            className="w-full mt-12 border-b border-border bg-transparent px-1 py-4 font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors placeholder:text-muted-foreground/60"
           />
 
-          <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <div className="mt-8 flex flex-wrap justify-center gap-x-5 gap-y-2">
             {EXAMPLES.map((ex) => (
               <button
                 key={ex}
                 onClick={() => setInput(ex)}
-                className="text-xs font-serif italic text-muted-foreground hover:text-foreground border border-border px-3 py-1.5 rounded-full transition-colors"
+                className="text-sm font-serif italic text-muted-foreground hover:text-foreground transition-colors"
               >
-                {ex}
+                “{ex}”
               </button>
             ))}
           </div>
 
-          <div className="mt-10 flex items-center justify-center gap-4">
+          <div className="mt-14 flex items-center justify-center gap-5">
             <button
               onClick={submit}
               disabled={loading || !input.trim()}
-              className="px-10 py-3 text-[11px] tracking-[3px] uppercase disabled:opacity-40 bg-foreground text-background hover:bg-foreground/90 transition-colors"
+              className="px-12 py-3.5 text-[11px] tracking-[3px] uppercase disabled:opacity-30 bg-foreground text-background hover:bg-foreground/90 transition-colors"
             >
-              {loading ? "Thinking…" : "Untangle"}
+              {loading ? "Thinking…" : "Begin"}
             </button>
             <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
               ⌘ + Enter
             </span>
           </div>
 
-          {err && <p className="mt-6 text-sm text-red-700 text-center">{err}</p>}
+          {err && <p className="mt-6 text-sm text-destructive text-center">{err}</p>}
 
-          <p className="mt-16 text-center text-[10px] tracking-[3px] uppercase text-muted-foreground">
+          <p className="mt-24 text-center text-[10px] tracking-[3px] uppercase text-muted-foreground">
             Every analysis is pinned to the{" "}
-            <Link to="/whiteboard" className="underline hover:text-foreground">Whiteboard</Link>
+            <Link to="/whiteboard" className="underline underline-offset-4 hover:text-foreground">Whiteboard</Link>
           </p>
         </div>
       )}
