@@ -48,8 +48,11 @@ function DiagnosePage() {
           <h2 className="font-serif text-5xl text-foreground text-center leading-tight">
             What are you noticing?
           </h2>
-          <p className="mt-4 text-center text-muted-foreground font-serif italic">
-            Speak plainly. The system untangles feeling into mechanism, evidence, and one next step.
+          <p className="mt-3 text-center text-muted-foreground font-serif italic">
+            Or — what isn't making sense?
+          </p>
+          <p className="mt-6 text-center text-xs tracking-[2px] uppercase text-muted-foreground">
+            Notice · Analyze · Connect · Act
           </p>
 
           <textarea
@@ -59,8 +62,8 @@ function DiagnosePage() {
               if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit();
             }}
             rows={5}
-            placeholder="I'm overwhelmed."
-            className="w-full mt-10 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
+            placeholder="An observation. A friction. A pattern. A question you keep circling."
+            className="w-full mt-8 border border-border rounded-sm p-5 bg-card font-serif text-xl leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
           />
 
           <div className="mt-5 flex flex-wrap justify-center gap-2">
