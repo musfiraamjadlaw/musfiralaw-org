@@ -47,8 +47,8 @@ function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <h1 className="font-serif text-3xl text-navy">Untangle</h1>
-          <p className="mt-2 text-xs tracking-[3px] uppercase text-muted-foreground">
-            Executive function &amp; decision system
+          <p className="mt-3 font-serif italic text-sm text-muted-foreground">
+            Find the pattern. Take the next step. Make it happen.
           </p>
         </div>
         <form onSubmit={submit} className="space-y-4 bg-card border border-border p-8 rounded">
