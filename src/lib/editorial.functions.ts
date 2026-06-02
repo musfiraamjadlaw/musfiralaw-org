@@ -461,3 +461,95 @@ export const setThreadStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- Deep article extraction ----------
+// Per-article: themes, recurring questions, key ideas, references
+// (books, people, concepts, research). Builds the intellectual memory
+// of the corpus, one piece at a time.
+
+type ArticleRefs = {
+  books: string[];
+  people: string[];
+  concepts: string[];
+  research: string[];
+};
+
+export const extractArticleSignals = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ limit: z.number().int().min(1).max(20).optional() }).parse(input ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const limit = data.limit ?? 8;
+
+    const { data: articles, error } = await supabase
+      .from("articles")
+      .select("id, title, content_text, published_at")
+      .is("analyzed_at", null)
+      .order("published_at", { ascending: true, nullsFirst: false })
+      .limit(limit);
+    if (error) throw new Error(error.message);
+    if (!articles?.length) return { analyzed: 0, remaining: 0 };
+
+    let analyzed = 0;
+    for (const a of articles) {
+      try {
+        const body = (a.content_text || "").slice(0, 12000);
+        if (!body.trim()) {
+          await supabase
+            .from("articles")
+            .update({ analyzed_at: new Date().toISOString() })
+            .eq("id", a.id);
+          continue;
+        }
+
+        const raw = await callAI(
+          `You are a developmental editor cataloguing a single essay for the writer's intellectual archive.\n\nEssay title: ${a.title}\n\nEssay text:\n${body}\n\nReturn JSON:\n{\n  "summary": "2-3 sentences. What this essay is actually arguing or wrestling with. Editorial register, not a blurb.",\n  "themes": ["1-3 word canonical theme names, max 6"],\n  "questions": ["The recurring questions this essay asks — not topics, real questions ending in '?'. Max 5."],\n  "key_ideas": ["Load-bearing ideas in the essay — short noun phrases or single sentences. Max 6."],\n  "references": {\n    "books": ["Title — Author, when the essay names or clearly leans on a book"],\n    "people": ["Person, role/why-mentioned"],\n    "concepts": ["Named concepts, frameworks, or terms the essay uses"],\n    "research": ["Studies, papers, fields, or empirical findings the essay relies on"]\n  }\n}\n\nRules: Ground every entry strictly in the essay. Do NOT invent references. Empty arrays are correct when the essay doesn't name them. No emojis. No marketing language.`,
+        );
+
+        const parsed = parseJson<{
+          summary?: string;
+          themes?: string[];
+          questions?: string[];
+          key_ideas?: string[];
+          references?: Partial<ArticleRefs>;
+        }>(raw);
+
+        const refs: ArticleRefs = {
+          books: (parsed.references?.books ?? []).slice(0, 12).map((s) => String(s).slice(0, 240)),
+          people: (parsed.references?.people ?? []).slice(0, 20).map((s) => String(s).slice(0, 240)),
+          concepts: (parsed.references?.concepts ?? []).slice(0, 20).map((s) => String(s).slice(0, 240)),
+          research: (parsed.references?.research ?? []).slice(0, 20).map((s) => String(s).slice(0, 240)),
+        };
+
+        const themes = (parsed.themes ?? []).slice(0, 6).map((s) => String(s).slice(0, 80));
+        const questions = (parsed.questions ?? []).slice(0, 5).map((s) => String(s).slice(0, 240));
+        const key_ideas = (parsed.key_ideas ?? []).slice(0, 6).map((s) => String(s).slice(0, 280));
+        const summary = (parsed.summary ?? "").slice(0, 800);
+
+        const { error: upErr } = await supabase
+          .from("articles")
+          .update({
+            summary: summary || null,
+            themes,
+            questions,
+            key_ideas,
+            refs: refs as any,
+            analyzed_at: new Date().toISOString(),
+          })
+          .eq("id", a.id);
+        if (!upErr) analyzed++;
+      } catch (e) {
+        console.error("extract failed for", a.id, e);
+      }
+    }
+
+    const { count } = await supabase
+      .from("articles")
+      .select("id", { count: "exact", head: true })
+      .is("analyzed_at", null);
+
+    return { analyzed, remaining: count ?? 0 };
+  });
+

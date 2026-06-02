@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import signatureAsset from "@/assets/signature.jpg.asset.json";
 
 const PHOTO_1 =
@@ -186,6 +188,10 @@ function ColophonPage() {
         <div className="mx-auto mt-8 h-px w-12 bg-border" />
       </blockquote>
 
+      <SourceMaterial />
+
+
+
       <footer className="pt-10 border-t border-border">
         <div className="text-center space-y-5">
           <p className="text-muted-foreground italic" style={{ fontSize: "18px" }}>
@@ -244,5 +250,89 @@ function ColophonPage() {
         </div>
       </footer>
     </article>
+  );
+}
+
+function SourceMaterial() {
+  const { data } = useQuery({
+    queryKey: ["colophon-source-material"],
+    queryFn: async () =>
+      (await supabase
+        .from("articles")
+        .select("id, title, url, summary, published_at, content_text, key_ideas")
+        .eq("source", "published")
+        .order("published_at", { ascending: false, nullsFirst: false })
+        .limit(4)).data ?? [],
+  });
+
+  if (!data?.length) return null;
+
+  return (
+    <section className="my-24">
+      <header className="text-center mb-12">
+        <p className="text-[10px] tracking-[0.32em] uppercase text-muted-foreground">
+          Read the Source Material
+        </p>
+        <div className="mx-auto mt-4 h-px w-16 bg-border" />
+        <p className="mt-4 font-serif italic text-muted-foreground">
+          Selected essays — the writing this application is built around.
+        </p>
+      </header>
+
+      <div className="grid gap-8 sm:grid-cols-2">
+        {data.map((a: any) => {
+          const excerpt =
+            a.summary ??
+            (a.content_text ?? "").replace(/\s+/g, " ").slice(0, 220) + "…";
+          const whyItMatters = a.key_ideas?.[0];
+          return (
+            <article
+              key={a.id}
+              className="border border-border bg-card p-6 flex flex-col"
+            >
+              <p className="text-[10px] tracking-[0.24em] uppercase text-muted-foreground">
+                {a.published_at
+                  ? new Date(a.published_at).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "Undated"}
+              </p>
+              <h3
+                className="mt-3 text-foreground leading-snug"
+                style={{ fontFamily: "var(--font-serif)", fontSize: "24px" }}
+              >
+                {a.title}
+              </h3>
+              <p
+                className="mt-4 text-foreground/80 leading-relaxed"
+                style={{ fontFamily: "var(--font-serif)", fontSize: "15px" }}
+              >
+                {excerpt}
+              </p>
+              {whyItMatters && (
+                <p className="mt-4 pt-4 border-t border-border text-[11px] tracking-[0.16em] uppercase text-muted-foreground">
+                  Why it matters
+                  <span className="block mt-1 normal-case tracking-normal font-serif italic text-foreground/80 text-sm">
+                    {whyItMatters}
+                  </span>
+                </p>
+              )}
+              {a.url && (
+                <a
+                  href={a.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-5 text-[10px] tracking-[0.24em] uppercase text-foreground hover:opacity-70 transition-opacity self-start"
+                >
+                  Read in full →
+                </a>
+              )}
+            </article>
+          );
+        })}
+      </div>
+    </section>
   );
 }

@@ -143,7 +143,7 @@ export const diagnose = createServerFn({ method: "POST" })
     ] = await Promise.all([
       supabase
         .from("articles")
-        .select("id, title, url, summary, themes, content_text")
+        .select("id, title, url, summary, themes, questions, key_ideas, refs, content_text")
         .order("published_at", { ascending: false })
         .limit(60),
       supabase
@@ -164,12 +164,21 @@ export const diagnose = createServerFn({ method: "POST" })
     ]);
 
     const articleCorpus = (articles ?? [])
-      .map(
-        (a) =>
-          `ID: ${a.id}\nTITLE: ${a.title}\nURL: ${a.url ?? ""}\nTHEMES: ${(a.themes ?? []).join(", ")}\nSUMMARY: ${
-            a.summary ?? (a.content_text ?? "").slice(0, 500)
-          }`,
-      )
+      .map((a) => {
+        const refs = (a.refs ?? {}) as { books?: string[]; people?: string[]; concepts?: string[]; research?: string[] };
+        const lines = [
+          `ID: ${a.id}`,
+          `TITLE: ${a.title}`,
+          a.url ? `URL: ${a.url}` : "",
+          (a.themes ?? []).length ? `THEMES: ${(a.themes ?? []).join(", ")}` : "",
+          (a.questions ?? []).length ? `QUESTIONS IT ASKS: ${(a.questions ?? []).join(" | ")}` : "",
+          (a.key_ideas ?? []).length ? `KEY IDEAS: ${(a.key_ideas ?? []).join(" | ")}` : "",
+          (refs.concepts ?? []).length ? `CONCEPTS: ${(refs.concepts ?? []).join(", ")}` : "",
+          (refs.books ?? []).length ? `BOOKS: ${(refs.books ?? []).join("; ")}` : "",
+          `SUMMARY: ${a.summary ?? (a.content_text ?? "").slice(0, 500)}`,
+        ].filter(Boolean);
+        return lines.join("\n");
+      })
       .join("\n---\n");
 
     // Pattern aggregation — counts, not quotes.
