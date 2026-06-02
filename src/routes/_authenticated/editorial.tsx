@@ -406,6 +406,235 @@ function SectionTitle({ children }: { children: React.ReactNode }) {
   return <h3 className="font-serif text-2xl mb-3">{children}</h3>;
 }
 
+// ============================================================
+// Sensemaking Chain — Observation → Question → Mechanism →
+// Your Writing → Research → Book → Better Question → Action
+// ============================================================
+const SENSEMAKE_EXAMPLES = [
+  "I have a million things to do.",
+  "I can't focus.",
+  "I keep thinking about them.",
+  "I don't know where to start.",
+  "Something about this isn't sitting right.",
+  "I keep avoiding this and I don't know why.",
+];
+
+function SensemakingChain() {
+  const run = useServerFn(sensemake);
+  const [input, setInput] = useState("");
+  const [submitted, setSubmitted] = useState("");
+  const [result, setResult] = useState<SensemakeResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+
+  async function submit() {
+    if (!input.trim() || loading) return;
+    setLoading(true);
+    setErr("");
+    setResult(null);
+    setSubmitted(input.trim());
+    try {
+      const r = await run({ data: { input: input.trim() } });
+      setResult(r);
+    } catch (e: any) {
+      setErr(e.message ?? "Something went wrong.");
+    }
+    setLoading(false);
+  }
+
+  return (
+    <section>
+      <div className="flex items-baseline gap-3">
+        <SectionTitle>Sensemaking Engine</SectionTitle>
+        <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
+          observation → explanation
+        </span>
+      </div>
+      <p className="text-sm text-muted-foreground max-w-2xl mb-5">
+        Enter what you're noticing. The engine builds an intellectual chain — finds the question underneath, names the mechanism, pulls the piece of your own writing that's wrestling with the same idea, and points to the research worth sitting with. Help yourself move from description to explanation.
+      </p>
+
+      {!result && (
+        <div>
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit();
+            }}
+            rows={4}
+            placeholder="An observation. A friction. A pattern. A question you keep circling."
+            className="w-full border border-border rounded-sm p-4 bg-card font-serif text-lg leading-relaxed outline-none resize-none focus:border-foreground transition-colors"
+          />
+          <div className="mt-3 flex flex-wrap gap-2">
+            {SENSEMAKE_EXAMPLES.map((ex) => (
+              <button
+                key={ex}
+                onClick={() => setInput(ex)}
+                className="text-xs font-serif italic text-muted-foreground hover:text-foreground border border-border px-3 py-1.5 rounded-full transition-colors"
+              >
+                {ex}
+              </button>
+            ))}
+          </div>
+          <div className="mt-4 flex items-center gap-4">
+            <button
+              onClick={submit}
+              disabled={loading || !input.trim()}
+              className="px-8 py-3 text-[11px] tracking-[3px] uppercase disabled:opacity-40 bg-foreground text-background hover:bg-foreground/90 transition-colors"
+            >
+              {loading ? "Thinking…" : "Build the chain"}
+            </button>
+            <span className="text-[10px] tracking-[2px] uppercase text-muted-foreground">
+              ⌘ + Enter
+            </span>
+          </div>
+          {err && <p className="mt-4 text-sm text-red-700">{err}</p>}
+        </div>
+      )}
+
+      {result && (
+        <article className="space-y-14 pt-2 pb-4">
+          <ChainStep number="01" label="Observation">
+            <blockquote className="pl-5 border-l-2 border-foreground font-serif italic text-2xl text-foreground leading-relaxed">
+              {submitted}
+            </blockquote>
+            <p className="mt-4 font-serif text-muted-foreground">
+              {result.observation_echo}
+            </p>
+          </ChainStep>
+
+          <ChainStep number="02" label="The question underneath">
+            <p className="font-serif italic text-3xl text-foreground leading-snug">
+              {result.core_question}
+            </p>
+            <p className="mt-4 font-serif text-foreground/80 leading-relaxed">
+              {result.question_context}
+            </p>
+          </ChainStep>
+
+          <ChainStep number="03" label="What may be happening">
+            <p className="font-serif text-xl text-foreground leading-relaxed">
+              {result.mechanism.plain}
+            </p>
+            <p className="mt-5 font-serif text-base text-foreground/80 leading-relaxed">
+              {result.mechanism.deeper}
+            </p>
+            {result.mechanism.citations?.length > 0 && (
+              <p className="mt-4 font-mono text-[11px] text-muted-foreground">
+                {result.mechanism.citations.join(" · ")}
+              </p>
+            )}
+          </ChainStep>
+
+          {result.article && (
+            <ChainStep number="04" label="You've thought about this before">
+              <h4 className="font-serif text-2xl text-foreground leading-snug">
+                {result.article.url ? (
+                  <a href={result.article.url} target="_blank" rel="noreferrer" className="hover:underline">
+                    {result.article.title}
+                  </a>
+                ) : (
+                  result.article.title
+                )}
+              </h4>
+              <p className="mt-3 font-serif italic text-muted-foreground">
+                The question it explores: {result.article.question_it_explores}
+              </p>
+              <p className="mt-3 font-serif text-foreground/85 leading-relaxed">
+                {result.article.why_relevant}
+              </p>
+              <p className="mt-3 font-serif text-foreground/85 leading-relaxed">
+                {result.article.insight}
+              </p>
+            </ChainStep>
+          )}
+
+          <ChainStep number={result.article ? "05" : "04"} label="Related research">
+            <p className="font-serif text-xl text-foreground">{result.study.title}</p>
+            <p className="font-serif text-sm text-muted-foreground mt-1">
+              {result.study.authors} ({result.study.year})
+            </p>
+            <p className="mt-3 font-serif text-foreground/85 leading-relaxed">
+              {result.study.finding}
+            </p>
+            <p className="mt-3 font-serif italic text-muted-foreground leading-relaxed">
+              {result.study.why_it_deepens}
+            </p>
+            <p className="mt-3 font-mono text-[11px] text-muted-foreground">
+              {result.study.citation}
+            </p>
+          </ChainStep>
+
+          <ChainStep number={result.article ? "06" : "05"} label="A book to sit with">
+            <p className="font-serif text-xl text-foreground">
+              <em>{result.book.title}</em> — {result.book.author}
+            </p>
+            <p className="mt-3 font-serif text-foreground/85 leading-relaxed">{result.book.why}</p>
+          </ChainStep>
+
+          <ChainStep number={result.article ? "07" : "06"} label="A better question">
+            <p className="font-serif italic text-3xl text-foreground leading-snug">
+              {result.better_question}
+            </p>
+          </ChainStep>
+
+          <ChainStep number={result.article ? "08" : "07"} label="One next step">
+            <p className="font-serif text-2xl text-foreground leading-snug">
+              {result.action.step}
+            </p>
+            <p className="mt-4 font-serif italic text-muted-foreground leading-relaxed">
+              {result.action.why_this_emerges}
+            </p>
+          </ChainStep>
+
+          <div className="pt-6 border-t border-border flex gap-3">
+            <button
+              onClick={() => {
+                setResult(null);
+                setInput("");
+                setSubmitted("");
+              }}
+              className="px-6 py-2 text-[10px] tracking-[3px] uppercase bg-foreground text-background hover:bg-foreground/90 transition-colors"
+            >
+              Again
+            </button>
+            <button
+              onClick={() => setResult(null)}
+              className="px-6 py-2 text-[10px] tracking-[3px] uppercase border border-border text-foreground hover:bg-muted transition-colors"
+            >
+              Refine
+            </button>
+          </div>
+        </article>
+      )}
+    </section>
+  );
+}
+
+function ChainStep({
+  number,
+  label,
+  children,
+}: {
+  number: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <div className="flex items-baseline gap-4 mb-5 border-b border-border pb-2">
+        <span className="font-mono text-[10px] tracking-[2px] text-muted-foreground">
+          {number}
+        </span>
+        <h4 className="font-serif italic text-foreground text-lg">{label}</h4>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+
 function KnowledgeGraph({ articles, themes }: { articles: any[]; themes: any[] }) {
   const W = 720, H = 440;
   const cx = W / 2, cy = H / 2;
