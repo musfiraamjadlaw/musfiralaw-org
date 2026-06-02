@@ -97,17 +97,21 @@ export type Database = {
           analyzed_at: string | null
           content_html: string | null
           content_text: string
+          core_argument: string | null
           created_at: string
           guid: string | null
           id: string
           imported_at: string
           key_ideas: string[]
+          open_loops: string[]
           published_at: string | null
           questions: string[]
+          recurring_concepts: string[]
           refs: Json
           source: string
           summary: string | null
           tags: string[]
+          tensions: string[]
           themes: string[]
           title: string
           updated_at: string
@@ -118,17 +122,21 @@ export type Database = {
           analyzed_at?: string | null
           content_html?: string | null
           content_text?: string
+          core_argument?: string | null
           created_at?: string
           guid?: string | null
           id?: string
           imported_at?: string
           key_ideas?: string[]
+          open_loops?: string[]
           published_at?: string | null
           questions?: string[]
+          recurring_concepts?: string[]
           refs?: Json
           source: string
           summary?: string | null
           tags?: string[]
+          tensions?: string[]
           themes?: string[]
           title: string
           updated_at?: string
@@ -139,17 +147,21 @@ export type Database = {
           analyzed_at?: string | null
           content_html?: string | null
           content_text?: string
+          core_argument?: string | null
           created_at?: string
           guid?: string | null
           id?: string
           imported_at?: string
           key_ideas?: string[]
+          open_loops?: string[]
           published_at?: string | null
           questions?: string[]
+          recurring_concepts?: string[]
           refs?: Json
           source?: string
           summary?: string | null
           tags?: string[]
+          tensions?: string[]
           themes?: string[]
           title?: string
           updated_at?: string
