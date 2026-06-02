@@ -30,7 +30,7 @@ const STATUS_COLOR: Record<string, string> = {
   emerging: "#C87D0E",
 };
 
-type Tab = "questions" | "themes" | "articles" | "knowledge" | "graph";
+type Tab = "questions" | "themes" | "corpus" | "knowledge" | "graph";
 
 function LibraryPage() {
   const qc = useQueryClient();
