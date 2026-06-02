@@ -51,7 +51,7 @@ const ACTIVATION: Condition[] = [
   },
   {
     id: "Novelty",
-    glyph: "⌛",
+    glyph: "◇",
     one_line: "Difference re-recruits attention that has gone stale.",
     keywords: ["Freshness", "Exploration", "Change"],
   },
