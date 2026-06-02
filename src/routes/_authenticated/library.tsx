@@ -553,11 +553,11 @@ function LibraryPage() {
         </section>
       )}
 
-      {/* === Knowledge Graph === */}
+      {/* === Idea Graph === */}
       {tab === "graph" && (
         <section>
           <p className="font-serif italic text-muted-foreground mb-6">
-            Themes (gold) at the center. Articles (navy) orbit and connect to the themes they belong to.
+            A map of thought. Themes (gold) at the center; recurring concepts (rust) trace what the work keeps returning to; essays (navy) orbit the ideas they touch.
           </p>
           <KnowledgeGraph articles={articles.data ?? []} themes={themes.data ?? []} />
         </section>
@@ -565,6 +565,7 @@ function LibraryPage() {
     </div>
   );
 }
+
 
 function KnowledgeGraph({ articles, themes }: { articles: any[]; themes: any[] }) {
   const W = 720, H = 440;
