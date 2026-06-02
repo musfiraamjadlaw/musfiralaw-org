@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedVaultRouteImport } from './routes/_authenticated/vault'
 import { Route as AuthenticatedUntangleRouteImport } from './routes/_authenticated/untangle'
+import { Route as AuthenticatedStatesRouteImport } from './routes/_authenticated/states'
 import { Route as AuthenticatedStartRouteImport } from './routes/_authenticated/start'
 import { Route as AuthenticatedMeaningRouteImport } from './routes/_authenticated/meaning'
 import { Route as AuthenticatedEditorialRouteImport } from './routes/_authenticated/editorial'
@@ -43,6 +44,11 @@ const AuthenticatedVaultRoute = AuthenticatedVaultRouteImport.update({
 const AuthenticatedUntangleRoute = AuthenticatedUntangleRouteImport.update({
   id: '/untangle',
   path: '/untangle',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedStatesRoute = AuthenticatedStatesRouteImport.update({
+  id: '/states',
+  path: '/states',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedStartRoute = AuthenticatedStartRouteImport.update({
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/editorial': typeof AuthenticatedEditorialRoute
   '/meaning': typeof AuthenticatedMeaningRoute
   '/start': typeof AuthenticatedStartRoute
+  '/states': typeof AuthenticatedStatesRoute
   '/untangle': typeof AuthenticatedUntangleRoute
   '/vault': typeof AuthenticatedVaultRoute
 }
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/editorial': typeof AuthenticatedEditorialRoute
   '/meaning': typeof AuthenticatedMeaningRoute
   '/start': typeof AuthenticatedStartRoute
+  '/states': typeof AuthenticatedStatesRoute
   '/untangle': typeof AuthenticatedUntangleRoute
   '/vault': typeof AuthenticatedVaultRoute
 }
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/_authenticated/editorial': typeof AuthenticatedEditorialRoute
   '/_authenticated/meaning': typeof AuthenticatedMeaningRoute
   '/_authenticated/start': typeof AuthenticatedStartRoute
+  '/_authenticated/states': typeof AuthenticatedStatesRoute
   '/_authenticated/untangle': typeof AuthenticatedUntangleRoute
   '/_authenticated/vault': typeof AuthenticatedVaultRoute
 }
@@ -125,6 +134,7 @@ export interface FileRouteTypes {
     | '/editorial'
     | '/meaning'
     | '/start'
+    | '/states'
     | '/untangle'
     | '/vault'
   fileRoutesByTo: FileRoutesByTo
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
     | '/editorial'
     | '/meaning'
     | '/start'
+    | '/states'
     | '/untangle'
     | '/vault'
   id:
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '/_authenticated/editorial'
     | '/_authenticated/meaning'
     | '/_authenticated/start'
+    | '/_authenticated/states'
     | '/_authenticated/untangle'
     | '/_authenticated/vault'
   fileRoutesById: FileRoutesById
@@ -195,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/untangle'
       fullPath: '/untangle'
       preLoaderRoute: typeof AuthenticatedUntangleRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/states': {
+      id: '/_authenticated/states'
+      path: '/states'
+      fullPath: '/states'
+      preLoaderRoute: typeof AuthenticatedStatesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/start': {
@@ -249,6 +268,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedEditorialRoute: typeof AuthenticatedEditorialRoute
   AuthenticatedMeaningRoute: typeof AuthenticatedMeaningRoute
   AuthenticatedStartRoute: typeof AuthenticatedStartRoute
+  AuthenticatedStatesRoute: typeof AuthenticatedStatesRoute
   AuthenticatedUntangleRoute: typeof AuthenticatedUntangleRoute
   AuthenticatedVaultRoute: typeof AuthenticatedVaultRoute
 }
@@ -260,6 +280,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedEditorialRoute: AuthenticatedEditorialRoute,
   AuthenticatedMeaningRoute: AuthenticatedMeaningRoute,
   AuthenticatedStartRoute: AuthenticatedStartRoute,
+  AuthenticatedStatesRoute: AuthenticatedStatesRoute,
   AuthenticatedUntangleRoute: AuthenticatedUntangleRoute,
   AuthenticatedVaultRoute: AuthenticatedVaultRoute,
 }
@@ -276,3 +297,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
