@@ -34,9 +34,10 @@
   --color-gold: var(--gold);
   --color-navy: var(--navy);
   --color-cream: var(--cream);
-  --font-serif: "Source Serif 4", "Source Serif Pro", "Spectral", Georgia, serif;
-  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --font-serif: "Source Serif 4", "Source Serif Pro", "Charter", "Spectral", Georgia, serif;
+  --font-display: "Cormorant Garamond", "EB Garamond", "Libre Baskerville", "Source Serif 4", Georgia, serif;
+  --font-sans: "Inter", "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "IBM Plex Mono", "Source Code Pro", ui-monospace, monospace;
   --font-script: "Tangerine", "Pinyon Script", "Dancing Script", cursive;
 }
 
