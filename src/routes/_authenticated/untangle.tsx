@@ -234,21 +234,21 @@ function LoadBadge({ load }: { load: "high" | "medium" | "low" }) {
 }
 
 function Section({
-  step,
+  phase,
   title,
   children,
 }: {
-  step: string;
+  phase: string;
   title: string;
   children: React.ReactNode;
 }) {
   return (
     <section>
       <div className="flex items-baseline gap-4 mb-5 border-b border-border pb-2">
-        <span className="font-serif italic text-foreground text-base">{step}</span>
-        <h3 className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-          {title}
-        </h3>
+        <span className="text-[10px] tracking-[3px] uppercase text-accent-foreground/70 font-medium">
+          {phase}
+        </span>
+        <h3 className="font-serif italic text-foreground text-lg">{title}</h3>
       </div>
       {children}
     </section>
