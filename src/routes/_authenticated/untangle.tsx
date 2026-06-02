@@ -46,10 +46,10 @@ function DiagnosePage() {
       {!result && (
         <div className="pt-12">
           <h2 className="font-serif text-5xl text-foreground text-center leading-tight">
-            How are you feeling?
+            What are you noticing?
           </h2>
           <p className="mt-4 text-center text-muted-foreground font-serif italic">
-            Speak plainly. The system translates feeling into mechanism.
+            Speak plainly. The system untangles feeling into mechanism, evidence, and one next step.
           </p>
 
           <textarea
