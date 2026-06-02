@@ -94,13 +94,17 @@ export type Database = {
       }
       articles: {
         Row: {
+          analyzed_at: string | null
           content_html: string | null
           content_text: string
           created_at: string
           guid: string | null
           id: string
           imported_at: string
+          key_ideas: string[]
           published_at: string | null
+          questions: string[]
+          refs: Json
           source: string
           summary: string | null
           tags: string[]
@@ -111,13 +115,17 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          analyzed_at?: string | null
           content_html?: string | null
           content_text?: string
           created_at?: string
           guid?: string | null
           id?: string
           imported_at?: string
+          key_ideas?: string[]
           published_at?: string | null
+          questions?: string[]
+          refs?: Json
           source: string
           summary?: string | null
           tags?: string[]
@@ -128,13 +136,17 @@ export type Database = {
           user_id: string
         }
         Update: {
+          analyzed_at?: string | null
           content_html?: string | null
           content_text?: string
           created_at?: string
           guid?: string | null
           id?: string
           imported_at?: string
+          key_ideas?: string[]
           published_at?: string | null
+          questions?: string[]
+          refs?: Json
           source?: string
           summary?: string | null
           tags?: string[]
