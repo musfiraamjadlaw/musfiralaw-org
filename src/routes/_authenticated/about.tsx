@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import signatureAsset from "@/assets/signature.jpg.asset.json";
 
 export const Route = createFileRoute("/_authenticated/about")({
   component: AboutPage,
