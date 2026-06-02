@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated")({
 type Tab = { id: string; label: string; to: string };
 
 const TABS: Tab[] = [
-  { id: "diagnose", label: "Diagnose", to: "/diagnose" },
+  { id: "untangle", label: "Untangle", to: "/untangle" },
   { id: "start", label: "Act", to: "/start" },
   { id: "courtroom", label: "Think", to: "/courtroom" },
   { id: "vault", label: "Learn", to: "/vault" },
