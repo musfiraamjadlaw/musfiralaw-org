@@ -8,7 +8,6 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 type Tab = { id: string; label: string; to: string };
-
 const TABS: Tab[] = [
   { id: "untangle", label: "Untangle", to: "/untangle" },
   { id: "whiteboard", label: "Whiteboard", to: "/whiteboard" },
@@ -17,14 +16,30 @@ const TABS: Tab[] = [
   { id: "colophon", label: "Colophon", to: "/colophon" },
 ];
 
+const ABOUT_KEY = "untangle:about-you";
+
 function AuthLayout() {
   const router = useRouter();
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [email, setEmail] = useState<string>("");
+  const [about, setAbout] = useState<string>("");
+  const [aboutInput, setAboutInput] = useState<string>("");
+  const [editingAbout, setEditingAbout] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? ""));
+    try {
+      const saved = localStorage.getItem(ABOUT_KEY) ?? "";
+      setAbout(saved);
+      setAboutInput(saved);
+    } catch {}
   }, []);
+
+  function saveAbout() {
+    setAbout(aboutInput);
+    try { localStorage.setItem(ABOUT_KEY, aboutInput); } catch {}
+    setEditingAbout(false);
+  }
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -44,7 +59,6 @@ function AuthLayout() {
                 className="block h-12 w-auto mx-auto"
                 style={{ mixBlendMode: "multiply" }}
               />
-
             </Link>
             <div className="w-24 flex justify-end">
               {email && (
@@ -57,6 +71,35 @@ function AuthLayout() {
               )}
             </div>
           </div>
+
+          {/* About you bar */}
+          <div className="flex justify-center mt-4 mb-1">
+            {editingAbout ? (
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={aboutInput}
+                  onChange={(e) => setAboutInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") saveAbout();
+                    if (e.key === "Escape") setEditingAbout(false);
+                  }}
+                  onBlur={saveAbout}
+                  placeholder="e.g. paralegal with ADHD, grad student, freelancer..."
+                  autoFocus
+                  className="text-[11px] tracking-[1px] text-muted-foreground bg-transparent border-b border-border outline-none w-80 pb-0.5 placeholder:text-muted-foreground/40"
+                />
+              </div>
+            ) : (
+              <button
+                onClick={() => setEditingAbout(true)}
+                className="text-[10px] tracking-[2px] uppercase text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+              >
+                {about ? `about you: ${about}` : "+ about you"}
+              </button>
+            )}
+          </div>
+
           <nav className="flex justify-center gap-8 mt-6">
             {TABS.map((t) => {
               const active = path.startsWith(t.to);
@@ -84,4 +127,3 @@ function AuthLayout() {
     </div>
   );
 }
-
