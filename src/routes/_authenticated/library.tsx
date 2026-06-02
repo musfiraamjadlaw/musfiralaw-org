@@ -134,7 +134,7 @@ function LibraryPage() {
           [
             { id: "questions", label: "Questions" },
             { id: "themes", label: "Themes" },
-            { id: "articles", label: "Articles" },
+            { id: "corpus", label: "Corpus" },
             { id: "knowledge", label: "Notes" },
             { id: "graph", label: "Knowledge Graph" },
           ] as { id: Tab; label: string }[]
