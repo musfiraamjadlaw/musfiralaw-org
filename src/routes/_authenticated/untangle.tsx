@@ -7,6 +7,7 @@ import {
   type ActivationCondition,
   type Intervention,
 } from "@/lib/diagnose.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_authenticated/untangle")({
   head: () => ({
@@ -75,6 +76,22 @@ function DiagnosePage() {
         sessionStorage.setItem(WHITEBOARD_KEY, payload);
       } catch {
         /* storage unavailable — Whiteboard will just show empty state */
+      }
+      // Persist to the casebook so every analysis is archived, not just the last one.
+      try {
+        const { data: auth } = await supabase.auth.getUser();
+        const uid = auth.user?.id;
+        if (uid) {
+          await supabase.from("untangle_analyses").insert({
+            user_id: uid,
+            input: input.trim(),
+            result: r as any,
+            missing_condition: r.mechanism.missing_condition ?? null,
+            core_question: r.core_question ?? null,
+          });
+        }
+      } catch {
+        /* archival is best-effort */
       }
     } catch (e: any) {
       setErr(e.message ?? "Something went wrong.");
