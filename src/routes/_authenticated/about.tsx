@@ -35,87 +35,19 @@ function AboutPage() {
         style={{ fontFamily: "var(--font-serif)", fontSize: "18px", lineHeight: 1.7 }}
       >
         <p>
-          For a long time, I thought my problem was discipline.
+          For a long time, I thought my problem was discipline. Then organization. Then productivity. Then ADHD. Then discipline again, because apparently I enjoy repeating failed experiments.
         </p>
 
         <p>
-          Then organization.
+          The issue was that none of those explanations felt complete. I could spend six hours reading case law, researching a question nobody asked, or disappearing down a behavioral neuroscience rabbit hole. But somehow answering an email felt like lifting a Honda Civic. That never made sense to me.
         </p>
 
         <p>
-          Then productivity.
+          I have a background in science. I work in litigation. In both worlds, when something doesn't make sense, you're supposed to investigate it. Instead, most advice seemed content to stop at the observation. You're overwhelmed. You're procrastinating. You're distracted. Fine. But those aren't explanations. They're descriptions. The interesting question is <em>why.</em>
         </p>
 
         <p>
-          Then ADHD.
-        </p>
-
-        <p>
-          Then discipline again, because apparently I enjoy repeating failed experiments.
-        </p>
-
-        <p>
-          The issue was that none of those explanations felt complete.
-        </p>
-
-        <p>
-          I could spend six hours reading case law, researching a question nobody asked, or disappearing down a behavioral neuroscience rabbit hole. But somehow answering an email felt like lifting a Honda Civic.
-        </p>
-
-        <p>
-          That never made sense to me.
-        </p>
-
-        <p>
-          I have a background in science. I work in litigation. In both worlds, when something doesn't make sense, you're supposed to investigate it.
-        </p>
-
-        <p>
-          Instead, most advice seemed content to stop at the observation.
-        </p>
-
-        <p>
-          You're overwhelmed.
-        </p>
-
-        <p>
-          You're procrastinating.
-        </p>
-
-        <p>
-          You're distracted.
-        </p>
-
-        <p>
-          Fine.
-        </p>
-
-        <p>
-          But those aren't explanations. They're descriptions.
-        </p>
-
-        <p>
-          The interesting question is <em>why.</em>
-        </p>
-
-        <p>
-          Over time, I started noticing patterns.
-        </p>
-
-        <p>
-          Sometimes I couldn't start because there was no urgency.
-        </p>
-
-        <p>
-          Sometimes because the task wasn't meaningful.
-        </p>
-
-        <p>
-          Sometimes because I was trying to hold twenty unfinished thoughts in my head at the same time.
-        </p>
-
-        <p>
-          Sometimes because I wasn't stuck at all — I just hadn't identified the real problem yet.
+          Over time, I started noticing patterns. Sometimes I couldn't start because there was no urgency. Sometimes because the task wasn't meaningful. Sometimes because I was trying to hold twenty unfinished thoughts in my head at the same time. Sometimes I wasn't stuck at all — I just hadn't identified the real problem yet.
         </p>
 
         <p>
@@ -123,23 +55,7 @@ function AboutPage() {
         </p>
 
         <p>
-          Untangle grew out of that realization.
-        </p>
-
-        <p>
-          Not as a productivity tool.
-        </p>
-
-        <p>
-          Not as a planner.
-        </p>
-
-        <p>
-          Not as a way to optimize every waking minute of my life.
-        </p>
-
-        <p>
-          Just a place to investigate what isn't making sense.
+          Untangle grew out of that realization. Not as a productivity tool. Not as a planner. Not as a way to optimize every waking minute of my life. Just a place to investigate what isn't making sense.
         </p>
 
         <p>
@@ -159,11 +75,7 @@ function AboutPage() {
         </p>
 
         <p>
-          Because most of the time, the thing causing the problem isn't the thing we think is causing the problem.
-        </p>
-
-        <p>
-          And that's usually where the interesting answers live.
+          Because most of the time, the thing causing the problem isn't the thing we think is causing the problem. And that's usually where the interesting answers live.
         </p>
       </div>
 
