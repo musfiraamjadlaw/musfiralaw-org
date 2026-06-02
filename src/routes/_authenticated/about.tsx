@@ -159,12 +159,12 @@ function AboutPage() {
         >
           Xoxo,
         </p>
-        <p
-          className="text-foreground"
-          style={{ fontFamily: "var(--font-script)", fontSize: "38px" }}
-        >
-          Musfira
-        </p>
+        <img
+          src={signatureAsset.url}
+          alt="Musfira"
+          className="block h-14 w-auto mx-auto"
+          style={{ mixBlendMode: "multiply" }}
+        />
         <div className="flex flex-col items-center gap-3 pt-6">
           <a
             href="https://musfiraamjadlaw.substack.com/"
