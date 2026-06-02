@@ -5,7 +5,16 @@ import { askAI } from "@/lib/ai.functions";
 import { Waves, AlertTriangle, Clock, Hourglass, Network, Compass } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/start")({
-  head: () => ({ meta: [{ title: "Act — Untangle" }] }),
+  head: () => ({
+    meta: [
+      { title: "Act — Untangle" },
+      { name: "description", content: "The Activation Framework: diagnose which cognitive condition is missing and find the first move that breaks inertia." },
+      { property: "og:title", content: "Act — The Activation Framework" },
+      { property: "og:description", content: "Action is rarely a matter of willpower. Diagnose which of the six conditions for action is missing." },
+      { property: "og:url", content: "/start" },
+    ],
+    links: [{ rel: "canonical", href: "/start" }],
+  }),
   component: StartPage,
 });
 
