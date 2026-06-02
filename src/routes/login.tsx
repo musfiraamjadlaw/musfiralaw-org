@@ -76,3 +76,74 @@ function LoginPage() {
     </div>
   );
 }
+
+function YarnBall() {
+  // A tight spiral "ball" with a single strand trailing off, continuously unravelling.
+  return (
+    <svg
+      viewBox="0 0 200 140"
+      width="120"
+      height="84"
+      className="mx-auto block"
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="yarnShade" cx="40%" cy="40%" r="60%">
+          <stop offset="0%" stopColor="oklch(0.78 0.13 75)" />
+          <stop offset="100%" stopColor="oklch(0.62 0.13 75)" />
+        </radialGradient>
+      </defs>
+
+      {/* Ball body */}
+      <g transform="translate(70 78)">
+        <circle r="32" fill="url(#yarnShade)" />
+        {/* Spiral wraps */}
+        <g
+          fill="none"
+          stroke="oklch(0.32 0.05 265 / 0.55)"
+          strokeWidth="1"
+          strokeLinecap="round"
+        >
+          <ellipse cx="0" cy="0" rx="30" ry="10" transform="rotate(-22)" />
+          <ellipse cx="0" cy="0" rx="30" ry="10" transform="rotate(18)" />
+          <ellipse cx="0" cy="0" rx="30" ry="10" transform="rotate(58)" />
+          <ellipse cx="0" cy="0" rx="28" ry="6" transform="rotate(-50)" />
+          <ellipse cx="0" cy="0" rx="26" ry="14" transform="rotate(80)" />
+          <ellipse cx="0" cy="0" rx="24" ry="8" transform="rotate(-80)" />
+        </g>
+        {/* Slow rotation of the ball itself */}
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          from="0"
+          to="360"
+          dur="18s"
+          repeatCount="indefinite"
+          additive="sum"
+        />
+      </g>
+
+      {/* Unravelling thread */}
+      <path
+        d="M 102 78
+           C 118 78, 130 64, 140 70
+           S 158 96, 168 88
+           S 188 70, 196 80"
+        fill="none"
+        stroke="oklch(0.62 0.13 75)"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeDasharray="180"
+        strokeDashoffset="180"
+      >
+        <animate
+          attributeName="stroke-dashoffset"
+          values="180; 0; 0; 180"
+          keyTimes="0; 0.55; 0.85; 1"
+          dur="5s"
+          repeatCount="indefinite"
+        />
+      </path>
+    </svg>
+  );
+}
