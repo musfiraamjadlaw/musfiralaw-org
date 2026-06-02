@@ -255,14 +255,71 @@ function WhiteboardPage() {
         </Prose>
       </Section>
 
-      {/* Current case — the pinned analysis lives at the bottom, where evidence belongs. */}
-      <Section eyebrow="IV" title="The current case">
+      {/* Casebook — every Untangle analysis, archived. */}
+      <Section eyebrow="IV" title="The casebook">
+        <Prose>
+          <p>
+            Every observation run through Untangle is filed here as a case. The
+            board keeps the working one open below; the rest stay on the shelf,
+            ready to re-open.
+          </p>
+        </Prose>
+        {cases.length === 0 ? (
+          <p className="mt-8 font-serif italic text-muted-foreground">
+            No cases on file yet. Open one in{" "}
+            <Link to="/untangle" className="underline decoration-foreground/40 hover:decoration-foreground">
+              Untangle
+            </Link>
+            {" "}to begin the record.
+          </p>
+        ) : (
+          <ol className="mt-10 divide-y divide-border/60 border-y border-border/60">
+            {cases.map((c, i) => {
+              const active = c.id === selectedId;
+              const date = new Date(c.created_at).toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              });
+              return (
+                <li key={c.id}>
+                  <button
+                    onClick={() => openCase(c)}
+                    className={
+                      "w-full text-left py-5 grid grid-cols-[3rem_5.5rem_1fr_auto] gap-x-5 items-baseline hover:bg-muted/40 transition-colors px-2 " +
+                      (active ? "bg-muted/60" : "")
+                    }
+                  >
+                    <span className="font-mono text-[10px] tracking-[2px] text-muted-foreground">
+                      №{String(cases.length - i).padStart(2, "0")}
+                    </span>
+                    <span className="font-mono text-[10px] tracking-[2px] uppercase text-muted-foreground">
+                      {date}
+                    </span>
+                    <span className="font-serif italic text-foreground leading-snug truncate">
+                      "{c.input}"
+                    </span>
+                    {c.missing_condition && (
+                      <span className="font-sans text-[10px] tracking-[2px] uppercase text-muted-foreground">
+                        Missing · {c.missing_condition}
+                      </span>
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
+        )}
+      </Section>
+
+      {/* Working case — the open case lives at the bottom, where evidence belongs. */}
+      <Section eyebrow="V" title="The working case">
         {data ? (
           <CurrentCase input={data.input} result={data.result} />
         ) : (
           <Prose>
             <p className="italic text-muted-foreground">
-              No analysis is pinned to the board yet. Run an observation in{" "}
+              No analysis is open on the board yet. Run an observation in{" "}
               <Link to="/untangle" className="underline decoration-foreground/40 hover:decoration-foreground">
                 Untangle
               </Link>
