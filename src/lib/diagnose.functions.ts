@@ -143,7 +143,7 @@ export const diagnose = createServerFn({ method: "POST" })
     ] = await Promise.all([
       supabase
         .from("articles")
-        .select("id, title, url, summary, themes, questions, key_ideas, refs, content_text")
+        .select("id, title, url, summary, themes, questions, key_ideas, refs, content_text, core_argument, tensions, open_loops, recurring_concepts")
         .order("published_at", { ascending: false })
         .limit(60),
       supabase
@@ -164,22 +164,27 @@ export const diagnose = createServerFn({ method: "POST" })
     ]);
 
     const articleCorpus = (articles ?? [])
-      .map((a) => {
+      .map((a: any) => {
         const refs = (a.refs ?? {}) as { books?: string[]; people?: string[]; concepts?: string[]; research?: string[] };
         const lines = [
           `ID: ${a.id}`,
           `TITLE: ${a.title}`,
           a.url ? `URL: ${a.url}` : "",
           (a.themes ?? []).length ? `THEMES: ${(a.themes ?? []).join(", ")}` : "",
+          a.core_argument ? `ARGUMENT: ${a.core_argument}` : "",
+          (a.tensions ?? []).length ? `TENSIONS: ${(a.tensions ?? []).join(" · ")}` : "",
+          (a.open_loops ?? []).length ? `OPEN LOOPS: ${(a.open_loops ?? []).join(" | ")}` : "",
+          (a.recurring_concepts ?? []).length ? `RECURRING CONCEPTS: ${(a.recurring_concepts ?? []).join(", ")}` : "",
           (a.questions ?? []).length ? `QUESTIONS IT ASKS: ${(a.questions ?? []).join(" | ")}` : "",
           (a.key_ideas ?? []).length ? `KEY IDEAS: ${(a.key_ideas ?? []).join(" | ")}` : "",
-          (refs.concepts ?? []).length ? `CONCEPTS: ${(refs.concepts ?? []).join(", ")}` : "",
+          (refs.concepts ?? []).length ? `NAMED CONCEPTS: ${(refs.concepts ?? []).join(", ")}` : "",
           (refs.books ?? []).length ? `BOOKS: ${(refs.books ?? []).join("; ")}` : "",
           `SUMMARY: ${a.summary ?? (a.content_text ?? "").slice(0, 500)}`,
         ].filter(Boolean);
         return lines.join("\n");
       })
       .join("\n---\n");
+
 
     // Pattern aggregation — counts, not quotes.
     const missingTally: Record<string, number> = {};
