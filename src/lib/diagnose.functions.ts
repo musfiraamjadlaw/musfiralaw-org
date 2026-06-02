@@ -135,11 +135,33 @@ export const diagnose = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<DiagnoseResult> => {
     const { supabase } = context;
 
-    const { data: articles } = await supabase
-      .from("articles")
-      .select("id, title, url, summary, themes, content_text")
-      .order("published_at", { ascending: false })
-      .limit(60);
+    const [
+      { data: articles },
+      { data: priorCases },
+      { data: themes },
+      { data: knowledge },
+    ] = await Promise.all([
+      supabase
+        .from("articles")
+        .select("id, title, url, summary, themes, content_text")
+        .order("published_at", { ascending: false })
+        .limit(60),
+      supabase
+        .from("untangle_analyses")
+        .select("input, core_question, missing_condition, created_at")
+        .order("created_at", { ascending: false })
+        .limit(40),
+      supabase
+        .from("writing_themes")
+        .select("name, frequency, description")
+        .order("frequency", { ascending: false })
+        .limit(20),
+      supabase
+        .from("knowledge_entries")
+        .select("title, category, tags")
+        .order("updated_at", { ascending: false })
+        .limit(40),
+    ]);
 
     const articleCorpus = (articles ?? [])
       .map(
@@ -150,6 +172,57 @@ export const diagnose = createServerFn({ method: "POST" })
       )
       .join("\n---\n");
 
+    // Pattern aggregation — counts, not quotes.
+    const missingTally: Record<string, number> = {};
+    for (const c of priorCases ?? []) {
+      if (c.missing_condition) {
+        missingTally[c.missing_condition] = (missingTally[c.missing_condition] ?? 0) + 1;
+      }
+    }
+    const totalPriorCases = (priorCases ?? []).length;
+    const missingSummary = Object.entries(missingTally)
+      .sort((a, b) => b[1] - a[1])
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(", ") || "(none yet)";
+
+    const recurringQuestions = (priorCases ?? [])
+      .map((c) => c.core_question)
+      .filter((q): q is string => !!q)
+      .slice(0, 12)
+      .map((q) => `- ${q}`)
+      .join("\n") || "(none yet)";
+
+    const recentObservations = (priorCases ?? [])
+      .slice(0, 8)
+      .map((c) => `- "${c.input.slice(0, 200)}"`)
+      .join("\n") || "(none yet)";
+
+    const writingThemes = (themes ?? [])
+      .map((t) => `- ${t.name} (×${t.frequency})${t.description ? ` — ${t.description}` : ""}`)
+      .join("\n") || "(none yet)";
+
+    const libraryIndex = (knowledge ?? [])
+      .map((k) => `- [${k.category}] ${k.title}${k.tags?.length ? ` · ${k.tags.join(", ")}` : ""}`)
+      .join("\n") || "(none yet)";
+
+    const patternsBlock = `PATTERNS — observational only. Use to recognize recurrences. NEVER imitate voice, tone, or vocabulary.
+
+Prior Untangle cases on file: ${totalPriorCases}
+Missing-condition tally across prior cases: ${missingSummary}
+
+Recurring questions the user has surfaced before:
+${recurringQuestions}
+
+Recent observations the user has brought in:
+${recentObservations}
+
+Themes the user returns to in their writing:
+${writingThemes}
+
+Library entries on file (titles only — for theme-matching, not quoting):
+${libraryIndex}
+`;
+
     const prompt = `THE USER WROTE:
 """
 ${data.input}
@@ -157,6 +230,9 @@ ${data.input}
 
 THE USER'S OWN WRITING (their Substack corpus — match by IDEA, not keyword; recommend at most ONE; pick null if nothing genuinely fits):
 ${articleCorpus || "(none)"}
+
+${patternsBlock}
+
 
 Build the intellectual chain. Return JSON with this exact shape:
 
