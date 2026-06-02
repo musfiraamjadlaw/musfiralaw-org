@@ -295,7 +295,7 @@ function DiagnosePage() {
 
           {/* 7. A Better Question */}
           <Step number={result.article ? "07" : "06"} label="A better question">
-            <p className="font-serif italic text-3xl text-foreground leading-snug">
+            <p className="font-display italic text-4xl md:text-[2.65rem] text-foreground leading-[1.15] tracking-tight">
               {result.better_question}
             </p>
           </Step>
