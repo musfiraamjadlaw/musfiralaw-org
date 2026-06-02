@@ -275,6 +275,15 @@ export const recommendNextArticle = createServerFn({ method: "POST" })
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 
+    // Always clear stale "open" recommendations first. Earlier versions of this
+    // function fed notes and to-dos into the editor; those rows can linger and
+    // mislead the reader. The corpus must be the source of truth.
+    await supabase
+      .from("article_recommendations")
+      .delete()
+      .eq("user_id", userId)
+      .eq("status", "open");
+
     // Only the writer's PUBLISHED work. No tasks. No admin notes. No reminders.
     const { data: articles, error: artErr } = await supabase
       .from("articles")
