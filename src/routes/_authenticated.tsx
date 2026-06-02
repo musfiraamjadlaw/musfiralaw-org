@@ -20,6 +20,7 @@ const TABS: Tab[] = [
   { id: "courtroom", label: "Think", to: "/courtroom" },
   { id: "vault", label: "Learn", to: "/vault" },
   { id: "editorial", label: "Write", to: "/editorial" },
+  { id: "about", label: "About", to: "/about" },
 ];
 
 function AuthLayout() {
