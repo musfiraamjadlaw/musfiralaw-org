@@ -13,29 +13,13 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 type Tab = { id: string; label: string; to: string };
-type Group = { label: string; tabs: Tab[] };
 
-const GROUPS: Group[] = [
-  {
-    label: "Cognitive Core",
-    tabs: [
-      { id: "states", label: "States", to: "/states" },
-      { id: "dump", label: "Brain Dump", to: "/dump" },
-      { id: "start", label: "Activation", to: "/start" },
-      { id: "untangle", label: "Untangle", to: "/untangle" },
-      { id: "clock", label: "Time Radar", to: "/clock" },
-      { id: "courtroom", label: "Courtroom", to: "/courtroom" },
-      { id: "vault", label: "Knowledge Vault", to: "/vault" },
-    ],
-  },
-  {
-    label: "Intelligence",
-    tabs: [{ id: "meaning", label: "Decision Engine", to: "/meaning" }],
-  },
-  {
-    label: "Insight",
-    tabs: [{ id: "editorial", label: "Writing Intelligence", to: "/editorial" }],
-  },
+const TABS: Tab[] = [
+  { id: "diagnose", label: "Diagnose", to: "/diagnose" },
+  { id: "start", label: "Act", to: "/start" },
+  { id: "courtroom", label: "Think", to: "/courtroom" },
+  { id: "vault", label: "Learn", to: "/vault" },
+  { id: "editorial", label: "Write", to: "/editorial" },
 ];
 
 function AuthLayout() {
