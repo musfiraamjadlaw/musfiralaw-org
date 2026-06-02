@@ -371,11 +371,11 @@ function Step({
 }) {
   return (
     <section>
-      <div className="flex items-baseline gap-4 mb-5 border-b border-border pb-2">
-        <span className="font-mono text-[10px] tracking-[2px] text-muted-foreground">
+      <div className="flex items-baseline gap-5 mb-6 border-b border-border pb-3">
+        <span className="font-mono text-[10px] tracking-[3px] text-muted-foreground tabular-nums">
           {number}
         </span>
-        <h3 className="font-serif italic text-foreground text-lg">{label}</h3>
+        <h3 className="font-display italic text-foreground text-xl leading-none">{label}</h3>
       </div>
       {children}
     </section>
