@@ -44,39 +44,30 @@ function AuthLayout() {
             <div className="flex items-baseline gap-3">
               <h1 className="font-serif text-xl font-semibold">Cognitive OS</h1>
               <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-                Attention · Time · Knowledge · Decisions
+                A private cognitive navigation system
               </span>
             </div>
             <button onClick={signOut} className="text-[10px] tracking-[2px] uppercase text-muted-foreground hover:text-navy">
               {email ? "Sign out" : ""}
             </button>
           </div>
-          <nav className="flex flex-wrap items-end gap-x-6 gap-y-2 pb-1">
-            {GROUPS.map((g) => (
-              <div key={g.label} className="flex flex-col">
-                <span className="text-[9px] tracking-[2.5px] uppercase text-muted-foreground/70 mb-1">
-                  {g.label}
-                </span>
-                <div className="flex gap-1">
-                  {g.tabs.map((t) => {
-                    const active = path.startsWith(t.to);
-                    return (
-                      <Link
-                        key={t.id}
-                        to={t.to}
-                        className={`px-3 py-2 text-[10px] tracking-[2.5px] uppercase whitespace-nowrap border-b-2 transition-colors ${
-                          active
-                            ? "border-accent text-navy font-medium"
-                            : "border-transparent text-muted-foreground hover:text-navy"
-                        }`}
-                      >
-                        {t.label}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+          <nav className="flex flex-wrap gap-1 pb-1">
+            {TABS.map((t) => {
+              const active = path.startsWith(t.to);
+              return (
+                <Link
+                  key={t.id}
+                  to={t.to}
+                  className={`px-4 py-2 text-[10px] tracking-[3px] uppercase whitespace-nowrap border-b-2 transition-colors ${
+                    active
+                      ? "border-accent text-navy font-medium"
+                      : "border-transparent text-muted-foreground hover:text-navy"
+                  }`}
+                >
+                  {t.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </header>
