@@ -440,6 +440,36 @@ export type Database = {
         }
         Relationships: []
       }
+      untangle_analyses: {
+        Row: {
+          core_question: string | null
+          created_at: string
+          id: string
+          input: string
+          missing_condition: string | null
+          result: Json
+          user_id: string
+        }
+        Insert: {
+          core_question?: string | null
+          created_at?: string
+          id?: string
+          input: string
+          missing_condition?: string | null
+          result: Json
+          user_id: string
+        }
+        Update: {
+          core_question?: string | null
+          created_at?: string
+          id?: string
+          input?: string
+          missing_condition?: string | null
+          result?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       writing_themes: {
         Row: {
           created_at: string
