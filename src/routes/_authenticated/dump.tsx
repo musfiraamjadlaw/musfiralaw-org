@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,41 +12,59 @@ export const Route = createFileRoute("/_authenticated/dump")({
 
 const CATS: Record<string, { label: string; color: string; bg: string; emoji: string }> = {
   work:     { label: "WORK",     color: "#1A2744", bg: "#EEF1F8", emoji: "▤" },
-  project:  { label: "PROJECT",  color: "#1A6FB5", bg: "#EEF5FD", emoji: "◇" },
-  research: { label: "RESEARCH", color: "#1A8A4A", bg: "#EDF7F2", emoji: "◎" },
-  idea:     { label: "IDEA",     color: "#C87D0E", bg: "#FEF9EF", emoji: "✦" },
-  admin:    { label: "ADMIN",    color: "#7B3FA8", bg: "#F4EEF9", emoji: "◈" },
+  personal: { label: "PERSONAL", color: "#1A6FB5", bg: "#EEF5FD", emoji: "◎" },
+  learning: { label: "LEARNING", color: "#1A8A4A", bg: "#EDF7F2", emoji: "◇" },
+  creative: { label: "CREATIVE", color: "#C87D0E", bg: "#FEF9EF", emoji: "✦" },
+  health:   { label: "HEALTH",   color: "#7B3FA8", bg: "#F4EEF9", emoji: "◈" },
 };
 
 function DumpPage() {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [localNotes, setLocalNotes] = useState<any[]>([]);
   const ai = useServerFn(askAI);
   const qc = useQueryClient();
 
-  const { data: notes = [] } = useQuery({
-    queryKey: ["notes"],
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUserId(data.user?.id ?? null));
+  }, []);
+
+  const { data: supabaseNotes = [] } = useQuery({
+    queryKey: ["notes", userId],
     queryFn: async () => {
+      if (!userId) return [];
       const { data, error } = await supabase.from("notes").select("*").order("created_at", { ascending: false });
       if (error) throw error;
       return data;
     },
+    enabled: !!userId,
   });
+
+  const notes = userId ? supabaseNotes : localNotes;
 
   const toggleDone = useMutation({
     mutationFn: async ({ id, done }: { id: string; done: boolean }) => {
-      const { error } = await supabase.from("notes").update({ done }).eq("id", id);
-      if (error) throw error;
+      if (userId) {
+        const { error } = await supabase.from("notes").update({ done }).eq("id", id);
+        if (error) throw error;
+      } else {
+        setLocalNotes(prev => prev.map(n => n.id === id ? { ...n, done } : n));
+      }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["notes"] }),
+    onSuccess: () => { if (userId) qc.invalidateQueries({ queryKey: ["notes", userId] }); },
   });
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("notes").delete().eq("id", id);
-      if (error) throw error;
+      if (userId) {
+        const { error } = await supabase.from("notes").delete().eq("id", id);
+        if (error) throw error;
+      } else {
+        setLocalNotes(prev => prev.filter(n => n.id !== id));
+      }
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["notes"] }),
+    onSuccess: () => { if (userId) qc.invalidateQueries({ queryKey: ["notes", userId] }); },
   });
 
   async function sortIt() {
@@ -55,20 +73,26 @@ function DumpPage() {
     try {
       const { text: raw } = await ai({
         data: {
-          prompt: `Brain dump from the user:\n\n"${text}"\n\nParse into individual tasks or items. Assign each to: work, project, research, idea, or admin. Set priority: high, medium, or low.\n\nJSON: {"items":[{"text":"...","category":"work","priority":"high"}]}`,
+          prompt: `Brain dump from the user:\n\n"${text}"\n\nParse into individual tasks or items. Assign each to one of: work, personal, learning, creative, or health. Set priority: high, medium, or low.\n\nJSON: {"items":[{"text":"...","category":"work","priority":"high"}]}`,
           wantJson: true,
         },
       });
       const { items } = JSON.parse(raw.replace(/```json|```/g, "").trim());
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) throw new Error("Not signed in");
-      const rows = (items as any[]).map((i) => ({
-        user_id: u.user!.id, text: i.text, category: i.category, priority: i.priority,
-      }));
-      const { error } = await supabase.from("notes").insert(rows);
-      if (error) throw error;
+
+      if (userId) {
+        const rows = (items as any[]).map((i) => ({
+          user_id: userId, text: i.text, category: i.category, priority: i.priority,
+        }));
+        const { error } = await supabase.from("notes").insert(rows);
+        if (error) throw error;
+        qc.invalidateQueries({ queryKey: ["notes", userId] });
+      } else {
+        const newItems = (items as any[]).map((i, idx) => ({
+          id: String(Date.now() + idx), text: i.text, category: i.category, priority: i.priority, done: false,
+        }));
+        setLocalNotes(prev => [...newItems, ...prev]);
+      }
       setText("");
-      qc.invalidateQueries({ queryKey: ["notes"] });
     } catch (e: any) {
       alert(e.message ?? "Something went wrong");
     } finally { setLoading(false); }
@@ -82,7 +106,7 @@ function DumpPage() {
       <p className="mt-2 text-sm text-muted-foreground">Everything on your mind. One line or twenty. Don't organize it. Just type.</p>
 
       <textarea value={text} onChange={(e) => setText(e.target.value)} rows={8}
-        placeholder="finish Q3 proposal&#10;call vendor about contract&#10;research competitor pricing..."
+        placeholder={"finish that report\ncall about the appointment\nlook into that course..."}
         className="w-full mt-6 border border-border rounded p-4 bg-card font-mono text-sm leading-7 outline-none resize-none focus:border-accent" />
 
       <button onClick={sortIt} disabled={loading || !text.trim()}
