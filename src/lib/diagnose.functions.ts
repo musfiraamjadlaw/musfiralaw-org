@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
 
 // ============================================================
 // UNTANGLE — Sensemaking engine with Activation Framework
@@ -11,6 +13,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 // Urgency, Novelty, Relationships, Meaning) → Your Writing →
 // Research → Book → Better Question → Action (emerging from
 // the missing condition) → Suggested Intervention.
+//
+// Auth is OPTIONAL. Authenticated users get personalization
+// (prior cases, writing themes, library). Anonymous users get
+// the full synthesis chain without personalization. No one
+// hits a silent error.
 // ============================================================
 
 const SYSTEM = `You are the sensemaking engine inside Untangle. You sit at the intersection of a developmental editor, a cognitive neuroscientist, a strategist, a researcher, and a mentor.
@@ -128,42 +135,83 @@ export type DiagnoseResult = {
 };
 
 export const diagnose = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((input: { input: string }) =>
     z.object({ input: z.string().min(1).max(4000) }).parse(input),
   )
-  .handler(async ({ data, context }): Promise<DiagnoseResult> => {
-    const { supabase } = context;
+  .handler(async ({ data }): Promise<DiagnoseResult> => {
 
-    const [
-      { data: articles },
-      { data: priorCases },
-      { data: themes },
-      { data: knowledge },
-    ] = await Promise.all([
-      supabase
-        .from("articles")
-        .select("id, title, url, summary, themes, questions, key_ideas, refs, content_text, core_argument, tensions, open_loops, recurring_concepts")
-        .order("published_at", { ascending: false })
-        .limit(60),
-      supabase
-        .from("untangle_analyses")
-        .select("input, core_question, missing_condition, created_at")
-        .order("created_at", { ascending: false })
-        .limit(40),
-      supabase
-        .from("writing_themes")
-        .select("name, frequency, description")
-        .order("frequency", { ascending: false })
-        .limit(20),
-      supabase
-        .from("knowledge_entries")
-        .select("title, category, tags")
-        .order("updated_at", { ascending: false })
-        .limit(40),
-    ]);
+    // ── Auth is optional ─────────────────────────────────────
+    // Authenticated users get personalization (their prior cases,
+    // writing themes, library). Anonymous users get the full
+    // synthesis chain without personalization. Either way the
+    // engine runs — no one hits a silent error.
+    let articles: any[] = [];
+    let priorCases: any[] = [];
+    let themes: any[] = [];
+    let knowledge: any[] = [];
+    let isAuthenticated = false;
 
-    const articleCorpus = (articles ?? [])
+    try {
+      const SUPABASE_URL = process.env.SUPABASE_URL;
+      const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+
+      if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY) {
+        const request = getRequest();
+        const authHeader = request?.headers?.get("authorization");
+        const token = authHeader?.startsWith("Bearer ")
+          ? authHeader.replace("Bearer ", "")
+          : null;
+
+        if (token) {
+          const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+            global: { headers: { Authorization: `Bearer ${token}` } },
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+          });
+
+          const { data: claimsData } = await supabase.auth.getClaims(token);
+          if (claimsData?.claims?.sub) {
+            isAuthenticated = true;
+            const [
+              { data: a },
+              { data: p },
+              { data: t },
+              { data: k },
+            ] = await Promise.all([
+              supabase
+                .from("articles")
+                .select("id, title, url, summary, themes, questions, key_ideas, refs, content_text, core_argument, tensions, open_loops, recurring_concepts")
+                .order("published_at", { ascending: false })
+                .limit(60),
+              supabase
+                .from("untangle_analyses")
+                .select("input, core_question, missing_condition, created_at")
+                .order("created_at", { ascending: false })
+                .limit(40),
+              supabase
+                .from("writing_themes")
+                .select("name, frequency, description")
+                .order("frequency", { ascending: false })
+                .limit(20),
+              supabase
+                .from("knowledge_entries")
+                .select("title, category, tags")
+                .order("updated_at", { ascending: false })
+                .limit(40),
+            ]);
+
+            articles = a ?? [];
+            priorCases = p ?? [];
+            themes = t ?? [];
+            knowledge = k ?? [];
+          }
+        }
+      }
+    } catch {
+      // Auth unavailable or failed — continue without personalization
+    }
+
+    // ── Build article corpus ──────────────────────────────────
+    const articleCorpus = articles
       .map((a: any) => {
         const refs = (a.refs ?? {}) as { books?: string[]; people?: string[]; concepts?: string[]; research?: string[] };
         const lines = [
@@ -185,41 +233,41 @@ export const diagnose = createServerFn({ method: "POST" })
       })
       .join("\n---\n");
 
-
-    // Pattern aggregation — counts, not quotes.
+    // ── Pattern aggregation ───────────────────────────────────
     const missingTally: Record<string, number> = {};
-    for (const c of priorCases ?? []) {
+    for (const c of priorCases) {
       if (c.missing_condition) {
         missingTally[c.missing_condition] = (missingTally[c.missing_condition] ?? 0) + 1;
       }
     }
-    const totalPriorCases = (priorCases ?? []).length;
+    const totalPriorCases = priorCases.length;
     const missingSummary = Object.entries(missingTally)
       .sort((a, b) => b[1] - a[1])
       .map(([k, v]) => `${k}: ${v}`)
       .join(", ") || "(none yet)";
 
-    const recurringQuestions = (priorCases ?? [])
+    const recurringQuestions = priorCases
       .map((c) => c.core_question)
       .filter((q): q is string => !!q)
       .slice(0, 12)
       .map((q) => `- ${q}`)
       .join("\n") || "(none yet)";
 
-    const recentObservations = (priorCases ?? [])
+    const recentObservations = priorCases
       .slice(0, 8)
       .map((c) => `- "${c.input.slice(0, 200)}"`)
       .join("\n") || "(none yet)";
 
-    const writingThemes = (themes ?? [])
+    const writingThemes = themes
       .map((t) => `- ${t.name} (×${t.frequency})${t.description ? ` — ${t.description}` : ""}`)
       .join("\n") || "(none yet)";
 
-    const libraryIndex = (knowledge ?? [])
+    const libraryIndex = knowledge
       .map((k) => `- [${k.category}] ${k.title}${k.tags?.length ? ` · ${k.tags.join(", ")}` : ""}`)
       .join("\n") || "(none yet)";
 
-    const patternsBlock = `PATTERNS — observational only. Use to recognize recurrences. NEVER imitate voice, tone, or vocabulary.
+    const patternsBlock = isAuthenticated
+      ? `PATTERNS — observational only. Use to recognize recurrences. NEVER imitate voice, tone, or vocabulary.
 
 Prior Untangle cases on file: ${totalPriorCases}
 Missing-condition tally across prior cases: ${missingSummary}
@@ -235,7 +283,8 @@ ${writingThemes}
 
 Library entries on file (titles only — for theme-matching, not quoting):
 ${libraryIndex}
-`;
+`
+      : "PATTERNS: No prior session data available. Analyze this observation on its own merits.";
 
     const prompt = `THE USER WROTE:
 """
@@ -328,7 +377,7 @@ RULES:
     const parsed = parseJson<DiagnoseResult>(raw);
 
     if (parsed.article) {
-      const validIds = new Set((articles ?? []).map((a) => a.id));
+      const validIds = new Set(articles.map((a) => a.id));
       if (!validIds.has(parsed.article.id)) parsed.article = null;
     }
 
@@ -336,6 +385,37 @@ RULES:
     parsed.pattern_notes = parsed.pattern_notes
       .filter((n): n is string => typeof n === "string" && n.trim().length > 0)
       .slice(0, 3);
+
+    // Best-effort archive — only when authenticated
+    if (isAuthenticated) {
+      try {
+        const SUPABASE_URL = process.env.SUPABASE_URL;
+        const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+        const request = getRequest();
+        const authHeader = request?.headers?.get("authorization");
+        const token = authHeader?.replace("Bearer ", "");
+
+        if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY && token) {
+          const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+            global: { headers: { Authorization: `Bearer ${token}` } },
+            auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+          });
+          const { data: claimsData } = await supabase.auth.getClaims(token);
+          const uid = claimsData?.claims?.sub;
+          if (uid) {
+            await supabase.from("untangle_analyses").insert({
+              user_id: uid,
+              input: data.input,
+              result: parsed as any,
+              missing_condition: parsed.mechanism.missing_condition ?? null,
+              core_question: parsed.core_question ?? null,
+            });
+          }
+        }
+      } catch {
+        /* archival is best-effort */
+      }
+    }
 
     return parsed;
   });
