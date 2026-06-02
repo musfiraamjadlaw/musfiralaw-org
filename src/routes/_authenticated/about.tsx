@@ -61,6 +61,33 @@ function AboutPage() {
           For a long time, I thought my problem was discipline. Then organization. Then productivity. Then ADHD. Then discipline again, because apparently I enjoy repeating failed experiments.
         </p>
 
+        <Figure src={PHOTO_1} alt="Musfira — science years" />
+
+        <p>
+          The issue was that none of those explanations felt complete. I could spend six hours reading case law, researching a question nobody asked, or disappearing down a behavioral neuroscience rabbit hole. But somehow answering an email felt like lifting a Honda Civic. That never made sense to me.
+        </p>
+
+        <Figure src={PHOTO_2} alt="At the desk" />
+
+        <p>
+          I have a background in science. I work in litigation. In both worlds, when something doesn't make sense, you're supposed to investigate it. Instead, most advice seemed content to stop at the observation. You're overwhelmed. You're procrastinating. You're distracted. Fine. But those aren't explanations. They're descriptions. The interesting question is <em>why.</em>
+        </p>
+
+        <Figure src={PHOTO_3} alt="Books and case files" />
+
+        <p>
+          Over time, I started noticing patterns. Sometimes I couldn't start because there was no urgency. Sometimes because the task wasn't meaningful. Sometimes because I was trying to hold twenty unfinished thoughts in my head at the same time. Sometimes I wasn't stuck at all — I just hadn't identified the real problem yet.
+        </p>
+
+        <p>
+          The more attention I paid, the less it felt like a character flaw and the more it felt like a system.
+        </p>
+
+        <Figure src={PHOTO_4} alt="Portrait" />
+
+        <p>
+          Untangle grew out of that realization. Not as a productivity tool. Not as a planner. Not as a way to optimize every waking minute of my life. Just a place to investigate what isn't making sense.
+
         <p>
           The issue was that none of those explanations felt complete. I could spend six hours reading case law, researching a question nobody asked, or disappearing down a behavioral neuroscience rabbit hole. But somehow answering an email felt like lifting a Honda Civic. That never made sense to me.
         </p>
