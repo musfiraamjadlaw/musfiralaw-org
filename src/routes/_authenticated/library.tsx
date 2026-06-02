@@ -30,6 +30,27 @@ const STATUS_COLOR: Record<string, string> = {
   emerging: "#C87D0E",
 };
 
+function CorpusRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-4">
+      <p className="text-[10px] tracking-[2px] uppercase text-muted-foreground mb-2">
+        {label}
+      </p>
+      <div className="flex flex-wrap gap-1.5">{children}</div>
+    </div>
+  );
+}
+
+function Chip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="text-[11px] px-2 py-0.5 border border-border rounded-sm bg-card text-foreground/85">
+      {children}
+    </span>
+  );
+}
+
+
+
 type Tab = "questions" | "themes" | "corpus" | "knowledge" | "graph";
 
 function LibraryPage() {
