@@ -4,6 +4,16 @@ import type {
   DiagnoseResult,
   ActivationCondition,
 } from "@/lib/diagnose.functions";
+import { supabase } from "@/integrations/supabase/client";
+
+type CaseRow = {
+  id: string;
+  input: string;
+  result: DiagnoseResult;
+  missing_condition: string | null;
+  core_question: string | null;
+  created_at: string;
+};
 
 export const Route = createFileRoute("/_authenticated/whiteboard")({
   head: () => ({
