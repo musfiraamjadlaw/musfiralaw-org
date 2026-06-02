@@ -360,12 +360,9 @@ ${corpus}`,
 
     const validIds = new Set(articles.map((a: any) => a.id));
 
-    // Clear previous open recommendations so the surface stays current
-    await supabase
-      .from("article_recommendations")
-      .delete()
-      .eq("user_id", userId)
-      .eq("status", "open");
+    // Stale open recommendations were already cleared at the top of this handler.
+
+
 
     const rows = (parsed.recommendations ?? []).slice(0, 5).map((r) => ({
       user_id: userId,
