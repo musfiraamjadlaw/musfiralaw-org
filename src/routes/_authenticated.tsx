@@ -37,43 +37,55 @@ function AuthLayout() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-navy font-sans">
-      <header className="border-b border-border bg-background sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-7 pt-5">
-          <div className="flex items-baseline justify-between mb-4">
-            <div className="flex items-baseline gap-3">
-              <h1 className="font-serif text-xl font-semibold">Cognitive OS</h1>
-              <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground">
-                A private cognitive navigation system
+    <div className="min-h-screen bg-background text-foreground font-sans">
+      <header className="border-b border-border bg-background">
+        <div className="max-w-6xl mx-auto px-6 pt-8 pb-0">
+          <div className="flex items-center justify-between">
+            <div className="w-24" />
+            <Link to="/diagnose" className="block text-center group">
+              <span
+                className="block leading-none text-foreground"
+                style={{ fontFamily: "var(--font-script)", fontSize: "44px", fontWeight: 400 }}
+              >
+                Cognitive OS
               </span>
+            </Link>
+            <div className="w-24 flex justify-end">
+              {email && (
+                <button
+                  onClick={signOut}
+                  className="text-[11px] tracking-[2px] uppercase text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Sign out
+                </button>
+              )}
             </div>
-            <button onClick={signOut} className="text-[10px] tracking-[2px] uppercase text-muted-foreground hover:text-navy">
-              {email ? "Sign out" : ""}
-            </button>
           </div>
-          <nav className="flex flex-wrap gap-1 pb-1">
+          <nav className="flex justify-center gap-8 mt-6">
             {TABS.map((t) => {
               const active = path.startsWith(t.to);
               return (
                 <Link
                   key={t.id}
                   to={t.to}
-                  className={`px-4 py-2 text-[10px] tracking-[3px] uppercase whitespace-nowrap border-b-2 transition-colors ${
-                    active
-                      ? "border-accent text-navy font-medium"
-                      : "border-transparent text-muted-foreground hover:text-navy"
+                  className={`relative pb-3 text-[13px] font-medium tracking-tight transition-colors ${
+                    active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {t.label}
+                  {active && (
+                    <span className="absolute left-0 right-0 -bottom-px h-0.5 bg-foreground" />
+                  )}
                 </Link>
               );
             })}
           </nav>
         </div>
       </header>
-      <main className="max-w-5xl mx-auto px-7 py-12 pb-24">
+      <main className="max-w-6xl mx-auto px-6 py-12 pb-24">
         <Outlet />
       </main>
     </div>
   );
 }
+
