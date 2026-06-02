@@ -285,23 +285,31 @@ function DiagnosePage() {
             )}
           </Step>
 
-          <div className="pt-8 border-t border-border flex gap-3">
-            <button
-              onClick={() => {
-                setResult(null);
-                setInput("");
-                setSubmittedInput("");
-              }}
-              className="px-6 py-2 text-[10px] tracking-[3px] uppercase bg-foreground text-background hover:bg-foreground/90 transition-colors"
+          <div className="pt-8 border-t border-border flex flex-wrap gap-3 items-center justify-between">
+            <Link
+              to="/whiteboard"
+              className="px-6 py-3 text-[10px] tracking-[3px] uppercase border border-foreground text-foreground hover:bg-foreground hover:text-background transition-colors"
             >
-              Again
-            </button>
-            <button
-              onClick={() => setResult(null)}
-              className="px-6 py-2 text-[10px] tracking-[3px] uppercase border border-border text-foreground hover:bg-muted transition-colors"
-            >
-              Refine
-            </button>
+              View Whiteboard →
+            </Link>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setResult(null);
+                  setInput("");
+                  setSubmittedInput("");
+                }}
+                className="px-6 py-2 text-[10px] tracking-[3px] uppercase bg-foreground text-background hover:bg-foreground/90 transition-colors"
+              >
+                Again
+              </button>
+              <button
+                onClick={() => setResult(null)}
+                className="px-6 py-2 text-[10px] tracking-[3px] uppercase border border-border text-foreground hover:bg-muted transition-colors"
+              >
+                Refine
+              </button>
+            </div>
           </div>
         </article>
       )}
