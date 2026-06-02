@@ -19,6 +19,7 @@ const TABS = [
   { id: "courtroom", label: "Courtroom", to: "/courtroom" },
   { id: "clock", label: "Time Radar", to: "/clock" },
   { id: "vault", label: "Knowledge Vault", to: "/vault" },
+  { id: "editorial", label: "Editorial", to: "/editorial" },
   { id: "meaning", label: "Meaning Engine", to: "/meaning" },
 ] as const;
 

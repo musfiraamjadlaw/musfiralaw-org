@@ -41,6 +41,105 @@ export type Database = {
         }
         Relationships: []
       }
+      article_recommendations: {
+        Row: {
+          connects_to: string[]
+          created_at: string
+          gap: string | null
+          id: string
+          outline: string | null
+          rationale: string
+          score: number | null
+          status: string
+          themes: string[]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          connects_to?: string[]
+          created_at?: string
+          gap?: string | null
+          id?: string
+          outline?: string | null
+          rationale: string
+          score?: number | null
+          status?: string
+          themes?: string[]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          connects_to?: string[]
+          created_at?: string
+          gap?: string | null
+          id?: string
+          outline?: string | null
+          rationale?: string
+          score?: number | null
+          status?: string
+          themes?: string[]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      articles: {
+        Row: {
+          content_html: string | null
+          content_text: string
+          created_at: string
+          guid: string | null
+          id: string
+          imported_at: string
+          published_at: string | null
+          source: string
+          summary: string | null
+          tags: string[]
+          themes: string[]
+          title: string
+          updated_at: string
+          url: string | null
+          user_id: string
+        }
+        Insert: {
+          content_html?: string | null
+          content_text?: string
+          created_at?: string
+          guid?: string | null
+          id?: string
+          imported_at?: string
+          published_at?: string | null
+          source: string
+          summary?: string | null
+          tags?: string[]
+          themes?: string[]
+          title: string
+          updated_at?: string
+          url?: string | null
+          user_id: string
+        }
+        Update: {
+          content_html?: string | null
+          content_text?: string
+          created_at?: string
+          guid?: string | null
+          id?: string
+          imported_at?: string
+          published_at?: string | null
+          source?: string
+          summary?: string | null
+          tags?: string[]
+          themes?: string[]
+          title?: string
+          updated_at?: string
+          url?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       courtroom_entries: {
         Row: {
           alternatives: string | null
@@ -227,6 +326,36 @@ export type Database = {
         }
         Relationships: []
       }
+      substack_sources: {
+        Row: {
+          created_at: string
+          feed_url: string
+          id: string
+          last_synced_at: string | null
+          publication_name: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feed_url: string
+          id?: string
+          last_synced_at?: string | null
+          publication_name?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feed_url?: string
+          id?: string
+          last_synced_at?: string | null
+          publication_name?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           created_at: string
@@ -260,6 +389,84 @@ export type Database = {
           updated_at?: string
           user_id?: string
           why?: string | null
+        }
+        Relationships: []
+      }
+      unfinished_threads: {
+        Row: {
+          created_at: string
+          evidence: string | null
+          id: string
+          last_seen_at: string | null
+          mentions_count: number
+          question: string | null
+          sources: string[]
+          status: string
+          topic: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          last_seen_at?: string | null
+          mentions_count?: number
+          question?: string | null
+          sources?: string[]
+          status?: string
+          topic: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          last_seen_at?: string | null
+          mentions_count?: number
+          question?: string | null
+          sources?: string[]
+          status?: string
+          topic?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      writing_themes: {
+        Row: {
+          created_at: string
+          description: string | null
+          frequency: number
+          id: string
+          last_seen_at: string | null
+          name: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          frequency?: number
+          id?: string
+          last_seen_at?: string | null
+          name: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          frequency?: number
+          id?: string
+          last_seen_at?: string | null
+          name?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
