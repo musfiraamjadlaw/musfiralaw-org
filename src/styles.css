@@ -30,37 +30,37 @@
   --color-gold: var(--gold);
   --color-navy: var(--navy);
   --color-cream: var(--cream);
-  --font-serif: "Playfair Display", Georgia, serif;
-  --font-sans: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Source Serif 4", "Source Serif Pro", "Spectral", Georgia, serif;
+  --font-sans: "Inter", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
+  --font-script: "Tangerine", "Pinyon Script", "Dancing Script", cursive;
 }
 
 :root {
-  --radius: 0.25rem;
-  /* Warm cream backgrounds, deep navy, gold accents */
-  --cream: oklch(0.972 0.018 85);
-  --navy: oklch(0.25 0.05 265);
-  --gold: oklch(0.75 0.13 75);
+  --radius: 0.125rem;
+  --cream: oklch(0.99 0.003 90);
+  --navy: oklch(0.18 0.01 270);
+  --gold: oklch(0.55 0.08 60);
 
-  --background: oklch(0.972 0.018 85);          /* #FBF7F0 */
-  --foreground: oklch(0.25 0.05 265);           /* navy */
-  --card: oklch(0.985 0.012 85);                /* lighter cream */
-  --card-foreground: oklch(0.25 0.05 265);
-  --popover: oklch(0.985 0.012 85);
-  --popover-foreground: oklch(0.25 0.05 265);
-  --primary: oklch(0.25 0.05 265);              /* navy */
-  --primary-foreground: oklch(0.985 0.012 85);
-  --secondary: oklch(0.92 0.025 80);
-  --secondary-foreground: oklch(0.25 0.05 265);
-  --muted: oklch(0.92 0.025 80);
-  --muted-foreground: oklch(0.55 0.02 80);
-  --accent: oklch(0.75 0.13 75);                /* gold */
-  --accent-foreground: oklch(0.25 0.05 265);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.18 0.01 270);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.18 0.01 270);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.18 0.01 270);
+  --primary: oklch(0.18 0.01 270);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.97 0.003 90);
+  --secondary-foreground: oklch(0.18 0.01 270);
+  --muted: oklch(0.96 0.003 90);
+  --muted-foreground: oklch(0.5 0.01 270);
+  --accent: oklch(0.55 0.08 60);
+  --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.55 0.22 27);
-  --destructive-foreground: oklch(0.985 0.012 85);
-  --border: oklch(0.88 0.022 80);
-  --input: oklch(0.88 0.022 80);
-  --ring: oklch(0.75 0.13 75);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.92 0.003 90);
+  --input: oklch(0.92 0.003 90);
+  --ring: oklch(0.18 0.01 270);
 }
 
 @layer base {
@@ -69,5 +69,7 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
   }
+  h1, h2, h3, h4 { font-family: var(--font-serif); letter-spacing: -0.01em; }
 }
