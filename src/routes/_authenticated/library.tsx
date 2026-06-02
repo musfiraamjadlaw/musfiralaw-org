@@ -82,14 +82,31 @@ function LibraryPage() {
     mutationFn: () => scan({}),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["library-threads"] }),
   });
+  const extract = useServerFn(extractArticleSignals);
+  const mExtract = useMutation({
+    mutationFn: () => extract({ data: { limit: 8 } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["library-articles"] }),
+  });
 
   const filteredArticles = useMemo(() => {
     const s = q.toLowerCase().trim();
     if (!s) return articles.data ?? [];
-    return (articles.data ?? []).filter((a: any) =>
-      `${a.title} ${(a.themes || []).join(" ")} ${a.content_text ?? ""}`.toLowerCase().includes(s),
-    );
+    return (articles.data ?? []).filter((a: any) => {
+      const refs = a.refs ?? {};
+      const refBlob = [refs.books, refs.people, refs.concepts, refs.research]
+        .flat()
+        .filter(Boolean)
+        .join(" ");
+      return `${a.title} ${(a.themes || []).join(" ")} ${(a.questions || []).join(" ")} ${(a.key_ideas || []).join(" ")} ${refBlob} ${a.summary ?? ""} ${a.content_text ?? ""}`
+        .toLowerCase()
+        .includes(s);
+    });
   }, [articles.data, q]);
+
+  const unanalyzedCount = useMemo(
+    () => (articles.data ?? []).filter((a: any) => !a.analyzed_at).length,
+    [articles.data],
+  );
 
   const filteredKnowledge = useMemo(() => {
     const s = q.toLowerCase().trim();
