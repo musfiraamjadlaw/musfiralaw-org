@@ -99,7 +99,7 @@ TIME ESTIMATE: [realistic time for this first step only]`,
         <p className="text-[10px] tracking-[3px] uppercase text-muted-foreground mb-3">
           Field guide
         </p>
-        <h2 className="font-serif text-3xl leading-tight">The Activation Framework</h2>
+        <h1 className="font-serif text-3xl leading-tight">The Activation Framework</h1>
         <div
           className="mt-4 max-w-2xl text-foreground/80"
           style={{ fontFamily: "var(--font-serif)", fontSize: "17px", lineHeight: 1.7 }}
