@@ -5,37 +5,15 @@ export const Route = createFileRoute("/_authenticated/about")({
   component: AboutPage,
   head: () => ({
     meta: [
-      { title: "About — Cognitive OS" },
+      { title: "About — Untangle" },
       {
         name: "description",
         content:
-          "Notes from Musfira Amjad — molecular biology, behavioral neuroscience, and civil litigation. The space between systems and people.",
+          "Why I built Untangle — from discipline and productivity to the real question: what condition for action is missing?",
       },
     ],
   }),
 });
-
-const IMG_PORTRAIT =
-  "https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F163f23ce-6e2e-4936-a181-71a6ab769b4e_885x787.jpeg";
-const IMG_DESK =
-  "https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fe1072df6-26a6-46c3-b2dc-665ed1e91cb2_1080x720.jpeg";
-const IMG_BOOKS =
-  "https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F6317c4e3-7564-4af3-855a-d89507c161fc_695x657.jpeg";
-const IMG_CIRCLE =
-  "https://substackcdn.com/image/fetch/f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fdbd90b81-fd91-4282-89bd-ccd6da150946_736x736.jpeg";
-
-function Figure({ src, alt }: { src: string; alt: string }) {
-  return (
-    <figure className="my-10">
-      <img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        className="w-full h-auto rounded-sm border border-border shadow-sm"
-      />
-    </figure>
-  );
-}
 
 function AboutPage() {
   return (
@@ -48,105 +26,144 @@ function AboutPage() {
           className="text-foreground leading-tight"
           style={{ fontFamily: "var(--font-serif)", fontSize: "44px", fontWeight: 400 }}
         >
-          Hi! I'm Musfira.
+          Why I Built Untangle
         </h1>
-        <p
-          className="mt-4 text-muted-foreground italic"
-          style={{ fontFamily: "var(--font-serif)", fontSize: "18px" }}
-        >
-          So, clearly, I loved science enough to do it twice. I love a good argument more.
-          <span className="not-italic"> (Yes, these facts are related.)</span>
-        </p>
       </header>
-
-      <Figure src={IMG_PORTRAIT} alt="Musfira" />
 
       <div
         className="space-y-6 text-foreground"
         style={{ fontFamily: "var(--font-serif)", fontSize: "18px", lineHeight: 1.7 }}
       >
         <p>
-          <em>Molecular biology. Behavioral neuroscience.</em> Years spent learning how to look at
-          something broken and ask why, <em>precisely</em>, it broke. I liked the rigor of it. I
-          liked the quiet arrogance of believing the truth was discoverable if you were disciplined
-          enough to chase it. I was good at it. I was also, it turns out,{" "}
-          <em>deeply annoying at dinner parties. Shocker!</em>
-        </p>
-
-        <Figure src={IMG_DESK} alt="Desk" />
-
-        <p>
-          Somewhere in another universe I am wearing a white coat and saying things like{" "}
-          <em>"statistically significant"</em> with alarming sincerity. In this one, I accidentally
-          fell in love with litigation.
+          For a long time, I thought my problem was discipline.
         </p>
 
         <p>
-          I walked into a law firm and something clicked hard enough that I still cannot fully
-          explain it. Civil litigation is not what people think it is. It is rarely dramatic. Mostly
-          it is attention. Pattern recognition. Reading a case file the same way you read a lab
-          report:{" "}
-          <em>
-            looking for omitted variables, inconsistencies, narrative distortions, the exact moment
-            the story stops making sense.
-          </em>
-        </p>
-
-        <p className="italic text-muted-foreground">
-          The main difference is that lab reports do not cry on you. Depositions are just very
-          expensive experiments with worse coffee.
-        </p>
-
-        <Figure src={IMG_BOOKS} alt="Books" />
-
-        <p>
-          I work in law now — or as most people would say:{" "}
-          <em>
-            a person constitutionally incapable of letting a bad argument sit peacefully in the room
-            without doing something about it.
-          </em>{" "}
-          This is professionally useful and <em>personally exhausting.</em>
-        </p>
-
-        <blockquote
-          className="border-l-2 border-accent-foreground pl-6 my-10 text-foreground"
-          style={{ fontFamily: "var(--font-serif)", fontSize: "22px", lineHeight: 1.5 }}
-        >
-          What keeps me writing is the distance between systems and people.
-        </blockquote>
-
-        <p>
-          The law promises objectivity while being practiced by profoundly subjective human beings.
-          Medicine does this too. Every institution eventually runs into the same problem: people
-          are emotionally complex in ways systems hate accounting for. A client trying to compress
-          the worst year of their life into a chronology. A physician documenting symptoms while
-          missing the person attached to them. Rules written in the abstract, then handed to lives
-          that are anything but.
+          Then organization.
         </p>
 
         <p>
-          That gap fascinates me. It is where most of the interesting questions live — and where
-          most of the comfortable answers go to die.
+          Then productivity.
         </p>
 
         <p>
-          Martin Schwartz once described science as <em>productive stupidity.</em> The uncomfortable
-          experience of standing directly at the edge of your own understanding and staying there
-          long enough to learn something. The older I get, the less intelligence seems connected to
-          certainty. Real intelligence, to me, looks more like curiosity with endurance and a high
-          tolerance for being wrong in public.
+          Then ADHD.
         </p>
 
         <p>
-          Most of my writing starts there. Somewhere between ambition and meaning. Between ethics
-          and performance. Between wanting to understand people and realizing people do not
-          particularly enjoy being understood.
+          Then discipline again, because apparently I enjoy repeating failed experiments.
         </p>
 
-        <Figure src={IMG_CIRCLE} alt="Circle" />
+        <p>
+          The issue was that none of those explanations felt complete.
+        </p>
 
-        <p className="text-center text-foreground" style={{ fontSize: "20px" }}>
-          <em>The law matters. The person in front of you matters more.</em>
+        <p>
+          I could spend six hours reading case law, researching a question nobody asked, or disappearing down a behavioral neuroscience rabbit hole. But somehow answering an email felt like lifting a Honda Civic.
+        </p>
+
+        <p>
+          That never made sense to me.
+        </p>
+
+        <p>
+          I have a background in science. I work in litigation. In both worlds, when something doesn't make sense, you're supposed to investigate it.
+        </p>
+
+        <p>
+          Instead, most advice seemed content to stop at the observation.
+        </p>
+
+        <p>
+          You're overwhelmed.
+        </p>
+
+        <p>
+          You're procrastinating.
+        </p>
+
+        <p>
+          You're distracted.
+        </p>
+
+        <p>
+          Fine.
+        </p>
+
+        <p>
+          But those aren't explanations. They're descriptions.
+        </p>
+
+        <p>
+          The interesting question is <em>why.</em>
+        </p>
+
+        <p>
+          Over time, I started noticing patterns.
+        </p>
+
+        <p>
+          Sometimes I couldn't start because there was no urgency.
+        </p>
+
+        <p>
+          Sometimes because the task wasn't meaningful.
+        </p>
+
+        <p>
+          Sometimes because I was trying to hold twenty unfinished thoughts in my head at the same time.
+        </p>
+
+        <p>
+          Sometimes because I wasn't stuck at all — I just hadn't identified the real problem yet.
+        </p>
+
+        <p>
+          The more attention I paid, the less it felt like a character flaw and the more it felt like a system.
+        </p>
+
+        <p>
+          Untangle grew out of that realization.
+        </p>
+
+        <p>
+          Not as a productivity tool.
+        </p>
+
+        <p>
+          Not as a planner.
+        </p>
+
+        <p>
+          Not as a way to optimize every waking minute of my life.
+        </p>
+
+        <p>
+          Just a place to investigate what isn't making sense.
+        </p>
+
+        <p>
+          A place to take a thought like:
+        </p>
+
+        <p className="italic text-muted-foreground pl-6">
+          "I have a million things to do."
+        </p>
+
+        <p>
+          and ask:
+        </p>
+
+        <p className="italic text-muted-foreground pl-6">
+          "What's actually going on here?"
+        </p>
+
+        <p>
+          Because most of the time, the thing causing the problem isn't the thing we think is causing the problem.
+        </p>
+
+        <p>
+          And that's usually where the interesting answers live.
         </p>
       </div>
 
